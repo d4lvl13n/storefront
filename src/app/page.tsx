@@ -1,3 +1,4 @@
+import { unstable_noStore as noStore } from "next/cache";
 import { redirect } from "next/navigation";
 import { DefaultChannelSlug } from "@/app/config";
 
@@ -8,6 +9,10 @@ import { DefaultChannelSlug } from "@/app/config";
  * In development, shows setup instructions if not configured.
  */
 export default function RootPage() {
+	// Avoid long-lived caching on the root redirect response.
+	// We want clients/CDNs to always resolve the current default channel.
+	noStore();
+
 	if (DefaultChannelSlug) {
 		redirect(`/${DefaultChannelSlug}`);
 	}

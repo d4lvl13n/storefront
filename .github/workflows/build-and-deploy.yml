@@ -99,7 +99,7 @@ jobs:
               echo "FATAL: /opt/saleor/.env.prod not found. Aborting deploy to avoid broken compose state."
               exit 1
             fi
-            docker compose -f docker-compose.prod.yml --profile frontend --env-file .env.prod up -d --no-deps storefront
+            docker compose -f docker-compose.prod.yml --profile frontend --env-file .env.prod up -d --no-deps --force-recreate storefront
 
             # Cleanup
             rm -f "$ENV_BACKUP"
