@@ -2,9 +2,6 @@ import { unstable_noStore as noStore } from "next/cache";
 import { redirect } from "next/navigation";
 import { DefaultChannelSlug } from "@/app/config";
 
-export const dynamic = "force-dynamic";
-export const revalidate = 0;
-
 /**
  * Root page redirects to the default channel.
  *
