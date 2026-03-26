@@ -1,4 +1,3 @@
-import { Suspense } from "react";
 import { cacheLife, cacheTag } from "next/cache";
 import Image from "next/image";
 import {
@@ -839,64 +838,17 @@ function NewsletterSection() {
 
 // ─── Skeletons ──────────────────────────────────────────────
 
-function ProductGridSkeleton({ count = 8 }: { count?: number }) {
-	return (
-		<section className="bg-neutral-950">
-			<div className="mx-auto max-w-7xl px-6 py-20">
-				<div className="mb-12">
-					<div className="mb-2 h-3 w-16 animate-pulse rounded bg-neutral-800" />
-					<div className="h-9 w-56 animate-pulse rounded bg-neutral-800" />
-				</div>
-				<ul className="grid grid-cols-2 gap-4 sm:gap-6 lg:grid-cols-4">
-					{Array.from({ length: count }).map((_, i) => (
-						<li key={i} className="animate-pulse">
-							<div className="aspect-square rounded-2xl bg-neutral-800" />
-							<div className="mt-3 space-y-2 px-0.5">
-								<div className="h-2.5 w-16 rounded bg-neutral-800" />
-								<div className="h-3.5 w-28 rounded bg-neutral-800" />
-								<div className="h-3.5 w-16 rounded bg-neutral-800" />
-							</div>
-						</li>
-					))}
-				</ul>
-			</div>
-		</section>
-	);
-}
-
-function CollectionsSkeleton() {
-	return (
-		<section className="bg-neutral-950">
-			<div className="mx-auto max-w-7xl px-6 py-20">
-				<div className="mb-12">
-					<div className="mb-2 h-3 w-20 animate-pulse rounded bg-neutral-800" />
-					<div className="h-9 w-48 animate-pulse rounded bg-neutral-800" />
-				</div>
-				<div className="grid grid-cols-2 gap-4 sm:grid-cols-3">
-					{Array.from({ length: 6 }).map((_, i) => (
-						<div key={i} className="h-40 animate-pulse rounded-2xl bg-neutral-800" />
-					))}
-				</div>
-			</div>
-		</section>
-	);
-}
-
 // ─── Main Page ──────────────────────────────────────────────
 
-export default function Page(props: { params: Promise<{ channel: string }> }) {
+export default async function Page(props: { params: Promise<{ channel: string }> }) {
 	return (
 		<>
 			<HeroSection />
 			<TrustBar />
 
-			<Suspense fallback={<CollectionsSkeleton />}>
-				<ShopByGoalSection params={props.params} />
-			</Suspense>
+			<ShopByGoalSection params={props.params} />
 
-			<Suspense fallback={<ProductGridSkeleton />}>
-				<TabbedProductsSection params={props.params} />
-			</Suspense>
+			<TabbedProductsSection params={props.params} />
 
 			<ScienceQualitySection />
 
