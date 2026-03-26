@@ -5,7 +5,6 @@ import { Suspense, type ReactNode } from "react";
 import { DraftModeNotification } from "@/ui/components/draft-mode-notification";
 import { rootMetadata } from "@/lib/seo";
 import { localeConfig } from "@/config/locale";
-import { SpeedInsights } from "@vercel/speed-insights/next";
 
 /**
  * Root metadata for the entire site.
@@ -26,7 +25,6 @@ export default function RootLayout(props: { children: ReactNode }) {
 				<Suspense>
 					<DraftModeNotification />
 				</Suspense>
-				<SpeedInsights />
 			</body>
 		</html>
 	);
