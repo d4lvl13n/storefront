@@ -1,7 +1,7 @@
 import { GeistSans } from "geist/font/sans";
 import { GeistMono } from "geist/font/mono";
 import "./globals.css";
-import { Suspense, type ReactNode } from "react";
+import { type ReactNode } from "react";
 import { DraftModeNotification } from "@/ui/components/draft-mode-notification";
 import { rootMetadata } from "@/lib/seo";
 import { localeConfig } from "@/config/locale";
@@ -19,12 +19,11 @@ export default function RootLayout(props: { children: ReactNode }) {
 		<html
 			lang={localeConfig.htmlLang}
 			className={`dark ${GeistSans.variable} ${GeistMono.variable} min-h-dvh`}
+			suppressHydrationWarning
 		>
-			<body className="min-h-dvh font-sans">
+			<body className="min-h-dvh font-sans" suppressHydrationWarning>
 				{children}
-				<Suspense>
-					<DraftModeNotification />
-				</Suspense>
+				<DraftModeNotification />
 			</body>
 		</html>
 	);
