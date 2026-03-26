@@ -5,10 +5,10 @@
 	"type": "module",
 	"license": "SEE LICENSE IN LICENSE",
 	"scripts": {
-		"dev": "next dev --webpack",
+		"dev": "next dev",
 		"dev:webpack": "next dev --webpack",
-		"dev:turbopack": "next dev",
-		"build": "next build",
+		"dev:turbopack": "next dev --turbopack",
+		"build": "next build --webpack",
 		"start": "next start",
 		"predev": "pnpm run generate:all",
 		"prebuild": "node scripts/generate-all-if-possible.mjs",

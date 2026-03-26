@@ -38,7 +38,8 @@ ENV PATH="$PNPM_HOME:$PATH"
 RUN corepack enable
 
 # Skip codegen (prebuild) — generated types are committed in src/gql/
-RUN npx next build
+# Use webpack for production build stability while investigating Turbopack runtime crash.
+RUN npx next build --webpack
 
 # Production image, copy all the files and run next
 FROM base AS runner
