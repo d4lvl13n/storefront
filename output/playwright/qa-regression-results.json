@@ -1,0 +1,63 @@
+{
+	"generatedAt": "2026-03-24T13:32:42.430Z",
+	"baseUrl": "http://localhost:3102",
+	"channel": "us-us",
+	"results": {
+		"home": {
+			"status": "passed",
+			"url": "http://localhost:3102/us-us",
+			"details": "InfinityBio Labs — Pharmaceutical-Grade Research Peptides | InfinityBio Labs"
+		},
+		"nav-to-plp": {
+			"status": "failed",
+			"url": "http://localhost:3102/us-us",
+			"error": "page.waitForURL: Timeout 30000ms exceeded.\n=========================== logs ===========================\nwaiting for navigation until \"load\"\n============================================================",
+			"screenshot": "output/playwright/nav-to-plp-failure.png"
+		},
+		"pdp": {
+			"status": "failed",
+			"url": "http://localhost:3102/us-us",
+			"error": "locator.getAttribute: Target page, context or browser has been closed",
+			"screenshot": "output/playwright/pdp-failure.png"
+		},
+		"cart": {
+			"status": "failed",
+			"url": "http://localhost:3102/us-us",
+			"error": "locator.click: Target page, context or browser has been closed",
+			"screenshot": "output/playwright/cart-failure.png"
+		},
+		"checkout-entry": {
+			"status": "failed",
+			"url": "http://localhost:3102/us-us",
+			"error": "locator.getAttribute: Target page, context or browser has been closed",
+			"screenshot": "output/playwright/checkout-entry-failure.png"
+		},
+		"login": {
+			"status": "failed",
+			"url": "http://localhost:3102/us-us",
+			"error": "page.goto: Target page, context or browser has been closed",
+			"screenshot": "output/playwright/login-failure.png"
+		},
+		"mobile-home": {
+			"status": "failed",
+			"url": "http://localhost:3102/us-us",
+			"error": "page.setViewportSize: Target page, context or browser has been closed",
+			"screenshot": "output/playwright/mobile-home-failure.png"
+		},
+		"privacy": {
+			"status": "failed",
+			"url": "http://localhost:3102/us-us",
+			"error": "page.setViewportSize: Target page, context or browser has been closed",
+			"screenshot": "output/playwright/privacy-failure.png"
+		},
+		"terms": {
+			"status": "failed",
+			"url": "http://localhost:3102/us-us",
+			"error": "page.goto: Target page, context or browser has been closed",
+			"screenshot": "output/playwright/terms-failure.png"
+		}
+	},
+	"consoleMessages": [],
+	"pageErrors": ["Failed to execute 'insertBefore' on 'Node': The new child element contains the parent."],
+	"failedRequests": []
+}

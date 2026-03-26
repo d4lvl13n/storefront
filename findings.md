@@ -1,0 +1,25 @@
+# Findings
+
+- Active Paperclip task is `CODA-115`, a critical premium UX/UI audit for the Infinity BioLabs storefront.
+- `.env` targets the local stack: `NEXT_PUBLIC_SALEOR_API_URL=http://localhost:8000/graphql/`, `NEXT_PUBLIC_STOREFRONT_URL=http://localhost:3000`, and default channel `us-us`.
+- The earlier `500 Internal Server Error` blocker cleared after the board comment at `2026-03-24T13:34:38Z`; `/us-us` returned `200 OK` again and new screenshots were captured successfully.
+- Fresh OCR from `output/playwright/audit-home-desktop.png` and `output/playwright/audit-home-mobile.png` confirms strong premium-science positioning on the homepage: pharmaceutical-grade headline, explicit purity claims, COA/HPLC proof blocks, institution logos, testimonial quotes, and a research guide lead magnet. The trust narrative is materially stronger than a generic supplement storefront.
+- The homepage is conversion-light for an ecommerce landing page: on both desktop and mobile, several screens of validation content appear before meaningful catalog entry. `Shop by Goal` exists, but it sits well below the initial proof stack and testimonials.
+- Fresh OCR from `output/playwright/audit-plp-desktop.png` shows the PLP is functional but lightly merchandised for a premium biotech brand: product cards expose mostly category, name, and price, with little purity, documentation, shipping, or use-case context.
+- Fresh OCR from `output/playwright/audit-pdp-desktop.png` shows the PDP keeps variant pricing and trust rails (`Secure checkout`, free delivery, RUO disclaimer) visible, but above the fold it remains sparse and utilitarian versus the strong homepage brand promise. Proof assets such as COA previews or lab-validation summaries are not prominent there.
+- Fresh OCR from `output/playwright/audit-login-desktop.png` shows the login page is straightforward but generic, with minimal reassurance about secure account access, order history, or research account benefits. This is a missed trust moment for repeat buyers.
+- The direct `/checkout` route currently provides a poor empty-state experience. `src/app/checkout/page.tsx` returns `null` when neither `checkout` nor `order` is present, and the live capture at `output/playwright/audit-checkout-desktop.png` produced an almost empty dark shell rather than a redirect or helpful recovery path.
+- The current legal pages render correctly and the earlier malformed `/privacy/products` and `/terms/products` links are no longer reproducible in the live HTML; both pages now surface `/us-us/products`.
+- Earlier same-day smoke artifacts in `output/playwright/qa-smoke-results.json` still show useful warning-level quality signals that likely remain relevant:
+  - Cart/dialog flows emitted missing `Description` / `aria-describedby` warnings.
+  - A hero image optimization path returned `404`.
+  - The InfinityBio logo was flagged as the LCP image without eager loading.
+  - PDP variant selection fell back to a name-based selector because structured attributes were missing.
+- The board reopened `CODA-115` to turn the audit into delivery tasks. Follow-up issues created under this parent:
+  - `CODA-122` Redesign homepage to surface shopping paths earlier
+  - `CODA-123` Upgrade PLP merchandising for a premium biotech brand
+  - `CODA-124` Strengthen PDP above-the-fold proof and conversion context
+  - `CODA-125` Fix checkout empty-state and recovery experience
+  - `CODA-126` Improve login and returning-customer trust cues
+  - `CODA-127` Triage storefront UX polish issues from audit backlog
+- Attempting to assign the new subtasks to Avery through the API failed with `403 Missing permission: tasks:assign`, so the tickets were created unassigned with `Suggested owner: Avery` in the description.

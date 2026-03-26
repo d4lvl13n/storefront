@@ -1,0 +1,80 @@
+{
+	"generatedAt": "2026-03-24T09:17:09.059Z",
+	"results": {
+		"home": {
+			"status": "passed",
+			"url": "http://localhost:3000/us",
+			"details": "InfinityBio Labs — Pharmaceutical-Grade Research Peptides | InfinityBio Labs"
+		},
+		"plp": {
+			"status": "passed",
+			"url": "http://localhost:3000/us/products",
+			"details": "12 product links visible"
+		},
+		"pdp": {
+			"status": "passed",
+			"url": "http://localhost:3000/us/products/5-amino-1mq?variant=UHJvZHVjdFZhcmlhbnQ6NTQ4",
+			"details": "5-Amino-1MQ"
+		},
+		"cart": {
+			"status": "passed",
+			"url": "http://localhost:3000/us/products/5-amino-1mq?variant=UHJvZHVjdFZhcmlhbnQ6NTQ4",
+			"details": "Cart drawer shows added product"
+		},
+		"checkout": {
+			"status": "passed",
+			"url": "http://localhost:3000/us/products/5-amino-1mq?variant=UHJvZHVjdFZhcmlhbnQ6NTQ4",
+			"details": "{\"title\":\"Buy 5-Amino-1MQ 5mg | Research Peptides\",\"hasCheckoutText\":true}"
+		},
+		"login": {
+			"status": "passed",
+			"url": "http://localhost:3000/us/login",
+			"details": "Sign In"
+		},
+		"about": {
+			"status": "passed",
+			"url": "http://localhost:3000/us/pages/about",
+			"details": "About | InfinityBio Labs"
+		},
+		"privacy": {
+			"status": "passed",
+			"url": "http://localhost:3000/privacy",
+			"details": "{\"title\":\"InfinityBio Labs — Pharmaceutical-Grade Research Peptides | InfinityBio Labs\",\"allLinkHref\":\"/privacy/products\",\"hasPrivacyHeading\":true}"
+		},
+		"terms": {
+			"status": "passed",
+			"url": "http://localhost:3000/terms",
+			"details": "{\"title\":\"InfinityBio Labs — Pharmaceutical-Grade Research Peptides | InfinityBio Labs\",\"allLinkHref\":\"/terms/products\",\"hasTermsHeading\":true}"
+		}
+	},
+	"consoleMessages": [
+		"error: Failed to load resource: the server responded with a status of 404 (Not Found)",
+		"warning: Image with src \"/InfinityBio_logo.png\" was detected as the Largest Contentful Paint (LCP). Please add the `loading=\"eager\"` property if this image is above the fold.\nRead more: https://nextjs.org/docs/app/api-reference/components/image#loading",
+		"warning: [VariantSelectionSection] Product \"5-amino-1mq\" has 3 variants but no structured attributes. Using name-based fallback selector. For better UX (color swatches, size pills, cross-filtering), configure variant attributes in Saleor Dashboard.",
+		"warning: Warning: Missing `Description` or `aria-describedby={undefined}` for {DialogContent}.",
+		"warning: Warning: Missing `Description` or `aria-describedby={undefined}` for {DialogContent}.",
+		"warning: Detected `scroll-behavior: smooth` on the `<html>` element. To disable smooth scrolling during route transitions, add `data-scroll-behavior=\"smooth\"` to your <html> element. Learn more: https://nextjs.org/docs/messages/missing-data-scroll-behavior",
+		"warning: Image with src \"/InfinityBio_logo.png\" was detected as the Largest Contentful Paint (LCP). Please add the `loading=\"eager\"` property if this image is above the fold.\nRead more: https://nextjs.org/docs/app/api-reference/components/image#loading",
+		"error: Failed to load resource: the server responded with a status of 404 (Not Found)",
+		"error: Failed to load resource: the server responded with a status of 404 (Not Found)"
+	],
+	"pageErrors": [],
+	"failedRequests": [
+		{
+			"url": "http://localhost:3000/_next/image?url=%2F_next%2Fstatic%2Fmedia%2Fhero-2.256a9059.png&w=8&q=70",
+			"failure": "HTTP 404"
+		},
+		{
+			"url": "http://localhost:3000/us/products/5-amino-1mq?variant=UHJvZHVjdFZhcmlhbnQ6NTQ4",
+			"failure": "net::ERR_ABORTED"
+		},
+		{
+			"url": "http://localhost:3000/_next/image?url=%2F_next%2Fstatic%2Fmedia%2Fhero-2.256a9059.png&w=8&q=70",
+			"failure": "HTTP 404"
+		},
+		{
+			"url": "http://localhost:3000/_next/image?url=%2F_next%2Fstatic%2Fmedia%2Fhero-2.256a9059.png&w=8&q=70",
+			"failure": "HTTP 404"
+		}
+	]
+}

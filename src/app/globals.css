@@ -27,7 +27,7 @@
 	header[data-transparent] {
 		color: white;
 	}
-	header[data-transparent] img {
+	header[data-transparent] img:not([data-logo]) {
 		filter: brightness(10);
 	}
 	header[data-transparent] input {

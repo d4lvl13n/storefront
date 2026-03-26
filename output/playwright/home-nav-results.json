@@ -1,0 +1,10 @@
+{
+	"generatedAt": "2026-03-24T13:34:43.117Z",
+	"baseUrl": "http://localhost:3102",
+	"channel": "us-us",
+	"href": "/us-us/products",
+	"navigated": false,
+	"finalUrl": "http://localhost:3102/us-us",
+	"pageErrors": ["Failed to execute 'insertBefore' on 'Node': The new child element contains the parent."],
+	"consoleMessages": []
+}

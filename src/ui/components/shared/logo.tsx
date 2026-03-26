@@ -23,11 +23,12 @@ interface LogoProps {
 export const Logo = ({ className, ariaLabel = "InfinityBio Labs" }: LogoProps) => {
 	return (
 		<Image
-			src="/InfinityBio_logo.png"
+			src="/InfinityBio_logo1.png"
 			alt={ariaLabel}
 			width={140}
 			height={50}
-			className={`object-contain ${className ?? ""}`}
+			className={`logo-image object-contain ${className ?? ""}`}
+			data-logo="true"
 		/>
 	);
 };
