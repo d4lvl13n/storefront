@@ -238,3 +238,76 @@
 .legal-contact a:hover {
 	color: rgb(110 231 183);
 }
+
+@keyframes ib-story-float {
+	0%,
+	100% {
+		transform: translateY(0px);
+	}
+	50% {
+		transform: translateY(-6px);
+	}
+}
+
+@keyframes ib-story-sheen {
+	0% {
+		transform: translateX(-130%);
+		opacity: 0;
+	}
+	18%,
+	82% {
+		opacity: 1;
+	}
+	100% {
+		transform: translateX(130%);
+		opacity: 0;
+	}
+}
+
+@keyframes ib-story-breathe {
+	0%,
+	100% {
+		transform: scale(1);
+		opacity: 0.8;
+	}
+	50% {
+		transform: scale(1.02);
+		opacity: 1;
+	}
+}
+
+@keyframes ib-story-pulse {
+	0%,
+	100% {
+		box-shadow: 0 0 0 rgba(16, 185, 129, 0);
+	}
+	50% {
+		box-shadow: 0 0 24px rgba(16, 185, 129, 0.18);
+	}
+}
+
+@keyframes ib-story-scan {
+	0% {
+		transform: translateY(-10px);
+		opacity: 0;
+	}
+	15%,
+	85% {
+		opacity: 1;
+	}
+	100% {
+		transform: translateY(290px);
+		opacity: 0;
+	}
+}
+
+@media (prefers-reduced-motion: reduce) {
+	.verified-story-card *,
+	.verified-story-card *::before,
+	.verified-story-card *::after {
+		animation-duration: 0.01ms !important;
+		animation-iteration-count: 1 !important;
+		transition-duration: 0.01ms !important;
+		scroll-behavior: auto !important;
+	}
+}

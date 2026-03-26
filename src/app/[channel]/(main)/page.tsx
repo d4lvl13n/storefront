@@ -9,6 +9,9 @@ import {
 import { executePublicGraphQL } from "@/lib/graphql";
 import { LinkWithChannel } from "@/ui/atoms/link-with-channel";
 import { ProductTabs } from "./product-tabs";
+import { HowOrderingWorks } from "@/ui/components/how-ordering-works";
+import { VerifiedStoryCard } from "@/ui/components/verified-story-card";
+import { ShopGoalCard, shopGoalCardStyles } from "@/ui/components/shop-goal-card";
 
 export const metadata = {
 	title: "InfinityBio Labs — Pharmaceutical-Grade Research Peptides",
@@ -143,37 +146,6 @@ function IconLock({ className }: { className?: string }) {
 	);
 }
 
-// ─── Collection icon mapping ────────────────────────────────
-
-const collectionIcons: Record<string, string> = {
-	"anti-aging-longevity": "M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z",
-	"cognitive-mood":
-		"M12 18v-5.25m0 0a6.01 6.01 0 001.5-.189m-1.5.189a6.01 6.01 0 01-1.5-.189m3.75 7.478a12.06 12.06 0 01-4.5 0m3.75 2.383a14.406 14.406 0 01-3 0M14.25 18v-.192c0-.983.658-1.823 1.508-2.316a7.5 7.5 0 10-7.517 0c.85.493 1.509 1.333 1.509 2.316V18",
-	"growth-recovery":
-		"M2.25 18L9 11.25l4.306 4.306a11.95 11.95 0 015.814-5.518l2.74-1.22m0 0l-5.94-2.281m5.94 2.28l-2.28 5.941",
-	"weight-management":
-		"M3 13.125C3 12.504 3.504 12 4.125 12h2.25c.621 0 1.125.504 1.125 1.125v6.75C7.5 20.496 6.996 21 6.375 21h-2.25A1.125 1.125 0 013 19.875v-6.75zM9.75 8.625c0-.621.504-1.125 1.125-1.125h2.25c.621 0 1.125.504 1.125 1.125v11.25c0 .621-.504 1.125-1.125 1.125h-2.25a1.125 1.125 0 01-1.125-1.125V8.625zM16.5 4.125c0-.621.504-1.125 1.125-1.125h2.25C20.496 3 21 3.504 21 4.125v15.75c0 .621-.504 1.125-1.125 1.125h-2.25a1.125 1.125 0 01-1.125-1.125V4.125z",
-	performance: "M3.75 13.5l10.5-11.25L12 10.5h8.25L9.75 21.75 12 13.5H3.75",
-	"immune-support":
-		"M9 12.75L11.25 15 15 9.75m-3-7.036A11.959 11.959 0 013.598 6 11.99 11.99 0 003 9.749c0 5.592 3.824 10.29 9 11.623 5.176-1.332 9-6.03 9-11.622 0-1.31-.21-2.571-.598-3.751h-.152c-3.196 0-6.1-1.248-8.25-3.285z",
-	"sleep-recovery":
-		"M21.752 15.002A9.718 9.718 0 0118 15.75c-5.385 0-9.75-4.365-9.75-9.75 0-1.33.266-2.597.748-3.752A9.753 9.753 0 003 11.25C3 16.635 7.365 21 12.75 21a9.753 9.753 0 009.002-5.998z",
-	"sexual-health":
-		"M21 8.25c0-2.485-2.099-4.5-4.688-4.5-1.935 0-3.597 1.126-4.312 2.733-.715-1.607-2.377-2.733-4.313-2.733C5.1 3.75 3 5.765 3 8.25c0 7.22 9 12 9 12s9-4.78 9-12z",
-	"tanning-skin":
-		"M12 3v2.25m6.364.386l-1.591 1.591M21 12h-2.25m-.386 6.364l-1.591-1.591M12 18.75V21m-4.773-4.227l-1.591 1.591M5.25 12H3m4.227-4.773L5.636 5.636M15.75 12a3.75 3.75 0 11-7.5 0 3.75 3.75 0 017.5 0z",
-	aesthetics:
-		"M9.813 15.904L9 18.75l-.813-2.846a4.5 4.5 0 00-3.09-3.09L2.25 12l2.846-.813a4.5 4.5 0 003.09-3.09L9 5.25l.813 2.846a4.5 4.5 0 003.09 3.09L15.75 12l-2.846.813a4.5 4.5 0 00-3.09 3.09zM18.259 8.715L18 9.75l-.259-1.035a3.375 3.375 0 00-2.455-2.456L14.25 6l1.036-.259a3.375 3.375 0 002.455-2.456L18 2.25l.259 1.035a3.375 3.375 0 002.455 2.456L21.75 6l-1.036.259a3.375 3.375 0 00-2.455 2.456zM16.894 20.567L16.5 21.75l-.394-1.183a2.25 2.25 0 00-1.423-1.423L13.5 18.75l1.183-.394a2.25 2.25 0 001.423-1.423l.394-1.183.394 1.183a2.25 2.25 0 001.423 1.423l1.183.394-1.183.394a2.25 2.25 0 00-1.423 1.423z",
-	"fertility-hormonal":
-		"M9.75 3.104v5.714a2.25 2.25 0 01-.659 1.591L5 14.5M9.75 3.104c-.251.023-.501.05-.75.082m.75-.082a24.301 24.301 0 014.5 0m0 0v5.714c0 .597.237 1.17.659 1.591L19.8 15.3M14.25 3.104c.251.023.501.05.75.082M5 14.5l-.94.94a1.5 1.5 0 00-.22 1.927l2.3 3.45A1.5 1.5 0 007.39 21.5h9.22a1.5 1.5 0 001.25-.683l2.3-3.45a1.5 1.5 0 00-.22-1.927L19.8 15.3M5 14.5h14.8",
-	"vitamins-supplements":
-		"M4.26 10.147a60.436 60.436 0 00-.491 6.347A48.627 48.627 0 0112 20.904a48.627 48.627 0 018.232-4.41 60.46 60.46 0 00-.491-6.347m-15.482 0a50.57 50.57 0 00-2.658-.813A59.905 59.905 0 0112 3.493a59.902 59.902 0 0110.399 5.84c-.896.248-1.783.52-2.658.814m-15.482 0A50.697 50.697 0 0112 13.489a50.702 50.702 0 017.74-3.342",
-	accessories:
-		"M20.25 7.5l-.625 10.632a2.25 2.25 0 01-2.247 2.118H6.622a2.25 2.25 0 01-2.247-2.118L3.75 7.5M10 11.25h4M3.375 7.5h17.25c.621 0 1.125-.504 1.125-1.125v-1.5c0-.621-.504-1.125-1.125-1.125H3.375c-.621 0-1.125.504-1.125 1.125v1.5c0 .621.504 1.125 1.125 1.125z",
-	"recovery-healing":
-		"M21 8.25c0-2.485-2.099-4.5-4.688-4.5-1.935 0-3.597 1.126-4.312 2.733-.715-1.607-2.377-2.733-4.313-2.733C5.1 3.75 3 5.765 3 8.25c0 7.22 9 12 9 12s9-4.78 9-12z",
-};
-
 const collectionDescriptions: Record<string, string> = {
 	"anti-aging-longevity": "Peptides targeting cellular repair, telomere support, and age-related pathways.",
 	"cognitive-mood": "Nootropic compounds for memory, focus, and neurotransmitter research.",
@@ -190,24 +162,59 @@ const collectionDescriptions: Record<string, string> = {
 	"recovery-healing": "Restorative peptides for wound healing and tissue regeneration.",
 };
 
-function CollectionIcon({ slug, className }: { slug: string; className?: string }) {
-	const path = collectionIcons[slug];
-	if (!path) {
-		return (
-			<svg className={className} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={1.5}>
-				<path
-					strokeLinecap="round"
-					strokeLinejoin="round"
-					d="M9.75 3.104v5.714a2.25 2.25 0 01-.659 1.591L5 14.5M9.75 3.104c-.251.023-.501.05-.75.082m.75-.082a24.301 24.301 0 014.5 0m0 0v5.714c0 .597.237 1.17.659 1.591L19.8 15.3M14.25 3.104c.251.023.501.05.75.082M5 14.5l-.94.94a1.5 1.5 0 00-.22 1.927l2.3 3.45A1.5 1.5 0 007.39 21.5h9.22a1.5 1.5 0 001.25-.683l2.3-3.45a1.5 1.5 0 00-.22-1.927L19.8 15.3M5 14.5h14.8"
-				/>
-			</svg>
-		);
+function getCollectionDescription(slug: string) {
+	const exact = collectionDescriptions[slug];
+	if (exact) return exact;
+
+	if (slug.includes("anti") || slug.includes("longevity")) {
+		return "Peptides targeting cellular repair, telomere support, and age-related pathways.";
 	}
-	return (
-		<svg className={className} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={1.5}>
-			<path strokeLinecap="round" strokeLinejoin="round" d={path} />
-		</svg>
-	);
+
+	if (slug.includes("cognitive") || slug.includes("mood")) {
+		return "Nootropic compounds for memory, focus, and neurotransmitter research.";
+	}
+
+	if (slug.includes("growth") || slug.includes("recovery")) {
+		return "Growth factor peptides for tissue repair and musculoskeletal studies.";
+	}
+
+	if (slug.includes("weight") || slug.includes("metabolic")) {
+		return "Metabolic peptides for fat oxidation and appetite regulation research.";
+	}
+
+	if (slug.includes("immune")) {
+		return "Thymic peptides and immunomodulators for immune system research.";
+	}
+
+	if (slug.includes("sleep")) {
+		return "Peptides targeting circadian rhythm, deep sleep, and recovery cycles.";
+	}
+
+	if (slug.includes("sexual")) {
+		return "Compounds for reproductive health and sexual function research.";
+	}
+
+	if (slug.includes("skin") || slug.includes("tanning")) {
+		return "Melanocortin peptides for dermatological and pigmentation studies.";
+	}
+
+	if (slug.includes("aesthetic") || slug.includes("cosmetic")) {
+		return "Cosmetic peptides for skin elasticity, collagen synthesis, and tissue repair.";
+	}
+
+	if (slug.includes("fertility") || slug.includes("hormonal") || slug.includes("endocrine")) {
+		return "Hormonal peptides for reproductive and endocrine research.";
+	}
+
+	if (slug.includes("vitamin") || slug.includes("supplement")) {
+		return "Essential compounds supporting foundational health research.";
+	}
+
+	if (slug.includes("healing")) {
+		return "Restorative peptides for wound healing and tissue regeneration.";
+	}
+
+	return undefined;
 }
 
 // ─── Trust Items ────────────────────────────────────────────
@@ -225,28 +232,26 @@ const trustItems = [
 
 const qualityPillars = [
 	{
-		title: "HPLC Purity Analysis",
-		stat: "≥98%",
+		title: "≥99% Purity (HPLC)",
+		stat: "≥99%",
 		description:
-			"Every batch is analyzed via High-Performance Liquid Chromatography. We reject anything below our strict purity thresholds.",
+			"Each batch analyzed via High‑Performance Liquid Chromatography. Lots below our threshold are rejected.",
 	},
 	{
-		title: "Third-Party Verification",
+		title: "Third‑Party Lab Verification",
 		stat: "100%",
 		description:
-			"Independent accredited laboratories verify identity (mass spectrometry), purity, and endotoxin levels for every production lot.",
+			"Independent accredited laboratories verify identity (mass spectrometry), purity and endotoxin levels for every lot.",
 	},
 	{
-		title: "Cold-Chain Logistics",
+		title: "Low Endotoxin Levels",
+		stat: "<0.5 EU/mg",
+		description: "Endotoxin levels kept below 0.5 EU/mg, suitable for a wide range of in‑vitro applications.",
+	},
+	{
+		title: "Cold‑Chain Logistics",
 		stat: "2-8°C",
-		description:
-			"Temperature-controlled packaging from our facility to your lab. Lyophilized peptides shipped with cold packs to maintain stability.",
-	},
-	{
-		title: "Full Documentation",
-		stat: "COA",
-		description:
-			"Certificates of Analysis provided with every order. Batch-specific documentation including HPLC chromatograms and MS data.",
+		description: "Temperature‑controlled packaging ensures compound stability from our facility to your lab.",
 	},
 ];
 
@@ -306,7 +311,7 @@ function HeroSection() {
 	return (
 		<section className="noise-overlay relative -mt-16 flex min-h-[90vh] items-center overflow-hidden bg-neutral-950 pt-16">
 			{/* Full-bleed background image */}
-			<Image src="/hero-2.png" alt="" fill priority className="object-cover object-center" />
+			<Image src="/hero-2.webp" alt="" fill priority className="object-cover object-center" />
 
 			{/* Dark gradient overlay for text readability */}
 			<div className="absolute inset-0 bg-gradient-to-r from-neutral-950/95 via-neutral-950/80 to-neutral-950/60" />
@@ -444,9 +449,9 @@ function ScienceQualitySection() {
 				}}
 			/>
 
-			<div className="relative mx-auto max-w-7xl px-6 py-24 sm:py-32 lg:py-40">
+			<div className="relative mx-auto max-w-7xl px-6 py-20 sm:py-24 lg:py-28">
 				{/* Header */}
-				<div className="mb-16 text-center sm:mb-20">
+				<div className="mb-12 text-center sm:mb-14">
 					<p className="mb-4 text-sm font-medium uppercase tracking-[0.25em] text-emerald-400">
 						Quality Assurance
 					</p>
@@ -457,77 +462,32 @@ function ScienceQualitySection() {
 							a Verified Story
 						</span>
 					</h2>
-					<p className="mx-auto mt-8 max-w-xl text-lg leading-relaxed text-neutral-400">
+					<p className="mx-auto mt-6 max-w-xl text-lg leading-relaxed text-neutral-400">
 						From synthesis to your lab bench, every compound undergoes rigorous multi-stage verification.
 					</p>
 				</div>
 
 				{/* Two-column layout: COA card + quality pillars */}
-				<div className="grid items-start gap-10 sm:gap-16 lg:grid-cols-2 lg:gap-24">
-					{/* Left: Mock COA Document */}
+				<div className="grid items-start gap-8 sm:gap-10 lg:grid-cols-2 lg:gap-16">
+					{/* Left: Premium verified story card */}
 					<div className="relative">
-						<div className="absolute -inset-px animate-glow-pulse rounded-2xl bg-gradient-to-b from-emerald-500/20 via-emerald-500/5 to-transparent" />
-						<div className="relative overflow-hidden rounded-2xl border border-neutral-800 bg-neutral-900/90 backdrop-blur-sm">
-							{/* COA Header */}
-							<div className="border-b border-neutral-800 px-5 py-6 sm:px-8 sm:py-8 lg:px-12 lg:py-10">
-								<div className="flex items-center justify-between">
-									<div>
-										<p className="text-xs font-semibold uppercase tracking-[0.2em] text-neutral-500">
-											Certificate of Analysis
-										</p>
-										<p className="mt-3 text-xl font-bold text-white sm:text-2xl">
-											BPC-157 — Lot #IB-2026-0847
-										</p>
-									</div>
-									<div className="flex h-10 w-10 items-center justify-center rounded-full bg-emerald-500/20">
-										<svg className="h-5 w-5 text-emerald-400" viewBox="0 0 20 20" fill="currentColor">
-											<path
-												fillRule="evenodd"
-												d="M16.704 4.153a.75.75 0 01.143 1.052l-8 10.5a.75.75 0 01-1.127.075l-4.5-4.5a.75.75 0 011.06-1.06l3.894 3.893 7.48-9.817a.75.75 0 011.05-.143z"
-												clipRule="evenodd"
-											/>
-										</svg>
-									</div>
-								</div>
-							</div>
+						<VerifiedStoryCard />
 
-							{/* COA Data rows */}
-							<div className="divide-y divide-neutral-800/60 px-5 sm:px-8 lg:px-12">
-								{[
-									{ label: "Purity (HPLC)", value: "99.2%", status: "pass" },
-									{ label: "Identity (MS)", value: "Confirmed", status: "pass" },
-									{ label: "Endotoxin", value: "<0.5 EU/mg", status: "pass" },
-									{ label: "Appearance", value: "White lyophilized powder", status: "pass" },
-									{ label: "Molecular Weight", value: "1419.53 Da", status: "pass" },
-									{ label: "Sequence", value: "GEPPPGKPADDAGLV", status: "pass" },
-								].map((row) => (
-									<div key={row.label} className="flex items-center justify-between py-6">
-										<span className="text-sm font-medium text-neutral-400">{row.label}</span>
-										<div className="flex items-center gap-3">
-											<span className="font-mono text-sm font-semibold text-white">{row.value}</span>
-											<span className="flex h-5 w-5 items-center justify-center rounded-full bg-emerald-500/20">
-												<svg className="h-3 w-3 text-emerald-400" viewBox="0 0 20 20" fill="currentColor">
-													<path
-														fillRule="evenodd"
-														d="M16.704 4.153a.75.75 0 01.143 1.052l-8 10.5a.75.75 0 01-1.127.075l-4.5-4.5a.75.75 0 011.06-1.06l3.894 3.893 7.48-9.817a.75.75 0 011.05-.143z"
-														clipRule="evenodd"
-													/>
-												</svg>
-											</span>
-										</div>
-									</div>
-								))}
-							</div>
-
-							{/* COA Footer */}
-							<div className="border-t border-neutral-800 px-5 py-5 sm:px-8 sm:py-6 lg:px-12">
-								<div className="flex items-center justify-between">
-									<p className="text-xs text-neutral-500">Tested by independent accredited laboratory</p>
-									<span className="rounded-full bg-emerald-500/10 px-3 py-1 text-xs font-semibold text-emerald-400">
-										All Tests Passed
-									</span>
-								</div>
-							</div>
+						{/* Sample COA link */}
+						<div className="mt-4 text-center">
+							<LinkWithChannel
+								href="/sample-coa.pdf"
+								className="inline-flex items-center gap-2 text-sm font-medium text-emerald-400 transition-colors hover:text-emerald-300"
+							>
+								<svg className="h-4 w-4" viewBox="0 0 20 20" fill="currentColor">
+									<path
+										fillRule="evenodd"
+										d="M4 4a2 2 0 012-2h4.586A2 2 0 0112 2.586L15.414 6A2 2 0 0116 7.414V16a2 2 0 01-2 2H6a2 2 0 01-2-2V4zm2 6a1 1 0 011-1h6a1 1 0 110 2H7a1 1 0 01-1-1zm1 3a1 1 0 100 2h6a1 1 0 100-2H7z"
+										clipRule="evenodd"
+									/>
+								</svg>
+								View a sample Certificate of Analysis (PDF)
+							</LinkWithChannel>
 						</div>
 					</div>
 
@@ -544,6 +504,16 @@ function ScienceQualitySection() {
 								</p>
 							</div>
 						))}
+
+						<LinkWithChannel
+							href="/products"
+							className="inline-flex items-center gap-2 text-sm font-semibold text-emerald-400 transition-colors hover:text-emerald-300"
+						>
+							See COA on every product page
+							<svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+								<path strokeLinecap="round" strokeLinejoin="round" d="M13 7l5 5m0 0l-5 5m5-5H6" />
+							</svg>
+						</LinkWithChannel>
 					</div>
 				</div>
 			</div>
@@ -589,6 +559,7 @@ async function ShopByGoalSection({ params }: { params: Promise<{ channel: string
 			className="noise-overlay relative overflow-hidden bg-neutral-950 text-white"
 			aria-label="Shop by Goal"
 		>
+			<style>{shopGoalCardStyles}</style>
 			{/* Background */}
 			<div className="pointer-events-none absolute inset-0">
 				<div className="bg-emerald-500/8 absolute -left-40 top-0 h-[500px] w-[500px] rounded-full blur-[120px]" />
@@ -620,58 +591,8 @@ async function ShopByGoalSection({ params }: { params: Promise<{ channel: string
 				{/* Top 6 collections */}
 				<div className="grid grid-cols-1 gap-5 sm:grid-cols-2 sm:gap-6 lg:grid-cols-3">
 					{displayCollections.map((collection) => {
-						const description = collectionDescriptions[collection.slug];
-						return (
-							<LinkWithChannel
-								key={collection.id}
-								href={`/collections/${collection.slug}`}
-								className="group relative flex flex-col overflow-hidden rounded-3xl border border-white/[0.06] bg-gradient-to-b from-neutral-800/80 to-neutral-900/90 shadow-lg shadow-black/25 transition-all duration-500 hover:-translate-y-1 hover:border-emerald-500/20 hover:shadow-xl hover:shadow-emerald-900/30"
-							>
-								{/* Top-edge highlight — simulates light catching the surface */}
-								<div className="absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-white/[0.12] to-transparent" />
-
-								<div className="flex flex-1 flex-col justify-between p-7 sm:p-8 lg:p-9">
-									<div>
-										{/* Icon with soft radial glow */}
-										<div className="relative mb-6">
-											<div className="absolute -inset-3 rounded-full bg-emerald-500/[0.06] blur-xl transition-all duration-500 group-hover:bg-emerald-500/[0.12]" />
-											<div className="h-13 w-13 relative flex items-center justify-center rounded-2xl border border-emerald-500/[0.12] bg-emerald-500/[0.08] transition-all duration-300 group-hover:border-emerald-500/25 group-hover:bg-emerald-500/[0.14] sm:h-14 sm:w-14">
-												<CollectionIcon
-													slug={collection.slug}
-													className="h-6 w-6 text-emerald-400 sm:h-7 sm:w-7"
-												/>
-											</div>
-										</div>
-
-										<h3 className="text-lg font-semibold tracking-tight text-white/90 transition-colors duration-300 group-hover:text-white">
-											{collection.name}
-										</h3>
-										{description && (
-											<p className="mt-2.5 text-sm leading-relaxed text-neutral-500 transition-colors duration-300 group-hover:text-neutral-400">
-												{description}
-											</p>
-										)}
-									</div>
-
-									<div className="mt-7 flex items-center justify-between border-t border-white/[0.05] pt-5">
-										<span className="text-xs font-semibold uppercase tracking-[0.15em] text-neutral-600 transition-colors duration-300 group-hover:text-emerald-400">
-											Explore
-										</span>
-										<div className="flex h-8 w-8 items-center justify-center rounded-full border border-white/[0.08] bg-white/[0.03] transition-all duration-300 group-hover:border-emerald-500/30 group-hover:bg-emerald-500/10">
-											<svg
-												className="h-3.5 w-3.5 text-neutral-500 transition-all duration-300 group-hover:translate-x-0.5 group-hover:text-emerald-400"
-												fill="none"
-												viewBox="0 0 24 24"
-												stroke="currentColor"
-												strokeWidth={2}
-											>
-												<path strokeLinecap="round" strokeLinejoin="round" d="M13 7l5 5m0 0l-5 5m5-5H6" />
-											</svg>
-										</div>
-									</div>
-								</div>
-							</LinkWithChannel>
-						);
+						const description = getCollectionDescription(collection.slug);
+						return <ShopGoalCard key={collection.id} collection={collection} description={description} />;
 					})}
 				</div>
 			</div>
@@ -712,7 +633,10 @@ function TestimonialsSection() {
 					<p className="mb-3 text-sm font-medium uppercase tracking-[0.2em] text-emerald-400">
 						Trusted Worldwide
 					</p>
-					<h2 className="text-3xl font-bold tracking-tight sm:text-4xl lg:text-5xl">What Researchers Say</h2>
+					<h2 className="text-3xl font-bold tracking-tight sm:text-4xl lg:text-5xl">
+						Trusted by Researchers Worldwide
+					</h2>
+					<p className="mt-3 text-sm text-neutral-500">4.9/5 average rating across 1,200+ research orders.</p>
 				</div>
 
 				{/* Featured testimonial */}
@@ -746,6 +670,16 @@ function TestimonialsSection() {
 							<p className="text-lg font-semibold text-white">{featured.author}</p>
 							<p className="text-sm text-neutral-500">{featured.role}</p>
 						</div>
+						<span className="inline-flex items-center gap-1.5 rounded-full bg-emerald-500/10 px-3 py-1 text-xs font-medium text-emerald-400">
+							<svg className="h-3.5 w-3.5" viewBox="0 0 20 20" fill="currentColor">
+								<path
+									fillRule="evenodd"
+									d="M16.704 4.153a.75.75 0 01.143 1.052l-8 10.5a.75.75 0 01-1.127.075l-4.5-4.5a.75.75 0 011.06-1.06l3.894 3.893 7.48-9.817a.75.75 0 011.05-.143z"
+									clipRule="evenodd"
+								/>
+							</svg>
+							Verified Research Customer
+						</span>
 					</div>
 				</article>
 
@@ -773,13 +707,46 @@ function TestimonialsSection() {
 										.map((n) => n[0])
 										.join("")}
 								</div>
-								<div>
+								<div className="flex-1">
 									<p className="text-sm font-semibold text-white">{t.author}</p>
 									<p className="text-xs text-neutral-500">{t.role}</p>
 								</div>
+								<span className="inline-flex items-center gap-1 rounded-full bg-emerald-500/10 px-2.5 py-0.5 text-[10px] font-medium text-emerald-400">
+									<svg className="h-3 w-3" viewBox="0 0 20 20" fill="currentColor">
+										<path
+											fillRule="evenodd"
+											d="M16.704 4.153a.75.75 0 01.143 1.052l-8 10.5a.75.75 0 01-1.127.075l-4.5-4.5a.75.75 0 011.06-1.06l3.894 3.893 7.48-9.817a.75.75 0 011.05-.143z"
+											clipRule="evenodd"
+										/>
+									</svg>
+									Verified
+								</span>
 							</div>
 						</article>
 					))}
+				</div>
+
+				{/* Review links */}
+				<div className="mt-10 flex flex-col items-center gap-3 sm:flex-row sm:justify-center sm:gap-8">
+					<LinkWithChannel
+						href="/reviews"
+						className="inline-flex items-center gap-2 text-sm font-medium text-emerald-400 transition-colors hover:text-emerald-300"
+					>
+						Read all reviews
+						<svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+							<path strokeLinecap="round" strokeLinejoin="round" d="M13 7l5 5m0 0l-5 5m5-5H6" />
+						</svg>
+					</LinkWithChannel>
+					<span className="hidden text-neutral-700 sm:inline">·</span>
+					<LinkWithChannel
+						href="/partners"
+						className="inline-flex items-center gap-2 text-sm font-medium text-neutral-400 transition-colors hover:text-white"
+					>
+						See our RUO partners and case studies
+						<svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+							<path strokeLinecap="round" strokeLinejoin="round" d="M13 7l5 5m0 0l-5 5m5-5H6" />
+						</svg>
+					</LinkWithChannel>
 				</div>
 			</div>
 		</section>
@@ -789,6 +756,13 @@ function TestimonialsSection() {
 // ─── 8. Newsletter CTA (concrete offer) ────────────────────
 
 function NewsletterSection() {
+	const checklist = [
+		"Reconstitution protocols",
+		"pH & solvent tables",
+		"Freezer stability guidelines",
+		"Shipping vs. storage best practices",
+	];
+
 	return (
 		<section className="bg-neutral-950 px-6 py-24 sm:py-32" aria-label="Newsletter">
 			<div className="relative mx-auto max-w-4xl overflow-hidden rounded-3xl border border-white/[0.06] bg-gradient-to-b from-neutral-800/80 to-neutral-900/90 shadow-2xl shadow-black/30">
@@ -805,12 +779,28 @@ function NewsletterSection() {
 							Free Resource
 						</p>
 						<h2 className="text-3xl font-bold tracking-tight text-white sm:text-4xl lg:text-5xl">
-							Peptide Stability &amp; Storage Guide
+							Free Peptide Stability &amp; Storage Guide
 						</h2>
 						<p className="mx-auto mt-5 max-w-lg text-base leading-relaxed text-neutral-400">
-							Download our comprehensive guide on peptide reconstitution, storage protocols, and stability
-							data. Plus get early access to new compound launches.
+							Get our 20‑page reference guide on peptide reconstitution, storage protocols and stability data
+							— plus early access to new compound launches.
 						</p>
+
+						{/* Checklist */}
+						<ul className="mx-auto mt-6 flex max-w-lg flex-wrap justify-center gap-x-6 gap-y-2">
+							{checklist.map((item) => (
+								<li key={item} className="inline-flex items-center gap-1.5 text-sm text-neutral-400">
+									<svg className="h-4 w-4 shrink-0 text-emerald-500" viewBox="0 0 20 20" fill="currentColor">
+										<path
+											fillRule="evenodd"
+											d="M16.704 4.153a.75.75 0 01.143 1.052l-8 10.5a.75.75 0 01-1.127.075l-4.5-4.5a.75.75 0 011.06-1.06l3.894 3.893 7.48-9.817a.75.75 0 011.05-.143z"
+											clipRule="evenodd"
+										/>
+									</svg>
+									{item}
+								</li>
+							))}
+						</ul>
 
 						<div className="mx-auto mt-10 flex max-w-md flex-col gap-3 sm:flex-row">
 							<input
@@ -822,12 +812,13 @@ function NewsletterSection() {
 								type="button"
 								className="h-13 rounded-full bg-emerald-500 px-8 text-sm font-semibold text-white shadow-lg shadow-emerald-500/20 transition-all hover:bg-emerald-400 hover:shadow-xl hover:shadow-emerald-500/30"
 							>
-								Get Free Guide
+								Get the Free Guide
 							</button>
 						</div>
 
 						<p className="mt-5 text-xs leading-relaxed text-neutral-600">
-							Free PDF guide + research updates. No spam, ever. Unsubscribe anytime.
+							Used by lab managers and principal investigators in over 18 countries. No spam. Unsubscribe
+							anytime.
 						</p>
 					</div>
 				</div>
@@ -849,6 +840,8 @@ export default async function Page(props: { params: Promise<{ channel: string }>
 			<ShopByGoalSection params={props.params} />
 
 			<TabbedProductsSection params={props.params} />
+
+			<HowOrderingWorks />
 
 			<ScienceQualitySection />
 

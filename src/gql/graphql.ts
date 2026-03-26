@@ -33302,7 +33302,7 @@ export type CollectionsListQueryVariables = Exact<{
 }>;
 
 
-export type CollectionsListQuery = { __typename?: 'Query', collections?: { __typename?: 'CollectionCountableConnection', edges: Array<{ __typename?: 'CollectionCountableEdge', node: { __typename?: 'Collection', id: string, name: string, slug: string } }> } | null };
+export type CollectionsListQuery = { __typename?: 'Query', collections?: { __typename?: 'CollectionCountableConnection', edges: Array<{ __typename?: 'CollectionCountableEdge', node: { __typename?: 'Collection', id: string, name: string, slug: string, backgroundImage?: { __typename?: 'Image', url: string, alt?: string | null } | null } }> } | null };
 
 export type CurrentUserQueryVariables = Exact<{ [key: string]: never; }>;
 
@@ -34117,6 +34117,10 @@ export const CollectionsListDocument = new TypedDocumentString(`
         id
         name
         slug
+        backgroundImage {
+          url
+          alt
+        }
       }
     }
   }
