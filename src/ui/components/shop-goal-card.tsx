@@ -2,62 +2,6 @@ import Image from "next/image";
 import type { CollectionsListQuery } from "@/gql/graphql";
 import { LinkWithChannel } from "@/ui/atoms/link-with-channel";
 
-export const shopGoalCardStyles = `
-  @keyframes ib-goal-float {
-    0%, 100% { transform: translateY(0px); }
-    50% { transform: translateY(-7px); }
-  }
-
-  @keyframes ib-goal-pulse {
-    0%, 100% {
-      transform: scale(1);
-      opacity: 0.45;
-    }
-    50% {
-      transform: scale(1.05);
-      opacity: 0.9;
-    }
-  }
-
-  @keyframes ib-goal-sheen {
-    0% {
-      transform: translateX(-135%);
-      opacity: 0;
-    }
-    20%, 80% {
-      opacity: 1;
-    }
-    100% {
-      transform: translateX(135%);
-      opacity: 0;
-    }
-  }
-
-  @keyframes ib-goal-orbit {
-    0% { transform: rotate(0deg); }
-    100% { transform: rotate(360deg); }
-  }
-
-  @keyframes ib-goal-bar {
-    0%, 100% { transform: scaleY(0.45); opacity: 0.35; }
-    50% { transform: scaleY(1); opacity: 0.95; }
-  }
-
-  @keyframes ib-goal-drift {
-    0%, 100% { transform: translateX(0px); opacity: 0.35; }
-    50% { transform: translateX(8px); opacity: 0.9; }
-  }
-
-  @media (prefers-reduced-motion: reduce) {
-    * {
-      animation-duration: 0.01ms !important;
-      animation-iteration-count: 1 !important;
-      transition-duration: 0.01ms !important;
-      scroll-behavior: auto !important;
-    }
-  }
-`;
-
 type CollectionNode = NonNullable<NonNullable<CollectionsListQuery["collections"]>["edges"][number]>["node"];
 
 type HoverMediaOverride = {
@@ -434,7 +378,7 @@ export function ShopGoalCard({
 	return (
 		<LinkWithChannel
 			href={`/collections/${collection.slug}`}
-			className="hover:border-emerald-500/22 group relative flex min-h-[368px] flex-col overflow-hidden rounded-[1.9rem] border border-neutral-800/90 bg-neutral-950/95 shadow-[0_22px_60px_-34px_rgba(0,0,0,0.95)] transition-[transform,border-color,box-shadow,background-color] duration-500 hover:-translate-y-1.5 hover:shadow-[0_34px_90px_-42px_rgba(16,185,129,0.38)]"
+			className="shop-goal-card hover:border-emerald-500/22 group relative flex min-h-[368px] flex-col overflow-hidden rounded-[1.9rem] border border-neutral-800/90 bg-neutral-950/95 shadow-[0_22px_60px_-34px_rgba(0,0,0,0.95)] transition-[transform,border-color,box-shadow,background-color] duration-500 hover:-translate-y-1.5 hover:shadow-[0_34px_90px_-42px_rgba(16,185,129,0.38)]"
 		>
 			<div className="absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-white/10 to-transparent" />
 			<div className="pointer-events-none absolute inset-0 bg-gradient-to-br from-emerald-500/[0.035] via-transparent to-transparent opacity-70 transition-opacity duration-500 group-hover:opacity-100" />

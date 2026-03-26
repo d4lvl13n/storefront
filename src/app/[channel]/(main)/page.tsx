@@ -1,4 +1,3 @@
-import { cacheLife, cacheTag } from "next/cache";
 import Image from "next/image";
 import {
 	ProductListByCollectionDocument,
@@ -11,7 +10,7 @@ import { LinkWithChannel } from "@/ui/atoms/link-with-channel";
 import { ProductTabs } from "./product-tabs";
 import { HowOrderingWorks } from "@/ui/components/how-ordering-works";
 import { VerifiedStoryCard } from "@/ui/components/verified-story-card";
-import { ShopGoalCard, shopGoalCardStyles } from "@/ui/components/shop-goal-card";
+import { ShopGoalCard } from "@/ui/components/shop-goal-card";
 
 export const metadata = {
 	title: "InfinityBio Labs — Pharmaceutical-Grade Research Peptides",
@@ -22,10 +21,6 @@ export const metadata = {
 // ─── Data Fetchers ──────────────────────────────────────────
 
 async function getFeaturedProducts(channel: string) {
-	"use cache";
-	cacheLife("minutes");
-	cacheTag("collection:featured-products");
-
 	const result = await executePublicGraphQL(ProductListByCollectionDocument, {
 		variables: {
 			slug: "featured-products",
@@ -41,10 +36,6 @@ async function getFeaturedProducts(channel: string) {
 }
 
 async function getBestSellers(channel: string) {
-	"use cache";
-	cacheLife("minutes");
-	cacheTag("collection:best-sellers");
-
 	const result = await executePublicGraphQL(ProductListByCollectionDocument, {
 		variables: {
 			slug: "summer-picks",
@@ -60,10 +51,6 @@ async function getBestSellers(channel: string) {
 }
 
 async function getCollections(channel: string) {
-	"use cache";
-	cacheLife("hours");
-	cacheTag("collections");
-
 	const result = await executePublicGraphQL(CollectionsListDocument, {
 		variables: { channel, first: 20 },
 		revalidate: 3600,
@@ -559,7 +546,6 @@ async function ShopByGoalSection({ params }: { params: Promise<{ channel: string
 			className="noise-overlay relative overflow-hidden bg-neutral-950 text-white"
 			aria-label="Shop by Goal"
 		>
-			<style>{shopGoalCardStyles}</style>
 			{/* Background */}
 			<div className="pointer-events-none absolute inset-0">
 				<div className="bg-emerald-500/8 absolute -left-40 top-0 h-[500px] w-[500px] rounded-full blur-[120px]" />

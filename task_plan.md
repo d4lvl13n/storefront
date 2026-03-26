@@ -1,3 +1,22 @@
+# Production Hydration Investigation
+
+## Goal
+
+Find why the storefront works in local development but fails after production deploy with React hydration error `#418`, then identify the most likely fix or set of fixes.
+
+## Phases
+
+- [completed] Audit current config and likely hydration mismatch sources
+- [completed] Reproduce production build locally
+- [completed] Narrow the failing route/component
+- [completed] Apply fix and verify with production build
+
+## Errors Encountered
+
+| Error                                                      | Attempt | Resolution                                                                                                                 |
+| ---------------------------------------------------------- | ------- | -------------------------------------------------------------------------------------------------------------------------- |
+| `use cache` build errors after disabling `cacheComponents` | 1       | Removed `use cache` / `cacheLife` / `cacheTag` from affected routes and components, kept fetch-level `revalidate` behavior |
+
 # Task Plan
 
 ## Goal

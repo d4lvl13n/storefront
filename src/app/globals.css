@@ -239,6 +239,134 @@
 	color: rgb(110 231 183);
 }
 
+@keyframes ib-float {
+	0%,
+	100% {
+		transform: translateY(0px);
+	}
+	50% {
+		transform: translateY(-5px);
+	}
+}
+
+@keyframes ib-card-enter {
+	0% {
+		opacity: 0;
+		transform: translateY(18px) scale(0.985);
+	}
+	100% {
+		opacity: 1;
+		transform: translateY(0) scale(1);
+	}
+}
+
+@keyframes ib-breathe {
+	0%,
+	100% {
+		transform: scale(1);
+		opacity: 0.88;
+	}
+	50% {
+		transform: scale(1.015);
+		opacity: 1;
+	}
+}
+
+@keyframes ib-sheen {
+	0% {
+		transform: translateX(-130%);
+		opacity: 0;
+	}
+	20%,
+	80% {
+		opacity: 1;
+	}
+	100% {
+		transform: translateX(130%);
+		opacity: 0;
+	}
+}
+
+@keyframes ib-badge-glow {
+	0%,
+	100% {
+		box-shadow: 0 0 0 rgba(16, 185, 129, 0);
+	}
+	50% {
+		box-shadow: 0 0 22px rgba(16, 185, 129, 0.14);
+	}
+}
+
+@keyframes ib-goal-float {
+	0%,
+	100% {
+		transform: translateY(0px);
+	}
+	50% {
+		transform: translateY(-7px);
+	}
+}
+
+@keyframes ib-goal-pulse {
+	0%,
+	100% {
+		transform: scale(1);
+		opacity: 0.45;
+	}
+	50% {
+		transform: scale(1.05);
+		opacity: 0.9;
+	}
+}
+
+@keyframes ib-goal-sheen {
+	0% {
+		transform: translateX(-135%);
+		opacity: 0;
+	}
+	20%,
+	80% {
+		opacity: 1;
+	}
+	100% {
+		transform: translateX(135%);
+		opacity: 0;
+	}
+}
+
+@keyframes ib-goal-orbit {
+	0% {
+		transform: rotate(0deg);
+	}
+	100% {
+		transform: rotate(360deg);
+	}
+}
+
+@keyframes ib-goal-bar {
+	0%,
+	100% {
+		transform: scaleY(0.45);
+		opacity: 0.35;
+	}
+	50% {
+		transform: scaleY(1);
+		opacity: 0.95;
+	}
+}
+
+@keyframes ib-goal-drift {
+	0%,
+	100% {
+		transform: translateX(0px);
+		opacity: 0.35;
+	}
+	50% {
+		transform: translateX(8px);
+		opacity: 0.9;
+	}
+}
+
 @keyframes ib-story-float {
 	0%,
 	100% {
@@ -302,6 +430,18 @@
 }
 
 @media (prefers-reduced-motion: reduce) {
+	.how-ordering-works,
+	.how-ordering-works::before,
+	.how-ordering-works::after,
+	.how-ordering-works *,
+	.how-ordering-works *::before,
+	.how-ordering-works *::after,
+	.shop-goal-card,
+	.shop-goal-card::before,
+	.shop-goal-card::after,
+	.shop-goal-card *,
+	.shop-goal-card *::before,
+	.shop-goal-card *::after,
 	.verified-story-card *,
 	.verified-story-card *::before,
 	.verified-story-card *::after {

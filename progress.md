@@ -1,3 +1,16 @@
+# Progress Log
+
+## 2026-03-26
+
+- Started production hydration mismatch investigation.
+- Checked existing terminal sessions to avoid duplicating running servers.
+- Read planning workflow guidance and created project-local investigation files.
+- Searched the codebase for common hydration mismatch patterns and found remaining inline style tags in homepage-related code.
+- Disabled `cacheComponents` in `next.config.js`.
+- Moved homepage animation styles out of inline `<style>` tags and into `src/app/globals.css`.
+- Removed `use cache` directives from affected routes/components so the app builds with `cacheComponents` disabled.
+- Rebuilt the app successfully and verified the local production homepage renders all main sections without hydration errors.
+
 # Progress
 
 - Checked Paperclip identity, inbox, heartbeat context, and the new board comment for `CODA-115`.

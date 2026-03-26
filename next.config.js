@@ -5,10 +5,10 @@ const config = {
 
 	// FINDING-10: Remove X-Powered-By header
 	poweredByHeader: false,
-	// Cache Components (Partial Prerendering)
-	// Enables mixing static, cached, and dynamic content in a single route.
-	// See: https://nextjs.org/docs/app/getting-started/cache-components
-	cacheComponents: true,
+	// Cache Components (Partial Prerendering) — DISABLED
+	// Production refreshes intermittently lose the main route subtree due to
+	// hydration/resumability mismatches, so keep this off until the app is stable.
+	cacheComponents: false,
 
 	// Optimize barrel file imports for better bundle size and cold start performance
 	// See: https://vercel.com/blog/how-we-optimized-package-imports-in-next-js

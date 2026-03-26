@@ -1,5 +1,14 @@
 # Findings
 
+- Investigation started for production-only React hydration error `#418`.
+- Existing repo context suggests `cacheComponents` / Partial Prerendering has previously caused deploy-time resumable slot mismatches.
+- Initial search found inline `<style>` tags in `src/ui/components/how-ordering-works.tsx` and `src/app/[channel]/(main)/page.tsx`, both worth validating against production rendering behavior.
+- The failure pattern was intermittent on refresh and isolated to the `props.children` subtree in `src/app/[channel]/(main)/layout.tsx`, while header/footer continued rendering.
+- Disabling `cacheComponents` required removing `use cache` directives from homepage, product/category/collection pages, footer, and nav links.
+- After the changes, the production build succeeded and the local production homepage rendered with hero + all main sections visible and no React hydration errors.
+
+# Findings
+
 - Active Paperclip task is `CODA-115`, a critical premium UX/UI audit for the Infinity BioLabs storefront.
 - `.env` targets the local stack: `NEXT_PUBLIC_SALEOR_API_URL=http://localhost:8000/graphql/`, `NEXT_PUBLIC_STOREFRONT_URL=http://localhost:3000`, and default channel `us-us`.
 - The earlier `500 Internal Server Error` blocker cleared after the board comment at `2026-03-24T13:34:38Z`; `/us-us` returned `200 OK` again and new screenshots were captured successfully.
