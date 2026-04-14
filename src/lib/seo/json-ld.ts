@@ -1,4 +1,4 @@
-import { type WithContext, type Product, type FAQPage, type BreadcrumbList } from "schema-dts";
+import { type WithContext, type Product, type FAQPage, type BreadcrumbList, type HowTo } from "schema-dts";
 import { seoConfig, getBaseUrl } from "./config";
 
 /**
@@ -154,6 +154,37 @@ export function buildBreadcrumbJsonLd(
 			position: index + 1,
 			name: item.label,
 			...(item.href && { item: `${baseUrl}${item.href}` }),
+		})),
+	};
+}
+
+/**
+ * HowTo JSON-LD structured data builder
+ *
+ * Creates Schema.org HowTo markup for step-by-step guides in Google search.
+ * @see https://developers.google.com/search/docs/appearance/structured-data/how-to
+ */
+export function buildHowToJsonLd(options: {
+	name: string;
+	description: string;
+	steps: { name: string; text: string }[];
+	totalTime?: string; // ISO 8601 duration, e.g. "PT5M"
+}): WithContext<HowTo> | null {
+	if (!seoConfig.enableJsonLd || options.steps.length === 0) {
+		return null;
+	}
+
+	return {
+		"@context": "https://schema.org",
+		"@type": "HowTo",
+		name: options.name,
+		description: options.description,
+		...(options.totalTime && { totalTime: options.totalTime }),
+		step: options.steps.map((step, index) => ({
+			"@type": "HowToStep" as const,
+			position: index + 1,
+			name: step.name,
+			text: step.text,
 		})),
 	};
 }
