@@ -62,7 +62,7 @@ const steps = [
 
 export default function AffiliatePage() {
 	return (
-		<div className="bg-neutral-950 text-white">
+		<div className="bg-background text-foreground">
 			{/* Hero */}
 			<section className="relative overflow-hidden py-24 sm:py-32">
 				<div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top,_var(--tw-gradient-stops))] from-emerald-900/20 via-transparent to-transparent" />
@@ -74,7 +74,7 @@ export default function AffiliatePage() {
 						<h1 className="mt-4 text-3xl font-bold tracking-tight sm:text-4xl lg:text-5xl">
 							Earn With InfinityBio Labs
 						</h1>
-						<p className="mt-6 text-lg leading-relaxed text-neutral-300">
+						<p className="mt-6 text-lg leading-relaxed text-muted-foreground">
 							Partner with us and earn commissions promoting pharmaceutical-grade research peptides. Whether
 							you&apos;re a researcher, content creator, or industry professional — there&apos;s a place for
 							you in our program.
@@ -84,7 +84,7 @@ export default function AffiliatePage() {
 			</section>
 
 			{/* Benefits */}
-			<section className="border-t border-neutral-800 py-24 sm:py-32">
+			<section className="border-t border-border py-24 sm:py-32">
 				<div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
 					<div className="mx-auto max-w-2xl text-center">
 						<p className="text-sm font-medium uppercase tracking-[0.25em] text-emerald-400">Why Join</p>
@@ -96,13 +96,13 @@ export default function AffiliatePage() {
 						{benefits.map((benefit) => (
 							<div
 								key={benefit.title}
-								className="rounded-xl border border-neutral-800 bg-neutral-900/60 p-6 transition-colors hover:border-neutral-700"
+								className="rounded-xl border border-border bg-card p-6 transition-colors hover:border-border"
 							>
 								<div className="flex h-10 w-10 items-center justify-center rounded-lg bg-emerald-500/10">
 									<benefit.icon className="h-5 w-5 text-emerald-400" />
 								</div>
 								<h3 className="mt-4 text-lg font-semibold">{benefit.title}</h3>
-								<p className="mt-2 text-sm leading-relaxed text-neutral-400">{benefit.description}</p>
+								<p className="mt-2 text-sm leading-relaxed text-muted-foreground">{benefit.description}</p>
 							</div>
 						))}
 					</div>
@@ -110,7 +110,7 @@ export default function AffiliatePage() {
 			</section>
 
 			{/* How it works */}
-			<section className="border-t border-neutral-800 py-24 sm:py-32">
+			<section className="border-t border-border py-24 sm:py-32">
 				<div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
 					<div className="mx-auto max-w-2xl text-center">
 						<p className="text-sm font-medium uppercase tracking-[0.25em] text-emerald-400">How It Works</p>
@@ -125,7 +125,7 @@ export default function AffiliatePage() {
 									<span className="text-lg font-bold text-emerald-400">{item.step}</span>
 								</div>
 								<h3 className="mt-6 text-xl font-semibold">{item.title}</h3>
-								<p className="mt-3 text-sm leading-relaxed text-neutral-400">{item.description}</p>
+								<p className="mt-3 text-sm leading-relaxed text-muted-foreground">{item.description}</p>
 							</div>
 						))}
 					</div>
@@ -133,7 +133,7 @@ export default function AffiliatePage() {
 			</section>
 
 			{/* Application Form */}
-			<section id="apply" className="border-t border-neutral-800 py-24 sm:py-32">
+			<section id="apply" className="border-t border-border py-24 sm:py-32">
 				<div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
 					<div className="mx-auto max-w-2xl">
 						<div className="text-center">
@@ -141,7 +141,7 @@ export default function AffiliatePage() {
 							<h2 className="mt-4 text-3xl font-bold tracking-tight sm:text-4xl">
 								Join Our Affiliate Program
 							</h2>
-							<p className="mt-4 text-neutral-400">
+							<p className="mt-4 text-muted-foreground">
 								Tell us about yourself and how you plan to promote InfinityBio Labs. We review every
 								application and typically respond within a few business days.
 							</p>

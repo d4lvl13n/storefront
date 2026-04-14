@@ -51,7 +51,7 @@ export default function ContactPage() {
 	}
 
 	return (
-		<div className="bg-neutral-950 text-white">
+		<div className="bg-background text-foreground">
 			{/* Hero */}
 			<section className="relative overflow-hidden py-20 sm:py-28">
 				<div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top,_var(--tw-gradient-stops))] from-emerald-900/20 via-transparent to-transparent" />
@@ -59,7 +59,7 @@ export default function ContactPage() {
 					<div className="mx-auto max-w-3xl text-center">
 						<p className="text-sm font-medium uppercase tracking-[0.25em] text-emerald-400">Get in Touch</p>
 						<h1 className="mt-4 text-3xl font-bold tracking-tight sm:text-4xl lg:text-5xl">Contact Us</h1>
-						<p className="mt-6 text-base leading-relaxed text-neutral-300 sm:text-lg">
+						<p className="mt-6 text-base leading-relaxed text-muted-foreground sm:text-lg">
 							Questions about products, bulk pricing, or your order? Our team typically responds within one
 							business day.
 						</p>
@@ -73,7 +73,7 @@ export default function ContactPage() {
 						{/* Contact info */}
 						<div className="lg:col-span-2">
 							<h2 className="text-xl font-bold sm:text-2xl">How can we help?</h2>
-							<p className="mt-4 text-sm leading-relaxed text-neutral-400">
+							<p className="mt-4 text-sm leading-relaxed text-muted-foreground">
 								Whether you need a Certificate of Analysis, want to discuss bulk orders, or have a technical
 								question about our compounds — we&apos;re here.
 							</p>
@@ -84,7 +84,7 @@ export default function ContactPage() {
 									<dd className="mt-2">
 										<a
 											href="mailto:support@infinitybiolabs.com"
-											className="text-sm text-neutral-300 transition-colors hover:text-white"
+											className="text-sm text-foreground transition-colors hover:text-foreground"
 										>
 											support@infinitybiolabs.com
 										</a>
@@ -94,13 +94,13 @@ export default function ContactPage() {
 									<dt className="text-xs font-medium uppercase tracking-wider text-emerald-400">
 										Response Time
 									</dt>
-									<dd className="mt-2 text-sm text-neutral-400">Within 1 business day (Mon-Fri)</dd>
+									<dd className="mt-2 text-sm text-muted-foreground">Within 1 business day (Mon-Fri)</dd>
 								</div>
 								<div>
 									<dt className="text-xs font-medium uppercase tracking-wider text-emerald-400">
 										Bulk Orders
 									</dt>
-									<dd className="mt-2 text-sm text-neutral-400">
+									<dd className="mt-2 text-sm text-muted-foreground">
 										For institutional pricing and NET-30 terms, select &quot;Bulk / institutional
 										pricing&quot; in the form.
 									</dd>
@@ -122,13 +122,15 @@ export default function ContactPage() {
 										</svg>
 									</div>
 									<h3 className="mt-6 text-xl font-bold">Message Sent</h3>
-									<p className="mt-2 text-neutral-400">We&apos;ll get back to you within one business day.</p>
+									<p className="mt-2 text-muted-foreground">
+										We&apos;ll get back to you within one business day.
+									</p>
 								</div>
 							) : (
 								<form onSubmit={handleSubmit} className="space-y-6">
 									<div className="grid gap-6 sm:grid-cols-2">
 										<div>
-											<label htmlFor="name" className="mb-2 block text-sm font-medium text-neutral-300">
+											<label htmlFor="name" className="mb-2 block text-sm font-medium text-foreground">
 												Full Name
 											</label>
 											<input
@@ -136,12 +138,12 @@ export default function ContactPage() {
 												name="name"
 												type="text"
 												required
-												className="h-12 w-full rounded-xl border border-neutral-800 bg-neutral-900/60 px-4 text-sm text-white placeholder-neutral-500 outline-none transition-colors focus:border-emerald-500 focus:ring-1 focus:ring-emerald-500"
+												className="h-12 w-full rounded-xl border border-border bg-card px-4 text-sm text-foreground placeholder-muted-foreground outline-none transition-colors focus:border-emerald-500 focus:ring-1 focus:ring-emerald-500"
 												placeholder="Dr. Jane Smith"
 											/>
 										</div>
 										<div>
-											<label htmlFor="email" className="mb-2 block text-sm font-medium text-neutral-300">
+											<label htmlFor="email" className="mb-2 block text-sm font-medium text-foreground">
 												Email
 											</label>
 											<input
@@ -149,34 +151,34 @@ export default function ContactPage() {
 												name="email"
 												type="email"
 												required
-												className="h-12 w-full rounded-xl border border-neutral-800 bg-neutral-900/60 px-4 text-sm text-white placeholder-neutral-500 outline-none transition-colors focus:border-emerald-500 focus:ring-1 focus:ring-emerald-500"
+												className="h-12 w-full rounded-xl border border-border bg-card px-4 text-sm text-foreground placeholder-muted-foreground outline-none transition-colors focus:border-emerald-500 focus:ring-1 focus:ring-emerald-500"
 												placeholder="jane@university.edu"
 											/>
 										</div>
 									</div>
 
 									<div>
-										<label htmlFor="institution" className="mb-2 block text-sm font-medium text-neutral-300">
+										<label htmlFor="institution" className="mb-2 block text-sm font-medium text-foreground">
 											Institution / Organization
 										</label>
 										<input
 											id="institution"
 											name="institution"
 											type="text"
-											className="h-12 w-full rounded-xl border border-neutral-800 bg-neutral-900/60 px-4 text-sm text-white placeholder-neutral-500 outline-none transition-colors focus:border-emerald-500 focus:ring-1 focus:ring-emerald-500"
+											className="h-12 w-full rounded-xl border border-border bg-card px-4 text-sm text-foreground placeholder-muted-foreground outline-none transition-colors focus:border-emerald-500 focus:ring-1 focus:ring-emerald-500"
 											placeholder="Stanford University"
 										/>
 									</div>
 
 									<div>
-										<label htmlFor="reason" className="mb-2 block text-sm font-medium text-neutral-300">
+										<label htmlFor="reason" className="mb-2 block text-sm font-medium text-foreground">
 											Reason for Contact
 										</label>
 										<select
 											id="reason"
 											name="reason"
 											required
-											className="h-12 w-full rounded-xl border border-neutral-800 bg-neutral-900/60 px-4 text-sm text-white outline-none transition-colors focus:border-emerald-500 focus:ring-1 focus:ring-emerald-500"
+											className="h-12 w-full rounded-xl border border-border bg-card px-4 text-sm text-foreground outline-none transition-colors focus:border-emerald-500 focus:ring-1 focus:ring-emerald-500"
 										>
 											<option value="">Select a reason...</option>
 											{contactReasons.map((reason) => (
@@ -188,7 +190,7 @@ export default function ContactPage() {
 									</div>
 
 									<div>
-										<label htmlFor="message" className="mb-2 block text-sm font-medium text-neutral-300">
+										<label htmlFor="message" className="mb-2 block text-sm font-medium text-foreground">
 											Message
 										</label>
 										<textarea
@@ -196,7 +198,7 @@ export default function ContactPage() {
 											name="message"
 											required
 											rows={5}
-											className="w-full rounded-xl border border-neutral-800 bg-neutral-900/60 px-4 py-3 text-sm text-white placeholder-neutral-500 outline-none transition-colors focus:border-emerald-500 focus:ring-1 focus:ring-emerald-500"
+											className="w-full rounded-xl border border-border bg-card px-4 py-3 text-sm text-foreground placeholder-muted-foreground outline-none transition-colors focus:border-emerald-500 focus:ring-1 focus:ring-emerald-500"
 											placeholder="Tell us how we can help..."
 										/>
 									</div>

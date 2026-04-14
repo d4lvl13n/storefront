@@ -50,7 +50,7 @@ export function AffiliateApplicationForm() {
 			<div className="rounded-xl border border-emerald-500/30 bg-emerald-500/10 p-8 text-center">
 				<CheckCircle className="mx-auto h-12 w-12 text-emerald-400" />
 				<h3 className="mt-4 text-xl font-semibold">Application Submitted</h3>
-				<p className="mt-2 text-neutral-300">
+				<p className="mt-2 text-foreground">
 					Thank you for your interest. We&apos;ll review your application and get back to you within a few
 					business days.
 				</p>
@@ -70,7 +70,7 @@ export function AffiliateApplicationForm() {
 			<div className="grid gap-6 sm:grid-cols-2">
 				{/* Name */}
 				<div>
-					<label htmlFor="name" className="mb-2 block text-sm font-medium text-neutral-200">
+					<label htmlFor="name" className="mb-2 block text-sm font-medium text-foreground">
 						Full Name <span className="text-red-400">*</span>
 					</label>
 					<input
@@ -80,13 +80,13 @@ export function AffiliateApplicationForm() {
 						required
 						maxLength={200}
 						placeholder="John Doe"
-						className="flex h-10 w-full rounded-md border border-neutral-700 bg-neutral-800 px-3 py-2 text-sm text-white placeholder:text-neutral-500 focus:border-emerald-500 focus:outline-none focus:ring-1 focus:ring-emerald-500"
+						className="flex h-10 w-full rounded-md border border-border bg-secondary px-3 py-2 text-sm text-foreground placeholder:text-muted-foreground focus:border-emerald-500 focus:outline-none focus:ring-1 focus:ring-emerald-500"
 					/>
 				</div>
 
 				{/* Email */}
 				<div>
-					<label htmlFor="email" className="mb-2 block text-sm font-medium text-neutral-200">
+					<label htmlFor="email" className="mb-2 block text-sm font-medium text-foreground">
 						Email <span className="text-red-400">*</span>
 					</label>
 					<input
@@ -96,7 +96,7 @@ export function AffiliateApplicationForm() {
 						required
 						maxLength={200}
 						placeholder="john@example.com"
-						className="flex h-10 w-full rounded-md border border-neutral-700 bg-neutral-800 px-3 py-2 text-sm text-white placeholder:text-neutral-500 focus:border-emerald-500 focus:outline-none focus:ring-1 focus:ring-emerald-500"
+						className="flex h-10 w-full rounded-md border border-border bg-secondary px-3 py-2 text-sm text-foreground placeholder:text-muted-foreground focus:border-emerald-500 focus:outline-none focus:ring-1 focus:ring-emerald-500"
 					/>
 				</div>
 			</div>
@@ -104,7 +104,7 @@ export function AffiliateApplicationForm() {
 			<div className="grid gap-6 sm:grid-cols-2">
 				{/* Website */}
 				<div>
-					<label htmlFor="website" className="mb-2 block text-sm font-medium text-neutral-200">
+					<label htmlFor="website" className="mb-2 block text-sm font-medium text-foreground">
 						Website / Blog
 					</label>
 					<input
@@ -113,13 +113,13 @@ export function AffiliateApplicationForm() {
 						type="url"
 						maxLength={500}
 						placeholder="https://yoursite.com"
-						className="flex h-10 w-full rounded-md border border-neutral-700 bg-neutral-800 px-3 py-2 text-sm text-white placeholder:text-neutral-500 focus:border-emerald-500 focus:outline-none focus:ring-1 focus:ring-emerald-500"
+						className="flex h-10 w-full rounded-md border border-border bg-secondary px-3 py-2 text-sm text-foreground placeholder:text-muted-foreground focus:border-emerald-500 focus:outline-none focus:ring-1 focus:ring-emerald-500"
 					/>
 				</div>
 
 				{/* Social Media */}
 				<div>
-					<label htmlFor="social_media" className="mb-2 block text-sm font-medium text-neutral-200">
+					<label htmlFor="social_media" className="mb-2 block text-sm font-medium text-foreground">
 						Social Media
 					</label>
 					<input
@@ -128,14 +128,14 @@ export function AffiliateApplicationForm() {
 						type="text"
 						maxLength={500}
 						placeholder="@handle or profile URL"
-						className="flex h-10 w-full rounded-md border border-neutral-700 bg-neutral-800 px-3 py-2 text-sm text-white placeholder:text-neutral-500 focus:border-emerald-500 focus:outline-none focus:ring-1 focus:ring-emerald-500"
+						className="flex h-10 w-full rounded-md border border-border bg-secondary px-3 py-2 text-sm text-foreground placeholder:text-muted-foreground focus:border-emerald-500 focus:outline-none focus:ring-1 focus:ring-emerald-500"
 					/>
 				</div>
 			</div>
 
 			{/* Promotion Plan */}
 			<div>
-				<label htmlFor="promotion_plan" className="mb-2 block text-sm font-medium text-neutral-200">
+				<label htmlFor="promotion_plan" className="mb-2 block text-sm font-medium text-foreground">
 					How do you plan to promote InfinityBio Labs? <span className="text-red-400">*</span>
 				</label>
 				<textarea
@@ -145,14 +145,14 @@ export function AffiliateApplicationForm() {
 					maxLength={1000}
 					rows={4}
 					placeholder="Tell us about your audience, channels, and promotion strategy..."
-					className="flex w-full rounded-md border border-neutral-700 bg-neutral-800 px-3 py-2 text-sm text-white placeholder:text-neutral-500 focus:border-emerald-500 focus:outline-none focus:ring-1 focus:ring-emerald-500"
+					className="flex w-full rounded-md border border-border bg-secondary px-3 py-2 text-sm text-foreground placeholder:text-muted-foreground focus:border-emerald-500 focus:outline-none focus:ring-1 focus:ring-emerald-500"
 				/>
 			</div>
 
 			<button
 				type="submit"
 				disabled={status === "submitting"}
-				className="inline-flex h-12 w-full items-center justify-center gap-2 rounded-md bg-emerald-600 px-6 text-sm font-medium text-white transition-colors hover:bg-emerald-500 focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:ring-offset-2 focus:ring-offset-neutral-900 disabled:cursor-not-allowed disabled:opacity-50"
+				className="inline-flex h-12 w-full items-center justify-center gap-2 rounded-md bg-emerald-600 px-6 text-sm font-medium text-white transition-colors hover:bg-emerald-500 focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:ring-offset-2 focus:ring-offset-background disabled:cursor-not-allowed disabled:opacity-50"
 			>
 				{status === "submitting" ? (
 					<>
@@ -164,7 +164,7 @@ export function AffiliateApplicationForm() {
 				)}
 			</button>
 
-			<p className="text-center text-xs text-neutral-500">
+			<p className="text-center text-xs text-muted-foreground">
 				By submitting, you agree to our affiliate program terms. We&apos;ll only use your email to communicate
 				about the program.
 			</p>

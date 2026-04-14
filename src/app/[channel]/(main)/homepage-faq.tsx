@@ -47,7 +47,7 @@ function FAQItem({
 				"overflow-hidden rounded-2xl border-2 transition-all duration-500",
 				isOpen
 					? "-translate-y-0.5 border-emerald-500/40 bg-emerald-500/[0.05] shadow-xl shadow-emerald-500/10"
-					: "border-neutral-800 bg-neutral-900/50 shadow-sm hover:-translate-y-0.5 hover:border-neutral-700 hover:shadow-lg",
+					: "border-border bg-card shadow-sm hover:-translate-y-0.5 hover:border-border hover:shadow-lg",
 			)}
 		>
 			<button
@@ -62,7 +62,7 @@ function FAQItem({
 							"flex h-10 w-10 shrink-0 items-center justify-center rounded-lg font-mono text-xs font-bold transition-all duration-300 sm:h-12 sm:w-12 sm:rounded-xl sm:text-sm",
 							isOpen
 								? "bg-emerald-500 text-white shadow-lg shadow-emerald-500/30"
-								: "bg-neutral-800 text-neutral-400",
+								: "bg-secondary text-muted-foreground",
 						)}
 					>
 						{String(index + 1).padStart(2, "0")}
@@ -70,7 +70,7 @@ function FAQItem({
 					<span
 						className={cn(
 							"text-base font-semibold transition-colors sm:text-lg lg:text-xl",
-							isOpen ? "text-white" : "text-neutral-200",
+							isOpen ? "text-foreground" : "text-foreground",
 						)}
 					>
 						{item.q}
@@ -81,7 +81,7 @@ function FAQItem({
 						"flex h-9 w-9 shrink-0 items-center justify-center rounded-full transition-all duration-300 sm:h-10 sm:w-10",
 						isOpen
 							? "rotate-45 bg-emerald-500 text-white shadow-lg shadow-emerald-500/30"
-							: "bg-neutral-800 text-neutral-400",
+							: "bg-secondary text-muted-foreground",
 					)}
 				>
 					<svg className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
@@ -97,7 +97,7 @@ function FAQItem({
 			>
 				<div className="overflow-hidden">
 					<div className="px-4 pb-6 pl-[3.75rem] sm:px-8 sm:pb-10 sm:pl-[5.5rem] lg:px-10 lg:pl-[6rem]">
-						<p className="text-base leading-relaxed text-neutral-400">{item.a}</p>
+						<p className="text-base leading-relaxed text-muted-foreground">{item.a}</p>
 					</div>
 				</div>
 			</div>
@@ -109,15 +109,12 @@ export function HomepageFAQ() {
 	const [openIndex, setOpenIndex] = useState<number | null>(null);
 
 	return (
-		<section
-			className="border-t border-neutral-800 bg-neutral-950 py-24 text-white sm:py-32"
-			aria-label="FAQ"
-		>
+		<section className="border-t border-border bg-background py-24 text-foreground sm:py-32" aria-label="FAQ">
 			<div className="mx-auto max-w-4xl px-6">
 				<div className="mb-12 text-center sm:mb-16">
 					<p className="mb-3 text-sm font-medium uppercase tracking-[0.25em] text-emerald-400">FAQ</p>
 					<h2 className="text-3xl font-bold tracking-tight sm:text-4xl lg:text-5xl">Questions & Answers</h2>
-					<p className="mx-auto mt-5 max-w-xl text-base leading-relaxed text-neutral-400 sm:text-lg">
+					<p className="mx-auto mt-5 max-w-xl text-base leading-relaxed text-muted-foreground sm:text-lg">
 						Everything you need to know about our research compounds, quality standards, and ordering process.
 					</p>
 				</div>

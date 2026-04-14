@@ -16,7 +16,7 @@ const TAGS = [
 function BrowseBg() {
 	return (
 		<div className="pointer-events-none absolute inset-0 overflow-hidden rounded-[inherit]">
-			<div className="absolute inset-x-5 top-4 flex items-center justify-between font-mono text-[10px] uppercase tracking-[0.18em] text-neutral-600">
+			<div className="absolute inset-x-5 top-4 flex items-center justify-between font-mono text-[10px] uppercase tracking-[0.18em] text-muted-foreground">
 				<span>Catalog</span>
 				<span>Research map</span>
 			</div>
@@ -82,17 +82,17 @@ function CoaBg() {
 	const shown = step >= COA_LINES.length ? COA_LINES : COA_LINES.slice(0, step + 1);
 	return (
 		<div className="pointer-events-none absolute inset-0 overflow-hidden rounded-[inherit]">
-			<div className="absolute inset-x-5 top-4 flex items-center justify-between font-mono text-[10px] uppercase tracking-[0.18em] text-neutral-600">
+			<div className="absolute inset-x-5 top-4 flex items-center justify-between font-mono text-[10px] uppercase tracking-[0.18em] text-muted-foreground">
 				<span>Lot #A204</span>
 				<span>Lab report</span>
 			</div>
-			<div className="absolute inset-x-5 bottom-5 top-12 rounded-2xl border border-neutral-800/70 bg-black/20 p-4">
+			<div className="absolute inset-x-5 bottom-5 top-12 rounded-2xl border border-border bg-black/20 p-4">
 				<div className="absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-white/10 to-transparent" />
 				<div className="flex h-full flex-col justify-end gap-2 font-mono text-[11px]">
 					{shown.map((entry, index) => (
 						<div key={index} className={`flex gap-2 ${entry.color}`}>
-							<span className="text-neutral-700">›</span>
-							<span className="text-neutral-600">{entry.label}:</span>
+							<span className="text-muted-foreground">›</span>
+							<span className="text-muted-foreground">{entry.label}:</span>
 							<span>{entry.value}</span>
 						</div>
 					))}
@@ -120,20 +120,20 @@ function RuoBg() {
 	}, []);
 	return (
 		<div className="pointer-events-none absolute inset-0 overflow-hidden rounded-[inherit]">
-			<div className="absolute inset-x-5 top-4 flex items-center justify-between font-mono text-[10px] uppercase tracking-[0.18em] text-neutral-600">
+			<div className="absolute inset-x-5 top-4 flex items-center justify-between font-mono text-[10px] uppercase tracking-[0.18em] text-muted-foreground">
 				<span>Compliance</span>
 				<span>One-time waiver</span>
 			</div>
-			<div className="absolute inset-x-5 bottom-5 top-12 rounded-2xl border border-neutral-800/70 bg-black/20 p-4">
+			<div className="absolute inset-x-5 bottom-5 top-12 rounded-2xl border border-border bg-black/20 p-4">
 				<div className="flex h-full flex-col justify-between gap-3">
-					<div className="flex items-center gap-2 text-[11px] text-neutral-500">
+					<div className="flex items-center gap-2 text-[11px] text-muted-foreground">
 						<span className="h-1.5 w-1.5 rounded-full bg-emerald-500/60" />
 						Required before checkout
 					</div>
-					<div className="flex items-center gap-3 rounded-xl border border-neutral-800/80 bg-black/30 px-3 py-3">
+					<div className="flex items-center gap-3 rounded-xl border border-border bg-black/30 px-3 py-3">
 						<div
 							className={`flex h-4 w-4 shrink-0 items-center justify-center rounded border transition-all duration-500 ${
-								checked ? "border-emerald-500/50 bg-emerald-500/30" : "border-neutral-800/60"
+								checked ? "border-emerald-500/50 bg-emerald-500/30" : "border-border"
 							}`}
 						>
 							{checked ? (
@@ -150,7 +150,7 @@ function RuoBg() {
 						</div>
 						<span
 							className={`text-[11px] transition-colors duration-500 ${
-								checked ? "text-emerald-300/70" : "text-neutral-500"
+								checked ? "text-emerald-300/70" : "text-muted-foreground"
 							}`}
 						>
 							{checked ? "RUO confirmed — continue to checkout" : "Awaiting RUO confirmation…"}
@@ -172,13 +172,13 @@ const SHIP_STEPS = [
 function ShippingBg() {
 	return (
 		<div className="pointer-events-none absolute inset-0 overflow-hidden rounded-[inherit]">
-			<div className="absolute inset-x-5 top-4 flex items-center justify-between font-mono text-[10px] uppercase tracking-[0.18em] text-neutral-600">
+			<div className="absolute inset-x-5 top-4 flex items-center justify-between font-mono text-[10px] uppercase tracking-[0.18em] text-muted-foreground">
 				<span>Cold-chain route</span>
 				<span>Live tracking</span>
 			</div>
-			<div className="absolute inset-x-5 bottom-5 top-12 rounded-2xl border border-neutral-800/70 bg-black/20 px-4 py-5">
+			<div className="absolute inset-x-5 bottom-5 top-12 rounded-2xl border border-border bg-black/20 px-4 py-5">
 				<div className="relative flex h-full items-start justify-between gap-3">
-					<div className="absolute inset-x-2 top-4 h-px bg-neutral-800" />
+					<div className="absolute inset-x-2 top-4 h-px bg-secondary" />
 					<div className="absolute left-2 top-4 h-px w-[61%] bg-gradient-to-r from-emerald-500/50 to-teal-400/50" />
 					{SHIP_STEPS.map((step, index) => (
 						<div key={index} className="relative z-10 flex min-w-0 flex-1 flex-col items-center gap-2">
@@ -188,7 +188,7 @@ function ShippingBg() {
 										? "border-emerald-500/50 bg-emerald-500/15 text-emerald-400"
 										: step.done
 											? "border-emerald-500/30 bg-emerald-500/10 text-emerald-500/50"
-											: "border-neutral-800 bg-neutral-900 text-neutral-700"
+											: "border-border bg-card text-muted-foreground"
 								}`}
 							>
 								{step.done && !step.active ? "✓" : index + 1}
@@ -201,7 +201,11 @@ function ShippingBg() {
 							</div>
 							<span
 								className={`text-center text-[9px] font-medium sm:text-[10px] ${
-									step.active ? "text-emerald-300/80" : step.done ? "text-neutral-500" : "text-neutral-700"
+									step.active
+										? "text-emerald-300/80"
+										: step.done
+											? "text-muted-foreground"
+											: "text-muted-foreground"
 								}`}
 							>
 								{step.label}
@@ -237,7 +241,7 @@ function Card({
 }) {
 	return (
 		<article
-			className={`group relative overflow-hidden rounded-[1.75rem] border border-neutral-800 bg-neutral-950/80 opacity-0 transition-[transform,border-color,background-color,box-shadow] duration-500 [animation:ib-card-enter_720ms_cubic-bezier(0.22,1,0.36,1)_forwards] hover:-translate-y-1 hover:border-emerald-500/25 hover:bg-neutral-900/80 hover:shadow-[0_24px_60px_-32px_rgba(16,185,129,0.45)] ${className}`}
+			className={`group relative overflow-hidden rounded-[1.75rem] border border-border bg-background opacity-0 transition-[transform,border-color,background-color,box-shadow] duration-500 [animation:ib-card-enter_720ms_cubic-bezier(0.22,1,0.36,1)_forwards] hover:-translate-y-1 hover:border-emerald-500/25 hover:bg-card hover:shadow-[0_24px_60px_-32px_rgba(16,185,129,0.45)] ${className}`}
 			style={{ animationDelay: `${step * 90}ms` }}
 		>
 			<div className="absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-white/[0.06] to-transparent" />
@@ -247,17 +251,17 @@ function Card({
 				<div className="flex items-start justify-between gap-4">
 					<div className="max-w-xl">
 						<div className="mb-4 flex items-center gap-3">
-							<span className="inline-flex rounded-full border border-neutral-800 bg-black/30 px-2.5 py-1 font-mono text-[11px] uppercase tracking-[0.22em] text-neutral-500">
+							<span className="inline-flex rounded-full border border-border bg-black/30 px-2.5 py-1 font-mono text-[11px] uppercase tracking-[0.22em] text-muted-foreground">
 								{String(step).padStart(2, "0")}
 							</span>
-							<div className="flex h-10 w-10 items-center justify-center rounded-xl border border-neutral-800 bg-neutral-900 text-emerald-400 transition-transform duration-500 group-hover:-translate-y-0.5 group-hover:scale-[1.03]">
+							<div className="flex h-10 w-10 items-center justify-center rounded-xl border border-border bg-card text-emerald-400 transition-transform duration-500 group-hover:-translate-y-0.5 group-hover:scale-[1.03]">
 								{icon}
 							</div>
 						</div>
-						<h3 className="max-w-[24ch] text-lg font-semibold leading-tight text-white sm:text-[1.15rem]">
+						<h3 className="max-w-[24ch] text-lg font-semibold leading-tight text-foreground sm:text-[1.15rem]">
 							{title}
 						</h3>
-						<p className="mt-2 max-w-[60ch] text-sm leading-6 text-neutral-400">{description}</p>
+						<p className="mt-2 max-w-[60ch] text-sm leading-6 text-muted-foreground">{description}</p>
 					</div>
 					{badge && (
 						<div className="inline-flex shrink-0 items-center gap-1.5 self-start rounded-full border border-emerald-500/20 bg-emerald-500/10 px-2.5 py-1 font-mono text-[10px] text-emerald-400 transition-transform duration-500 [animation:ib-badge-glow_3.4s_ease-in-out_infinite] group-hover:-translate-y-0.5">
@@ -282,7 +286,7 @@ function Card({
 export function HowOrderingWorks() {
 	return (
 		<section
-			className="how-ordering-works bg-neutral-950 py-20 text-white sm:py-24"
+			className="how-ordering-works bg-background py-20 text-foreground sm:py-24"
 			aria-label="How Ordering Works"
 		>
 			<div className="mx-auto max-w-7xl px-6">
@@ -296,7 +300,7 @@ export function HowOrderingWorks() {
 							Infinity BioLabs Works
 						</span>
 					</h2>
-					<p className="mt-4 max-w-lg text-[15px] leading-relaxed text-neutral-400">
+					<p className="mt-4 max-w-lg text-[15px] leading-relaxed text-muted-foreground">
 						From browsing to your lab bench in 48 hours — every compound documented, every batch verified.
 					</p>
 				</div>
@@ -370,7 +374,7 @@ export function HowOrderingWorks() {
 				</div>
 
 				<div className="mt-8 text-center">
-					<p className="text-sm text-neutral-500">
+					<p className="text-sm text-muted-foreground">
 						Questions?{" "}
 						<LinkWithChannel
 							href="/contact"

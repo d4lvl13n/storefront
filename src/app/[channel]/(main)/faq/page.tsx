@@ -9,7 +9,7 @@ export const metadata: Metadata = {
 
 export default function FAQPage() {
 	return (
-		<div className="bg-neutral-950 text-white">
+		<div className="bg-background text-foreground">
 			{/* Hero */}
 			<section className="relative overflow-hidden py-24 sm:py-32">
 				<div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top,_var(--tw-gradient-stops))] from-emerald-900/20 via-transparent to-transparent" />
@@ -19,7 +19,7 @@ export default function FAQPage() {
 						<h1 className="mt-4 text-3xl font-bold tracking-tight sm:text-4xl lg:text-5xl">
 							Frequently Asked Questions
 						</h1>
-						<p className="mt-6 text-lg leading-relaxed text-neutral-300">
+						<p className="mt-6 text-lg leading-relaxed text-muted-foreground">
 							Everything you need to know about our research compounds, quality standards, and ordering
 							process.
 						</p>
@@ -31,10 +31,10 @@ export default function FAQPage() {
 			<HomepageFAQ />
 
 			{/* Contact CTA */}
-			<section className="border-t border-neutral-800 py-24 sm:py-32">
+			<section className="border-t border-border py-24 sm:py-32">
 				<div className="mx-auto max-w-3xl px-6 text-center">
 					<h2 className="text-2xl font-bold tracking-tight sm:text-3xl">Still have questions?</h2>
-					<p className="mt-4 text-neutral-400">
+					<p className="mt-4 text-muted-foreground">
 						Our support team is here to help. Reach out and we&apos;ll get back to you within one business
 						day.
 					</p>

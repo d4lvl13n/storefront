@@ -85,8 +85,8 @@ export function CalculatorView({ onCalculation }: CalculatorViewProps) {
 	return (
 		<div className="grid gap-8 lg:grid-cols-[1fr_1fr] lg:items-start">
 			{/* Input Card */}
-			<div className="rounded-2xl border border-neutral-800 bg-neutral-900/60 p-6 sm:p-8">
-				<h2 className="mb-6 text-lg font-semibold text-white">Inputs</h2>
+			<div className="rounded-2xl border border-border bg-card p-6 sm:p-8">
+				<h2 className="mb-6 text-lg font-semibold text-foreground">Inputs</h2>
 
 				{/* Peptide Amount */}
 				<FieldGroup label="Peptide Amount" error={fieldErrors.get("peptideAmount")}>
@@ -127,7 +127,7 @@ export function CalculatorView({ onCalculation }: CalculatorViewProps) {
 								hasError={fieldErrors.has("waterVolume")}
 							/>
 						</div>
-						<span className="flex items-center rounded-lg border border-neutral-700 bg-neutral-800 px-3 text-sm text-neutral-300">
+						<span className="flex items-center rounded-lg border border-border bg-background px-3 text-sm text-muted-foreground">
 							mL
 						</span>
 					</div>
@@ -173,7 +173,7 @@ export function CalculatorView({ onCalculation }: CalculatorViewProps) {
 								className={`rounded-lg border px-3 py-2.5 text-sm font-medium transition-colors ${
 									inputs.syringeIndex === i
 										? "border-emerald-500/50 bg-emerald-500/10 text-emerald-400"
-										: "border-neutral-700 bg-neutral-800 text-neutral-200 hover:border-neutral-600"
+										: "border-border bg-background text-foreground hover:border-muted-foreground"
 								}`}
 							>
 								{s.capacityMl} mL
@@ -188,17 +188,17 @@ export function CalculatorView({ onCalculation }: CalculatorViewProps) {
 						<button
 							type="button"
 							onClick={() => update("vialCount", Math.max(1, inputs.vialCount - 1))}
-							className="flex h-10 w-10 items-center justify-center rounded-lg border border-neutral-700 bg-neutral-800 text-neutral-200 transition-colors hover:border-neutral-600"
+							className="flex h-10 w-10 items-center justify-center rounded-lg border border-border bg-background text-foreground transition-colors hover:border-muted-foreground"
 						>
 							-
 						</button>
-						<span className="min-w-[2ch] text-center text-lg font-semibold text-white">
+						<span className="min-w-[2ch] text-center text-lg font-semibold text-foreground">
 							{inputs.vialCount}
 						</span>
 						<button
 							type="button"
 							onClick={() => update("vialCount", Math.min(3, inputs.vialCount + 1))}
-							className="flex h-10 w-10 items-center justify-center rounded-lg border border-neutral-700 bg-neutral-800 text-neutral-200 transition-colors hover:border-neutral-600"
+							className="flex h-10 w-10 items-center justify-center rounded-lg border border-border bg-background text-foreground transition-colors hover:border-muted-foreground"
 						>
 							+
 						</button>
@@ -222,20 +222,20 @@ export function CalculatorView({ onCalculation }: CalculatorViewProps) {
 				{output.result ? (
 					<div className="rounded-2xl border border-emerald-500/20 bg-emerald-500/[0.04] p-6 sm:p-8">
 						{/* Input recap */}
-						<div className="mb-5 flex flex-wrap gap-2 text-xs text-neutral-300">
-							<span className="rounded bg-neutral-800 px-2 py-1">
+						<div className="mb-5 flex flex-wrap gap-2 text-xs text-foreground">
+							<span className="rounded bg-secondary px-2 py-1">
 								{formatDose(inputs.peptideAmount, inputs.peptideUnit)}
 							</span>
-							<span className="rounded bg-neutral-800 px-2 py-1">{inputs.waterVolume} mL BAC water</span>
-							<span className="rounded bg-neutral-800 px-2 py-1">
+							<span className="rounded bg-secondary px-2 py-1">{inputs.waterVolume} mL BAC water</span>
+							<span className="rounded bg-secondary px-2 py-1">
 								{formatDose(inputs.doseAmount, inputs.doseUnit)} dose
 							</span>
-							<span className="rounded bg-neutral-800 px-2 py-1">
+							<span className="rounded bg-secondary px-2 py-1">
 								{SYRINGE_TYPES[inputs.syringeIndex]?.label}
 							</span>
 						</div>
 
-						<h2 className="mb-6 text-lg font-semibold text-white">Results</h2>
+						<h2 className="mb-6 text-lg font-semibold text-foreground">Results</h2>
 
 						<div className="space-y-4">
 							<ResultRow
@@ -265,7 +265,7 @@ export function CalculatorView({ onCalculation }: CalculatorViewProps) {
 						<button
 							type="button"
 							onClick={() => setShowExact(!showExact)}
-							className="mt-3 flex items-center gap-1.5 text-xs text-neutral-400 transition-colors hover:text-neutral-200"
+							className="mt-3 flex items-center gap-1.5 text-xs text-muted-foreground transition-colors hover:text-foreground"
 						>
 							<svg
 								xmlns="http://www.w3.org/2000/svg"
@@ -296,7 +296,7 @@ export function CalculatorView({ onCalculation }: CalculatorViewProps) {
 						<button
 							type="button"
 							onClick={handleCopy}
-							className="mt-4 flex w-full items-center justify-center gap-2 rounded-lg border border-neutral-700 bg-neutral-800 px-4 py-2.5 text-sm text-neutral-200 transition-colors hover:border-neutral-600 hover:text-white"
+							className="mt-4 flex w-full items-center justify-center gap-2 rounded-lg border border-border bg-secondary px-4 py-2.5 text-sm text-foreground transition-colors hover:border-border hover:text-foreground"
 						>
 							<svg
 								xmlns="http://www.w3.org/2000/svg"
@@ -319,7 +319,7 @@ export function CalculatorView({ onCalculation }: CalculatorViewProps) {
 						<button
 							type="button"
 							onClick={() => setShowFormula(!showFormula)}
-							className="mt-3 flex w-full items-center justify-between text-sm text-neutral-400 hover:text-neutral-200"
+							className="mt-3 flex w-full items-center justify-between text-sm text-muted-foreground hover:text-foreground"
 						>
 							<span>How is this calculated?</span>
 							<svg
@@ -343,42 +343,42 @@ export function CalculatorView({ onCalculation }: CalculatorViewProps) {
 							}`}
 						>
 							<div className="overflow-hidden">
-								<div className="pt-3 text-sm leading-relaxed text-neutral-300">
-									<div className="mb-4 rounded-lg border border-neutral-700 bg-neutral-800/60 px-3 py-2.5 text-xs text-neutral-400">
+								<div className="pt-3 text-sm leading-relaxed text-muted-foreground">
+									<div className="mb-4 rounded-lg border border-border bg-secondary px-3 py-2.5 text-xs text-muted-foreground">
 										All inputs are normalized to base units before calculation: peptide mass to{" "}
-										<strong className="text-neutral-200">mg</strong>, dose to{" "}
-										<strong className="text-neutral-200">mg</strong>, volume to{" "}
-										<strong className="text-neutral-200">mL</strong>. If you enter a dose in mcg, the engine
+										<strong className="text-foreground">mg</strong>, dose to{" "}
+										<strong className="text-foreground">mg</strong>, volume to{" "}
+										<strong className="text-foreground">mL</strong>. If you enter a dose in mcg, the engine
 										divides by 1,000 to convert to mg first.
 									</div>
 									<p className="mb-3">
-										<strong className="text-white">Concentration</strong> = Peptide Amount (mg) / Water Volume
-										(mL)
+										<strong className="text-foreground">Concentration</strong> = Peptide Amount (mg) / Water
+										Volume (mL)
 									</p>
 									<p className="mb-3">
-										<strong className="text-white">Draw Volume</strong> = Desired Dose (mg) / Concentration
-										(mg/mL)
+										<strong className="text-foreground">Draw Volume</strong> = Desired Dose (mg) /
+										Concentration (mg/mL)
 									</p>
 									<p className="mb-3">
-										<strong className="text-white">Syringe Units</strong> = Draw Volume (mL) x 100
-										<span className="ml-1 text-xs text-neutral-400">
+										<strong className="text-foreground">Syringe Units</strong> = Draw Volume (mL) x 100
+										<span className="ml-1 text-xs text-muted-foreground">
 											(U-100 standard: 100 units = 1 mL, so 1 unit = 0.01 mL)
 										</span>
 									</p>
 									<p>
-										<strong className="text-white">Doses per Vial</strong> = Total Peptide (mg) / Dose Amount
-										(mg)
+										<strong className="text-foreground">Doses per Vial</strong> = Total Peptide (mg) / Dose
+										Amount (mg)
 									</p>
 								</div>
 							</div>
 						</div>
 					</div>
 				) : (
-					<div className="rounded-2xl border border-neutral-800 bg-neutral-900/60 p-6 sm:p-8">
+					<div className="rounded-2xl border border-border bg-card p-6 sm:p-8">
 						{/* Error-level warnings when no result */}
 						{output.warnings.filter((w) => w.level === "error").length > 0 ? (
 							<div className="space-y-3">
-								<h2 className="text-lg font-semibold text-white">Cannot Calculate</h2>
+								<h2 className="text-lg font-semibold text-foreground">Cannot Calculate</h2>
 								<div className="space-y-2">
 									{output.warnings
 										.filter((w) => w.level === "error")
@@ -389,7 +389,7 @@ export function CalculatorView({ onCalculation }: CalculatorViewProps) {
 							</div>
 						) : (
 							<div className="flex min-h-[250px] items-center justify-center">
-								<p className="text-sm text-neutral-400">Enter valid inputs to see results.</p>
+								<p className="text-sm text-muted-foreground">Enter valid inputs to see results.</p>
 							</div>
 						)}
 					</div>
@@ -416,8 +416,8 @@ function FieldGroup({
 }) {
 	return (
 		<div className={last ? "" : "mb-6"}>
-			<label className="mb-1.5 block text-sm font-medium text-neutral-200">{label}</label>
-			{hint && <p className="mb-2 text-xs text-neutral-400">{hint}</p>}
+			<label className="mb-1.5 block text-sm font-medium text-foreground">{label}</label>
+			{hint && <p className="mb-2 text-xs text-muted-foreground">{hint}</p>}
 			{children}
 			{error && (
 				<p className="mt-1.5 flex items-start gap-1.5 text-xs text-red-400">
@@ -462,10 +462,10 @@ function NumberInput({
 			value={value || ""}
 			onChange={(e) => onChange(parseFloat(e.target.value) || 0)}
 			placeholder={placeholder}
-			className={`w-full rounded-lg border bg-neutral-800 px-4 py-2.5 text-white placeholder-neutral-500 transition-colors focus:outline-none focus:ring-1 ${
+			className={`w-full rounded-lg border bg-background px-4 py-2.5 text-foreground placeholder-muted-foreground transition-colors focus:outline-none focus:ring-1 ${
 				hasError
 					? "border-red-500/50 focus:border-red-500/50 focus:ring-red-500/30"
-					: "border-neutral-700 focus:border-emerald-500/50 focus:ring-emerald-500/30"
+					: "border-border focus:border-emerald-500/50 focus:ring-emerald-500/30"
 			}`}
 		/>
 	);
@@ -481,7 +481,7 @@ function UnitToggle({
 	onChange: (v: string) => void;
 }) {
 	return (
-		<div className="flex overflow-hidden rounded-lg border border-neutral-700">
+		<div className="flex overflow-hidden rounded-lg border border-border">
 			{options.map((opt) => (
 				<button
 					key={opt}
@@ -490,7 +490,7 @@ function UnitToggle({
 					className={`px-3 py-2.5 text-sm font-medium transition-colors ${
 						value === opt
 							? "bg-emerald-500/15 text-emerald-400"
-							: "bg-neutral-800 text-neutral-300 hover:text-neutral-100"
+							: "bg-background text-muted-foreground hover:text-foreground"
 					}`}
 				>
 					{opt}
@@ -521,7 +521,7 @@ function PresetRow({
 					className={`rounded-md px-2.5 py-1 text-xs font-medium transition-colors ${
 						active === v
 							? "bg-emerald-500/15 text-emerald-400"
-							: "bg-neutral-800 text-neutral-400 hover:text-neutral-200"
+							: "bg-secondary text-muted-foreground hover:text-foreground"
 					}`}
 				>
 					{v} {unit}
@@ -544,12 +544,12 @@ function ResultRow({
 }) {
 	return (
 		<div className="flex items-baseline justify-between">
-			<span className="text-sm text-neutral-300">{label}</span>
+			<span className="text-sm text-muted-foreground">{label}</span>
 			<div className="text-right">
-				<span className={`text-lg font-semibold ${highlight ? "text-emerald-400" : "text-white"}`}>
+				<span className={`text-lg font-semibold ${highlight ? "text-emerald-400" : "text-foreground"}`}>
 					{value}
 				</span>
-				{sub && <span className="ml-2 text-xs text-neutral-400">{sub}</span>}
+				{sub && <span className="ml-2 text-xs text-muted-foreground">{sub}</span>}
 			</div>
 		</div>
 	);

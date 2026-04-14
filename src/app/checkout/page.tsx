@@ -44,7 +44,7 @@ async function CheckoutContent({
 
 function CheckoutSkeleton() {
 	return (
-		<div className="flex min-h-screen items-center justify-center bg-neutral-950">
+		<div className="flex min-h-screen items-center justify-center bg-background">
 			<Loader />
 		</div>
 	);

@@ -24,7 +24,7 @@ export default function Page(props: {
 	params: Promise<{ channel: string }>;
 }) {
 	return (
-		<div className="min-h-[70vh] bg-neutral-950">
+		<div className="min-h-[70vh] bg-background">
 			<section className="mx-auto max-w-7xl px-4 py-10 sm:px-6 lg:px-8">
 				<Suspense fallback={<SearchSkeleton />}>
 					<SearchContent searchParams={props.searchParams} params={props.params} />
@@ -85,8 +85,8 @@ async function SearchContent({
 		<div>
 			<div className="mb-8 flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
 				<div>
-					<h1 className="text-2xl font-semibold text-white">Results for &quot;{query}&quot;</h1>
-					<p className="mt-1 text-sm text-neutral-400">
+					<h1 className="text-2xl font-semibold text-foreground">Results for &quot;{query}&quot;</h1>
+					<p className="mt-1 text-sm text-muted-foreground">
 						{pagination.totalCount} {pagination.totalCount === 1 ? "product" : "products"} found
 					</p>
 				</div>
@@ -113,20 +113,20 @@ function SearchSkeleton() {
 	return (
 		<div className="animate-skeleton-delayed opacity-0">
 			<div className="mb-8">
-				<div className="h-8 w-64 animate-pulse rounded bg-neutral-800" />
-				<div className="mt-2 h-4 w-32 animate-pulse rounded bg-neutral-800" />
+				<div className="h-8 w-64 animate-pulse rounded bg-secondary" />
+				<div className="mt-2 h-4 w-32 animate-pulse rounded bg-secondary" />
 			</div>
 			<div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
 				{Array.from({ length: 8 }).map((_, i) => (
 					<div
 						key={i}
-						className="animate-pulse overflow-hidden rounded-2xl border border-white/[0.06] bg-neutral-800/40"
+						className="animate-pulse overflow-hidden rounded-2xl border border-border bg-secondary"
 					>
-						<div className="aspect-square bg-neutral-800" />
+						<div className="aspect-square bg-secondary" />
 						<div className="p-4">
-							<div className="mb-1 h-3 w-16 rounded bg-neutral-800" />
-							<div className="h-4 w-3/4 rounded bg-neutral-800" />
-							<div className="mt-2 h-4 w-20 rounded bg-neutral-800" />
+							<div className="mb-1 h-3 w-16 rounded bg-secondary" />
+							<div className="h-4 w-3/4 rounded bg-secondary" />
+							<div className="mt-2 h-4 w-20 rounded bg-secondary" />
 						</div>
 					</div>
 				))}
@@ -138,11 +138,11 @@ function SearchSkeleton() {
 function EmptyState({ query, channel }: { query: string; channel: string }) {
 	return (
 		<div className="flex flex-col items-center justify-center py-20 text-center">
-			<div className="mb-6 flex h-16 w-16 items-center justify-center rounded-2xl bg-neutral-800/60">
-				<SearchIcon className="h-8 w-8 text-neutral-500" />
+			<div className="mb-6 flex h-16 w-16 items-center justify-center rounded-2xl bg-secondary">
+				<SearchIcon className="h-8 w-8 text-muted-foreground" />
 			</div>
-			<h1 className="text-2xl font-semibold text-white">No results for &quot;{query}&quot;</h1>
-			<p className="mt-3 max-w-md text-neutral-400">
+			<h1 className="text-2xl font-semibold text-foreground">No results for &quot;{query}&quot;</h1>
+			<p className="mt-3 max-w-md text-muted-foreground">
 				We couldn&apos;t find any products matching your search. Try a different term or browse our
 				categories.
 			</p>
@@ -155,7 +155,7 @@ function EmptyState({ query, channel }: { query: string; channel: string }) {
 				</Link>
 				<Link
 					href={`/${channel}`}
-					className="inline-flex items-center justify-center rounded-xl border border-white/[0.08] bg-white/[0.04] px-6 py-3 text-sm font-medium text-neutral-300 transition-colors hover:bg-white/[0.08] hover:text-white"
+					className="inline-flex items-center justify-center rounded-xl border border-border bg-secondary px-6 py-3 text-sm font-medium text-foreground transition-colors hover:bg-card hover:text-foreground"
 				>
 					Go to Homepage
 				</Link>

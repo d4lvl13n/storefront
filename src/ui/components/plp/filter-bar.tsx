@@ -98,7 +98,7 @@ export function FilterBar({
 		selectedCategories.length + selectedColors.length + selectedSizes.length + (selectedPriceRange ? 1 : 0);
 
 	return (
-		<div className="sticky top-16 z-30 border-b border-white/[0.06] bg-neutral-950/80 backdrop-blur-xl">
+		<div className="sticky top-16 z-30 border-b border-white/[0.06] bg-background backdrop-blur-xl">
 			<div className="mx-auto max-w-7xl px-4 py-4 sm:px-6 lg:px-8">
 				{/* Main Filter Row */}
 				<div className="flex items-center justify-between gap-4">
@@ -111,7 +111,7 @@ export function FilterBar({
 									<Button
 										variant="outline-solid"
 										size="sm"
-										className="shrink-0 border-white/[0.08] bg-transparent text-neutral-300 hover:border-white/[0.15] hover:text-white md:hidden"
+										className="shrink-0 border-white/[0.08] bg-transparent text-foreground hover:border-white/[0.15] hover:text-foreground md:hidden"
 									>
 										<SlidersHorizontal className="mr-2 h-4 w-4" />
 										Filters
@@ -127,10 +127,10 @@ export function FilterBar({
 								</SheetTrigger>
 								<SheetContent
 									side="left"
-									className="flex w-[280px] flex-col border-white/[0.06] bg-neutral-900 p-0 text-white"
+									className="flex w-[280px] flex-col border-white/[0.06] bg-card p-0 text-foreground"
 								>
 									<SheetHeader className="flex-row items-center justify-between border-b border-white/[0.06] px-4 py-4">
-										<SheetTitle className="text-white">Filters</SheetTitle>
+										<SheetTitle className="text-foreground">Filters</SheetTitle>
 										<SheetCloseButton />
 									</SheetHeader>
 
@@ -138,7 +138,7 @@ export function FilterBar({
 										<div className="divide-y divide-white/[0.06]">
 											{categoryOptions.length > 0 && onCategoryToggle && (
 												<div className="px-4 py-6">
-													<h3 className="mb-4 text-xs font-semibold uppercase tracking-wider text-neutral-500">
+													<h3 className="mb-4 text-xs font-semibold uppercase tracking-wider text-muted-foreground">
 														Category
 													</h3>
 													<div className="space-y-3">
@@ -154,12 +154,12 @@ export function FilterBar({
 																		className={`flex h-5 w-5 shrink-0 items-center justify-center rounded border transition-colors ${
 																			isSelected
 																				? "border-emerald-500 bg-emerald-500 text-white"
-																				: "border-neutral-700"
+																				: "border-border"
 																		}`}
 																	>
 																		{isSelected && <Check className="h-3 w-3" />}
 																	</span>
-																	<span className="text-sm text-neutral-300">{category.name}</span>
+																	<span className="text-sm text-foreground">{category.name}</span>
 																</button>
 															);
 														})}
@@ -169,7 +169,7 @@ export function FilterBar({
 
 											{colorOptions.length > 0 && onColorToggle && (
 												<div className="px-4 py-6">
-													<h3 className="mb-4 text-xs font-semibold uppercase tracking-wider text-neutral-500">
+													<h3 className="mb-4 text-xs font-semibold uppercase tracking-wider text-muted-foreground">
 														Color
 													</h3>
 													<div className="space-y-3">
@@ -185,7 +185,7 @@ export function FilterBar({
 																		className={`flex h-5 w-5 shrink-0 items-center justify-center rounded border transition-colors ${
 																			isSelected
 																				? "border-emerald-500 bg-emerald-500 text-white"
-																				: "border-neutral-700"
+																				: "border-border"
 																		}`}
 																	>
 																		{isSelected && <Check className="h-3 w-3" />}
@@ -196,8 +196,8 @@ export function FilterBar({
 																			style={{ backgroundColor: color.hex }}
 																		/>
 																	)}
-																	<span className="flex-1 text-sm text-neutral-300">{color.name}</span>
-																	<span className="text-xs text-neutral-600">({color.count})</span>
+																	<span className="flex-1 text-sm text-foreground">{color.name}</span>
+																	<span className="text-xs text-muted-foreground">({color.count})</span>
 																</button>
 															);
 														})}
@@ -207,7 +207,7 @@ export function FilterBar({
 
 											{sizeOptions.length > 0 && onSizeToggle && (
 												<div className="px-4 py-6">
-													<h3 className="mb-4 text-xs font-semibold uppercase tracking-wider text-neutral-500">
+													<h3 className="mb-4 text-xs font-semibold uppercase tracking-wider text-muted-foreground">
 														Size
 													</h3>
 													<div className="flex flex-wrap gap-2">
@@ -220,7 +220,7 @@ export function FilterBar({
 																	className={`rounded-lg border px-4 py-2 text-sm transition-colors ${
 																		isSelected
 																			? "border-emerald-500 bg-emerald-500/15 text-emerald-400"
-																			: "border-neutral-700 text-neutral-300 hover:border-neutral-500"
+																			: "border-border text-foreground hover:border-foreground"
 																	}`}
 																>
 																	{size.name}
@@ -233,7 +233,7 @@ export function FilterBar({
 
 											{priceRanges.length > 0 && onPriceRangeChange && (
 												<div className="px-4 py-6">
-													<h3 className="mb-4 text-xs font-semibold uppercase tracking-wider text-neutral-500">
+													<h3 className="mb-4 text-xs font-semibold uppercase tracking-wider text-muted-foreground">
 														Price
 													</h3>
 													<div className="space-y-3">
@@ -247,12 +247,12 @@ export function FilterBar({
 																>
 																	<span
 																		className={`flex h-5 w-5 shrink-0 items-center justify-center rounded-full border transition-colors ${
-																			isSelected ? "border-emerald-500 bg-emerald-500" : "border-neutral-700"
+																			isSelected ? "border-emerald-500 bg-emerald-500" : "border-border"
 																		}`}
 																	>
 																		{isSelected && <span className="h-2 w-2 rounded-full bg-white" />}
 																	</span>
-																	<span className="text-sm text-neutral-300">{range.label}</span>
+																	<span className="text-sm text-foreground">{range.label}</span>
 																</button>
 															);
 														})}
@@ -266,7 +266,7 @@ export function FilterBar({
 										<div className="border-t border-white/[0.06] p-4">
 											<Button
 												variant="outline-solid"
-												className="w-full border-white/[0.08] text-neutral-300"
+												className="w-full border-white/[0.08] text-foreground"
 												onClick={() => {
 													onClearFilters();
 													setMobileFiltersOpen(false);
@@ -286,7 +286,7 @@ export function FilterBar({
 									<Button
 										variant="outline-solid"
 										size="sm"
-										className="hidden shrink-0 border-white/[0.08] bg-transparent text-neutral-300 hover:border-white/[0.15] hover:text-white md:flex"
+										className="hidden shrink-0 border-white/[0.08] bg-transparent text-foreground hover:border-white/[0.15] hover:text-foreground md:flex"
 									>
 										Category
 										{selectedCategories.length > 0 && (
@@ -322,7 +322,7 @@ export function FilterBar({
 									<Button
 										variant="outline-solid"
 										size="sm"
-										className="hidden shrink-0 border-white/[0.08] bg-transparent text-neutral-300 hover:border-white/[0.15] hover:text-white md:flex"
+										className="hidden shrink-0 border-white/[0.08] bg-transparent text-foreground hover:border-white/[0.15] hover:text-foreground md:flex"
 									>
 										Color
 										{selectedColors.length > 0 && (
@@ -365,7 +365,7 @@ export function FilterBar({
 									<Button
 										variant="outline-solid"
 										size="sm"
-										className="hidden shrink-0 border-white/[0.08] bg-transparent text-neutral-300 hover:border-white/[0.15] hover:text-white md:flex"
+										className="hidden shrink-0 border-white/[0.08] bg-transparent text-foreground hover:border-white/[0.15] hover:text-foreground md:flex"
 									>
 										Size
 										{selectedSizes.length > 0 && (
@@ -402,7 +402,7 @@ export function FilterBar({
 									<Button
 										variant="outline-solid"
 										size="sm"
-										className="hidden shrink-0 border-white/[0.08] bg-transparent text-neutral-300 hover:border-white/[0.15] hover:text-white md:flex"
+										className="hidden shrink-0 border-white/[0.08] bg-transparent text-foreground hover:border-white/[0.15] hover:text-foreground md:flex"
 									>
 										Price
 										{selectedPriceRange && (
@@ -436,7 +436,7 @@ export function FilterBar({
 
 					{/* Right: Result Count + Sort */}
 					<div className="flex shrink-0 items-center gap-3">
-						<span className="hidden text-sm text-neutral-500 sm:block">
+						<span className="hidden text-sm text-muted-foreground sm:block">
 							{resultCount} {resultCount === 1 ? "product" : "products"}
 						</span>
 
@@ -445,7 +445,7 @@ export function FilterBar({
 								<Button
 									variant="outline-solid"
 									size="sm"
-									className="border-white/[0.08] bg-transparent text-neutral-300 hover:border-white/[0.15] hover:text-white"
+									className="border-white/[0.08] bg-transparent text-foreground hover:border-white/[0.15] hover:text-foreground"
 								>
 									Sort
 									<ChevronDown className="ml-1.5 h-4 w-4 opacity-50" />
@@ -474,9 +474,9 @@ export function FilterBar({
 							<Badge
 								key={`${filter.key}-${filter.value}`}
 								variant="secondary"
-								className="shrink-0 gap-1.5 border border-white/[0.08] bg-white/[0.04] pr-1.5 text-neutral-300"
+								className="shrink-0 gap-1.5 border border-white/[0.08] bg-white/[0.04] pr-1.5 text-foreground"
 							>
-								<span className="text-xs text-neutral-500">{filter.label}:</span>
+								<span className="text-xs text-muted-foreground">{filter.label}:</span>
 								{filter.value}
 								<button
 									onClick={() => onRemoveFilter(filter.key, filter.value)}
@@ -490,7 +490,7 @@ export function FilterBar({
 						<Button
 							variant="ghost"
 							size="sm"
-							className="h-6 shrink-0 px-2 text-xs text-neutral-500 hover:text-neutral-300"
+							className="h-6 shrink-0 px-2 text-xs text-muted-foreground hover:text-foreground"
 							onClick={onClearFilters}
 						>
 							Clear all

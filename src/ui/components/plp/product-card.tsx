@@ -59,9 +59,9 @@ export function ProductCard({ product, priority = false }: ProductCardProps) {
 		<article className="group">
 			<Link href={product.href} className="block">
 				{/* Card shell */}
-				<div className="overflow-hidden rounded-2xl border border-white/[0.06] bg-gradient-to-b from-neutral-800/60 to-neutral-900/80 shadow-lg shadow-black/20 transition-all duration-500 hover:-translate-y-1 hover:border-emerald-500/15 hover:shadow-xl hover:shadow-emerald-900/20">
+				<div className="overflow-hidden rounded-2xl border border-border bg-gradient-to-b from-secondary to-card shadow-lg shadow-black/20 transition-all duration-500 hover:-translate-y-1 hover:border-emerald-500/15 hover:shadow-xl hover:shadow-emerald-900/20">
 					{/* Image Container */}
-					<div className="relative aspect-[3/4] overflow-hidden bg-neutral-800/40">
+					<div className="relative aspect-[3/4] overflow-hidden bg-secondary">
 						<Image
 							src={product.image}
 							alt={product.imageAlt || product.name}
@@ -109,13 +109,13 @@ export function ProductCard({ product, priority = false }: ProductCardProps) {
 					</div>
 
 					{/* Product Info */}
-					<div className="border-t border-white/[0.05] px-4 py-4">
+					<div className="border-t border-border px-4 py-4">
 						{product.brand && (
 							<p className="mb-1 text-xs font-medium uppercase tracking-wider text-emerald-400/80">
 								{product.brand}
 							</p>
 						)}
-						<h3 className="line-clamp-2 text-sm font-medium leading-snug text-neutral-200 transition-colors md:group-hover:text-white">
+						<h3 className="line-clamp-2 text-sm font-medium leading-snug text-foreground transition-colors md:group-hover:text-foreground">
 							{product.name}
 						</h3>
 
@@ -130,15 +130,17 @@ export function ProductCard({ product, priority = false }: ProductCardProps) {
 									/>
 								))}
 								{product.colors.length > 4 && (
-									<span className="ml-0.5 text-xs text-neutral-500">+{product.colors.length - 4}</span>
+									<span className="ml-0.5 text-xs text-muted-foreground">+{product.colors.length - 4}</span>
 								)}
 							</div>
 						)}
 
 						<div className="mt-2 flex items-center gap-2">
-							<span className="font-semibold text-white">{formatPrice(product.price, product.currency)}</span>
+							<span className="font-semibold text-foreground">
+								{formatPrice(product.price, product.currency)}
+							</span>
 							{product.compareAtPrice && (
-								<span className="text-sm text-neutral-500 line-through">
+								<span className="text-sm text-muted-foreground line-through">
 									{formatPrice(product.compareAtPrice, product.currency)}
 								</span>
 							)}

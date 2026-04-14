@@ -76,7 +76,7 @@ const stats = [
 
 export default function AboutPage() {
 	return (
-		<div className="bg-neutral-950 text-white">
+		<div className="bg-background text-foreground">
 			{/* Hero */}
 			<section className="relative overflow-hidden py-20 sm:py-28 lg:py-36">
 				<div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top,_var(--tw-gradient-stops))] from-emerald-900/20 via-transparent to-transparent" />
@@ -90,7 +90,7 @@ export default function AboutPage() {
 								Uncompromising Quality
 							</span>
 						</h1>
-						<p className="mt-6 text-base leading-relaxed text-neutral-300 sm:text-lg">
+						<p className="mt-6 text-base leading-relaxed text-muted-foreground sm:text-lg">
 							InfinityBio Labs was founded on a simple premise: researchers deserve peptides they can trust.
 							We provide pharmaceutical-grade compounds with verified purity, full documentation, and
 							cold-chain delivery — so you can focus on what matters: the science.
@@ -100,14 +100,14 @@ export default function AboutPage() {
 			</section>
 
 			{/* Stats */}
-			<section className="border-y border-neutral-800">
-				<div className="mx-auto grid max-w-7xl grid-cols-2 divide-x divide-neutral-800 lg:grid-cols-4">
+			<section className="border-y border-border">
+				<div className="mx-auto grid max-w-7xl grid-cols-2 divide-x divide-border lg:grid-cols-4">
 					{stats.map((stat) => (
 						<div key={stat.label} className="px-4 py-8 text-center sm:px-6 sm:py-12">
 							<p className="font-mono text-2xl font-bold tracking-tight text-emerald-400 sm:text-3xl lg:text-4xl">
 								{stat.value}
 							</p>
-							<p className="mt-2 text-xs font-medium uppercase tracking-wider text-neutral-500">
+							<p className="mt-2 text-xs font-medium uppercase tracking-wider text-muted-foreground">
 								{stat.label}
 							</p>
 						</div>
@@ -127,10 +127,7 @@ export default function AboutPage() {
 
 					<div className="mt-16 grid gap-8 sm:grid-cols-2">
 						{values.map((value) => (
-							<div
-								key={value.title}
-								className="rounded-2xl border border-neutral-800 bg-neutral-900/40 p-6 sm:p-8"
-							>
+							<div key={value.title} className="rounded-2xl border border-border bg-card p-6 sm:p-8">
 								<div className="flex h-12 w-12 items-center justify-center rounded-xl bg-emerald-500/10">
 									<svg
 										className="h-6 w-6 text-emerald-400"
@@ -143,7 +140,7 @@ export default function AboutPage() {
 									</svg>
 								</div>
 								<h3 className="mt-5 text-lg font-semibold">{value.title}</h3>
-								<p className="mt-3 text-sm leading-relaxed text-neutral-400">{value.description}</p>
+								<p className="mt-3 text-sm leading-relaxed text-muted-foreground">{value.description}</p>
 							</div>
 						))}
 					</div>
@@ -151,7 +148,7 @@ export default function AboutPage() {
 			</section>
 
 			{/* Timeline */}
-			<section className="border-t border-neutral-800 py-20 sm:py-28">
+			<section className="border-t border-border py-20 sm:py-28">
 				<div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
 					<div className="mx-auto max-w-2xl text-center">
 						<p className="text-sm font-medium uppercase tracking-[0.25em] text-emerald-400">Our Journey</p>
@@ -162,7 +159,7 @@ export default function AboutPage() {
 
 					<div className="relative mx-auto mt-16 max-w-3xl">
 						{/* Vertical line */}
-						<div className="absolute left-4 top-0 h-full w-px bg-neutral-800 sm:left-1/2 sm:-translate-x-px" />
+						<div className="absolute left-4 top-0 h-full w-px bg-border sm:left-1/2 sm:-translate-x-px" />
 
 						<div className="space-y-12">
 							{milestones.map((milestone, i) => (
@@ -174,7 +171,7 @@ export default function AboutPage() {
 									)}
 								>
 									{/* Dot */}
-									<div className="absolute left-4 top-1 flex h-2.5 w-2.5 -translate-x-1/2 items-center justify-center rounded-full bg-emerald-500 ring-4 ring-neutral-950 sm:left-1/2" />
+									<div className="absolute left-4 top-1 flex h-2.5 w-2.5 -translate-x-1/2 items-center justify-center rounded-full bg-emerald-500 ring-4 ring-background sm:left-1/2" />
 
 									{/* Content */}
 									<div
@@ -185,7 +182,9 @@ export default function AboutPage() {
 									>
 										<span className="font-mono text-sm font-bold text-emerald-400">{milestone.year}</span>
 										<h3 className="mt-1 text-lg font-semibold">{milestone.title}</h3>
-										<p className="mt-2 text-sm leading-relaxed text-neutral-400">{milestone.description}</p>
+										<p className="mt-2 text-sm leading-relaxed text-muted-foreground">
+											{milestone.description}
+										</p>
 									</div>
 								</div>
 							))}
@@ -195,10 +194,10 @@ export default function AboutPage() {
 			</section>
 
 			{/* CTA */}
-			<section className="border-t border-neutral-800 py-20 sm:py-28">
+			<section className="border-t border-border py-20 sm:py-28">
 				<div className="mx-auto max-w-3xl px-6 text-center">
 					<h2 className="text-2xl font-bold tracking-tight sm:text-3xl">Ready to get started?</h2>
-					<p className="mt-4 text-neutral-400">
+					<p className="mt-4 text-muted-foreground">
 						Browse our catalog of 73+ research-grade peptides, or reach out to discuss your specific research
 						needs.
 					</p>
@@ -214,7 +213,7 @@ export default function AboutPage() {
 						</LinkWithChannel>
 						<LinkWithChannel
 							href="/contact"
-							className="inline-flex h-12 items-center rounded-full border border-neutral-700 px-8 text-sm font-semibold text-white transition-all hover:border-neutral-500 hover:bg-white/5"
+							className="inline-flex h-12 items-center rounded-full border border-border px-8 text-sm font-semibold text-foreground transition-all hover:border-muted-foreground hover:bg-secondary"
 						>
 							Contact Us
 						</LinkWithChannel>

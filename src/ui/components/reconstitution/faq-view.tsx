@@ -11,8 +11,8 @@ export function FaqView() {
 	return (
 		<div className="mx-auto max-w-2xl">
 			<div className="mb-8">
-				<h2 className="text-xl font-bold text-white">Frequently Asked Questions</h2>
-				<p className="mt-2 text-sm text-neutral-400">
+				<h2 className="text-xl font-bold text-foreground">Frequently Asked Questions</h2>
+				<p className="mt-2 text-sm text-muted-foreground">
 					Common questions about peptide reconstitution, units, and the calculator.
 				</p>
 			</div>
@@ -22,9 +22,7 @@ export function FaqView() {
 					<div
 						key={i}
 						className={`overflow-hidden rounded-2xl border transition-all duration-300 ${
-							openIndex === i
-								? "border-emerald-500/30 bg-emerald-500/[0.04]"
-								: "border-neutral-800 bg-neutral-900/60"
+							openIndex === i ? "border-emerald-500/30 bg-emerald-500/[0.04]" : "border-border bg-card"
 						}`}
 					>
 						<button
@@ -33,7 +31,7 @@ export function FaqView() {
 							aria-expanded={openIndex === i}
 							className="flex w-full items-center justify-between px-5 py-4 text-left"
 						>
-							<span className="pr-4 text-sm font-medium text-white">{item.question}</span>
+							<span className="pr-4 text-sm font-medium text-foreground">{item.question}</span>
 							<svg
 								xmlns="http://www.w3.org/2000/svg"
 								width="16"
@@ -44,7 +42,7 @@ export function FaqView() {
 								strokeWidth="2"
 								strokeLinecap="round"
 								strokeLinejoin="round"
-								className={`shrink-0 text-neutral-500 transition-transform duration-300 ${
+								className={`shrink-0 text-muted-foreground transition-transform duration-300 ${
 									openIndex === i ? "rotate-180" : ""
 								}`}
 							>
@@ -57,7 +55,7 @@ export function FaqView() {
 							}`}
 						>
 							<div className="overflow-hidden">
-								<p className="px-5 pb-5 text-sm leading-relaxed text-neutral-400">{item.answer}</p>
+								<p className="px-5 pb-5 text-sm leading-relaxed text-muted-foreground">{item.answer}</p>
 							</div>
 						</div>
 					</div>

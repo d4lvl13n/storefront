@@ -18,20 +18,20 @@ export function LegalLayout({
 	children: ReactNode;
 }) {
 	return (
-		<div className="bg-neutral-950 text-white">
+		<div className="bg-background text-foreground">
 			{/* Header */}
-			<section className="border-b border-neutral-800 py-14 sm:py-20">
+			<section className="border-b border-border py-14 sm:py-20">
 				<div className="mx-auto max-w-3xl px-4 sm:px-6">
-					<div className="mb-4 inline-flex items-center gap-2 rounded-full border border-neutral-800 bg-neutral-900/60 px-3 py-1">
+					<div className="mb-4 inline-flex items-center gap-2 rounded-full border border-border bg-card px-3 py-1">
 						<span className="h-1.5 w-1.5 rounded-full bg-emerald-500" />
-						<span className="text-xs font-medium text-neutral-400">Last updated {lastUpdated}</span>
+						<span className="text-xs font-medium text-muted-foreground">Last updated {lastUpdated}</span>
 					</div>
 					<h1 className="text-2xl font-bold tracking-tight sm:text-3xl lg:text-4xl">{title}</h1>
 				</div>
 			</section>
 
 			{/* Cross-nav */}
-			<div className="border-b border-neutral-800 bg-neutral-900/30">
+			<div className="border-b border-border bg-card">
 				<div className="mx-auto max-w-3xl px-4 sm:px-6">
 					<nav
 						className="no-scrollbar flex gap-6 overflow-x-auto py-3 text-xs font-medium"
@@ -41,7 +41,7 @@ export function LegalLayout({
 							<LinkWithChannel
 								key={item.href}
 								href={item.href}
-								className="shrink-0 text-neutral-500 transition-colors hover:text-white"
+								className="shrink-0 text-muted-foreground transition-colors hover:text-foreground"
 							>
 								{item.label}
 							</LinkWithChannel>

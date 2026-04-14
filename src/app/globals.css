@@ -23,26 +23,46 @@
 }
 
 @layer components {
-	/* Transparent header — invert all child colors on homepage at top */
+	/* Transparent header — use foreground color by default (works in light mode) */
 	header[data-transparent] {
-		color: white;
-	}
-	header[data-transparent] img:not([data-logo]) {
-		filter: brightness(10);
+		color: var(--foreground);
 	}
 	header[data-transparent] input {
+		background-color: var(--secondary);
+		border-color: var(--border);
+		color: var(--foreground);
+	}
+	header[data-transparent] input::placeholder {
+		color: var(--muted-foreground);
+	}
+	header[data-transparent] svg {
+		color: var(--foreground);
+	}
+	header[data-transparent] button,
+	header[data-transparent] a {
+		color: var(--foreground);
+	}
+
+	/* Dark mode: override transparent header to white for dark hero backgrounds */
+	.dark header[data-transparent] {
+		color: white;
+	}
+	.dark header[data-transparent] img:not([data-logo]) {
+		filter: brightness(10);
+	}
+	.dark header[data-transparent] input {
 		background-color: rgba(255, 255, 255, 0.1);
 		border-color: rgba(255, 255, 255, 0.15);
 		color: white;
 	}
-	header[data-transparent] input::placeholder {
+	.dark header[data-transparent] input::placeholder {
 		color: rgba(255, 255, 255, 0.5);
 	}
-	header[data-transparent] svg {
+	.dark header[data-transparent] svg {
 		color: white;
 	}
-	header[data-transparent] button,
-	header[data-transparent] a {
+	.dark header[data-transparent] button,
+	.dark header[data-transparent] a {
 		color: white;
 	}
 }

@@ -111,7 +111,7 @@ export function LoginMode() {
 
 	return (
 		<div className="w-full max-w-md">
-			<div className="relative overflow-hidden rounded-3xl border border-white/[0.06] bg-gradient-to-b from-neutral-800/80 to-neutral-900/90 shadow-2xl shadow-black/30">
+			<div className="relative overflow-hidden rounded-3xl border border-white/[0.06] bg-gradient-to-b from-card to-card shadow-2xl shadow-black/30">
 				<div className="absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-white/[0.12] to-transparent" />
 
 				<div className="noise-overlay relative p-8 sm:p-10">
@@ -119,14 +119,14 @@ export function LoginMode() {
 						<p className="text-xs font-semibold uppercase tracking-[0.25em] text-emerald-400">
 							Researcher Account
 						</p>
-						<h1 className="mt-3 text-2xl font-bold tracking-tight text-white sm:text-3xl">
+						<h1 className="mt-3 text-2xl font-bold tracking-tight text-foreground sm:text-3xl">
 							Sign in to your account
 						</h1>
-						<p className="mt-3 text-sm leading-relaxed text-neutral-400">
+						<p className="mt-3 text-sm leading-relaxed text-muted-foreground">
 							Access order history, saved lab addresses, and reorder details.{" "}
 							<Link
 								href={`/${params.channel}/signup`}
-								className="font-medium text-white underline underline-offset-2 transition-colors hover:text-emerald-400 hover:no-underline"
+								className="font-medium text-foreground underline underline-offset-2 transition-colors hover:text-emerald-400 hover:no-underline"
 							>
 								Create an account
 							</Link>
@@ -153,11 +153,11 @@ export function LoginMode() {
 						)}
 
 						<div className="space-y-1.5">
-							<Label htmlFor="email" className="text-sm font-medium text-neutral-300">
+							<Label htmlFor="email" className="text-sm font-medium text-foreground">
 								Email address
 							</Label>
 							<div className="relative">
-								<Mail className="absolute left-3.5 top-1/2 h-4 w-4 -translate-y-1/2 text-neutral-500" />
+								<Mail className="absolute left-3.5 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
 								<Input
 									id="email"
 									type="email"
@@ -169,7 +169,7 @@ export function LoginMode() {
 										setEmail(e.target.value);
 										setResetEmailSent(false);
 									}}
-									className="h-12 rounded-xl border-white/[0.08] bg-white/[0.04] pl-11 text-white placeholder-neutral-500 transition-all focus:border-emerald-500/60 focus:bg-white/[0.06] focus:ring-1 focus:ring-emerald-500/40"
+									className="h-12 rounded-xl border-white/[0.08] bg-white/[0.04] pl-11 text-foreground placeholder-muted-foreground transition-all focus:border-emerald-500/60 focus:bg-white/[0.06] focus:ring-1 focus:ring-emerald-500/40"
 									required
 								/>
 							</div>
@@ -177,20 +177,20 @@ export function LoginMode() {
 
 						<div className="space-y-1.5">
 							<div className="flex items-center justify-between">
-								<Label htmlFor="password" className="text-sm font-medium text-neutral-300">
+								<Label htmlFor="password" className="text-sm font-medium text-foreground">
 									Password
 								</Label>
 								<button
 									type="button"
 									onClick={handleForgotPassword}
 									disabled={isSubmitting}
-									className="text-sm text-neutral-500 transition-colors hover:text-emerald-400 disabled:opacity-50"
+									className="text-sm text-muted-foreground transition-colors hover:text-emerald-400 disabled:opacity-50"
 								>
 									{resetEmailSent ? "Resend reset link?" : "Forgot password?"}
 								</button>
 							</div>
 							<div className="relative">
-								<Lock className="absolute left-3.5 top-1/2 h-4 w-4 -translate-y-1/2 text-neutral-500" />
+								<Lock className="absolute left-3.5 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
 								<Input
 									id="password"
 									type={showPassword ? "text" : "password"}
@@ -198,14 +198,14 @@ export function LoginMode() {
 									autoComplete="current-password"
 									value={password}
 									onChange={(e) => setPassword(e.target.value)}
-									className="h-12 rounded-xl border-white/[0.08] bg-white/[0.04] pl-11 pr-11 text-white placeholder-neutral-500 transition-all focus:border-emerald-500/60 focus:bg-white/[0.06] focus:ring-1 focus:ring-emerald-500/40"
+									className="h-12 rounded-xl border-white/[0.08] bg-white/[0.04] pl-11 pr-11 text-foreground placeholder-muted-foreground transition-all focus:border-emerald-500/60 focus:bg-white/[0.06] focus:ring-1 focus:ring-emerald-500/40"
 									required
 								/>
 								<button
 									type="button"
 									onClick={() => setShowPassword(!showPassword)}
 									aria-label={showPassword ? "Hide password" : "Show password"}
-									className="absolute right-3.5 top-1/2 -translate-y-1/2 text-neutral-500 transition-colors hover:text-neutral-300"
+									className="absolute right-3.5 top-1/2 -translate-y-1/2 text-muted-foreground transition-colors hover:text-foreground"
 								>
 									{showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
 								</button>
@@ -222,10 +222,10 @@ export function LoginMode() {
 					</form>
 
 					<div className="mt-8 border-t border-white/[0.06] pt-6">
-						<p className="mb-3 text-xs font-semibold uppercase tracking-[0.2em] text-neutral-500">
+						<p className="mb-3 text-xs font-semibold uppercase tracking-[0.2em] text-muted-foreground">
 							Your account includes
 						</p>
-						<ul className="space-y-2.5 text-sm text-neutral-400">
+						<ul className="space-y-2.5 text-sm text-muted-foreground">
 							<li className="flex items-center gap-2.5">
 								<span className="flex h-6 w-6 shrink-0 items-center justify-center rounded-lg bg-emerald-500/10">
 									<svg

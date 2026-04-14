@@ -20,9 +20,9 @@ export function WorkedExampleView() {
 
 	return (
 		<div className="mx-auto max-w-2xl">
-			<div className="rounded-2xl border border-neutral-800 bg-neutral-900/60 p-6 sm:p-8">
-				<h2 className="mb-2 text-xl font-bold text-white">Worked Example</h2>
-				<p className="mb-8 text-sm text-neutral-400">
+			<div className="rounded-2xl border border-border bg-card p-6 sm:p-8">
+				<h2 className="mb-2 text-xl font-bold text-foreground">Worked Example</h2>
+				<p className="mb-8 text-sm text-muted-foreground">
 					Walk through a common reconstitution scenario step by step.
 				</p>
 
@@ -74,9 +74,9 @@ export function WorkedExampleView() {
 
 function InfoChip({ label, value }: { label: string; value: string }) {
 	return (
-		<div className="rounded-lg border border-neutral-700 bg-neutral-800 px-4 py-3">
-			<span className="text-xs text-neutral-500">{label}</span>
-			<p className="text-sm font-medium text-white">{value}</p>
+		<div className="rounded-lg border border-border bg-secondary px-4 py-3">
+			<span className="text-xs text-muted-foreground">{label}</span>
+			<p className="text-sm font-medium text-foreground">{value}</p>
 		</div>
 	);
 }
@@ -98,9 +98,9 @@ function Step({
 				{number}
 			</div>
 			<div className="flex-1">
-				<h3 className="font-medium text-white">{title}</h3>
+				<h3 className="font-medium text-foreground">{title}</h3>
 				<p className="mt-1 font-mono text-sm text-emerald-400">{formula}</p>
-				<p className="mt-1.5 text-sm text-neutral-400">{explanation}</p>
+				<p className="mt-1.5 text-sm text-muted-foreground">{explanation}</p>
 			</div>
 		</div>
 	);

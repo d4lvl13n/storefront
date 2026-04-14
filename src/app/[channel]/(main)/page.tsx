@@ -296,13 +296,22 @@ const institutions = [
 
 function HeroSection() {
 	return (
-		<section className="noise-overlay relative -mt-16 flex min-h-[90vh] items-center overflow-hidden bg-neutral-950 pt-16">
+		<section className="noise-overlay relative -mt-16 flex min-h-[90vh] items-center overflow-hidden bg-background pt-16">
 			{/* Full-bleed background image */}
 			<Image src="/hero-2.webp" alt="" fill priority className="object-cover object-center" />
 
-			{/* Dark gradient overlay for text readability */}
-			<div className="absolute inset-0 bg-gradient-to-r from-neutral-950/95 via-neutral-950/80 to-neutral-950/60" />
-			<div className="absolute inset-0 bg-neutral-950/40" />
+			{/* Gradient overlay for text readability */}
+			<div
+				className="absolute inset-0"
+				style={{
+					background:
+						"linear-gradient(to right, var(--background) 0%, color-mix(in oklch, var(--background) 80%, transparent) 50%, color-mix(in oklch, var(--background) 60%, transparent) 100%)",
+				}}
+			/>
+			<div
+				className="absolute inset-0"
+				style={{ backgroundColor: "color-mix(in oklch, var(--background) 40%, transparent)" }}
+			/>
 
 			{/* Gradient orbs */}
 			<div className="pointer-events-none absolute inset-0">
@@ -323,17 +332,17 @@ function HeroSection() {
 
 			<div className="relative z-10 mx-auto w-full max-w-7xl px-6 py-20">
 				<div className="max-w-2xl">
-					<p className="mb-6 animate-fade-in text-sm font-medium uppercase tracking-[0.3em] text-neutral-400 opacity-0">
+					<p className="mb-6 animate-fade-in text-sm font-medium uppercase tracking-[0.3em] text-muted-foreground opacity-0">
 						Pharmaceutical-Grade Research Peptides
 					</p>
-					<h1 className="animate-fade-in-up text-3xl font-bold leading-[1.05] tracking-tight text-white opacity-0 sm:text-5xl md:text-6xl lg:text-7xl">
+					<h1 className="animate-fade-in-up text-3xl font-bold leading-[1.05] tracking-tight text-foreground opacity-0 sm:text-5xl md:text-6xl lg:text-7xl">
 						The Science
 						<br />
 						<span className="bg-gradient-to-r from-emerald-400 via-teal-400 to-cyan-400 bg-clip-text text-transparent">
 							of Purity
 						</span>
 					</h1>
-					<p className="mt-6 max-w-xl animate-fade-in-up-delay-1 text-base leading-relaxed text-neutral-300 opacity-0 sm:mt-8 sm:text-lg">
+					<p className="mt-6 max-w-xl animate-fade-in-up-delay-1 text-base leading-relaxed text-foreground opacity-0 sm:mt-8 sm:text-lg">
 						HPLC-verified, 99%+ purity research peptides and biotech compounds. Every batch independently
 						tested. Every order documented with a Certificate of Analysis.
 					</p>
@@ -342,7 +351,7 @@ function HeroSection() {
 					<div className="mt-10 flex animate-fade-in-up-delay-2 flex-col gap-4 opacity-0 sm:flex-row sm:items-center">
 						<LinkWithChannel
 							href="/products"
-							className="group inline-flex h-12 items-center justify-center gap-2 rounded-full bg-emerald-500 px-6 text-sm font-semibold text-white transition-all hover:bg-emerald-400 hover:shadow-lg hover:shadow-emerald-500/25 sm:px-8"
+							className="group inline-flex h-12 items-center justify-center gap-2 rounded-full bg-emerald-500 px-6 text-sm font-semibold text-foreground transition-all hover:bg-emerald-400 hover:shadow-lg hover:shadow-emerald-500/25 sm:px-8"
 						>
 							Explore Compounds
 							<svg
@@ -357,7 +366,7 @@ function HeroSection() {
 						</LinkWithChannel>
 						<a
 							href="#shop-by-goal"
-							className="inline-flex h-12 items-center justify-center rounded-full border border-neutral-700 bg-neutral-950/30 px-6 text-sm font-semibold text-neutral-200 transition-colors hover:border-neutral-500 hover:text-white sm:px-8"
+							className="inline-flex h-12 items-center justify-center rounded-full border border-border bg-background px-6 text-sm font-semibold text-foreground transition-colors hover:border-muted-foreground hover:text-foreground sm:px-8"
 						>
 							Shop by Goal
 						</a>
@@ -367,7 +376,7 @@ function HeroSection() {
 					<dl className="mt-10 flex animate-fade-in-up-delay-2 flex-wrap gap-6 opacity-0 sm:mt-12 sm:gap-8 lg:gap-12">
 						{statsData.map((stat) => (
 							<div key={stat.label}>
-								<dt className="text-xs font-medium uppercase tracking-wider text-neutral-500">
+								<dt className="text-xs font-medium uppercase tracking-wider text-muted-foreground">
 									{stat.label}
 								</dt>
 								<dd className="mt-1 font-mono text-xl font-bold text-emerald-400 sm:text-2xl">
@@ -381,8 +390,8 @@ function HeroSection() {
 
 			{/* Scroll indicator */}
 			<div className="absolute bottom-8 left-1/2 -translate-x-1/2 animate-bounce">
-				<div className="flex h-10 w-6 justify-center rounded-full border-2 border-neutral-600 pt-2">
-					<div className="h-2 w-1 rounded-full bg-neutral-400" />
+				<div className="flex h-10 w-6 justify-center rounded-full border-2 border-muted-foreground pt-2">
+					<div className="h-2 w-1 rounded-full bg-muted-foreground" />
 				</div>
 			</div>
 		</section>
@@ -394,14 +403,14 @@ function HeroSection() {
 function TrustBar() {
 	const items = [...trustItems, ...trustItems];
 	return (
-		<div className="overflow-hidden border-y border-neutral-800 bg-neutral-900/50 py-4">
+		<div className="overflow-hidden border-y border-border bg-card py-4">
 			<div className="flex w-max animate-marquee">
 				{items.map((item, i) => {
 					const Icon = item.icon;
 					return (
 						<span
 							key={i}
-							className="mx-8 inline-flex items-center gap-2.5 text-xs font-medium uppercase tracking-[0.15em] text-neutral-500"
+							className="mx-8 inline-flex items-center gap-2.5 text-xs font-medium uppercase tracking-[0.15em] text-muted-foreground"
 						>
 							<Icon className="h-3.5 w-3.5 text-emerald-500/70" />
 							{item.label}
@@ -418,7 +427,7 @@ function TrustBar() {
 function ScienceQualitySection() {
 	return (
 		<section
-			className="noise-overlay relative overflow-hidden bg-neutral-950 text-white"
+			className="noise-overlay relative overflow-hidden bg-background text-foreground"
 			aria-label="Quality Assurance"
 		>
 			{/* Background */}
@@ -449,7 +458,7 @@ function ScienceQualitySection() {
 							a Verified Story
 						</span>
 					</h2>
-					<p className="mx-auto mt-6 max-w-xl text-lg leading-relaxed text-neutral-400">
+					<p className="mx-auto mt-6 max-w-xl text-lg leading-relaxed text-muted-foreground">
 						From synthesis to your lab bench, every compound undergoes rigorous multi-stage verification.
 					</p>
 				</div>
@@ -485,8 +494,8 @@ function ScienceQualitySection() {
 								<span className="mb-3 inline-block rounded-lg bg-emerald-500/10 px-3 py-1.5 font-mono text-sm font-bold text-emerald-400">
 									{pillar.stat}
 								</span>
-								<h3 className="text-lg font-semibold text-white sm:text-xl">{pillar.title}</h3>
-								<p className="mt-2 text-sm leading-relaxed text-neutral-400 sm:text-base">
+								<h3 className="text-lg font-semibold text-foreground sm:text-xl">{pillar.title}</h3>
+								<p className="mt-2 text-sm leading-relaxed text-muted-foreground sm:text-base">
 									{pillar.description}
 								</p>
 							</div>
@@ -512,14 +521,17 @@ function ScienceQualitySection() {
 
 function InstitutionLogosBar() {
 	return (
-		<section className="border-y border-neutral-800 bg-neutral-900/30 py-12">
+		<section className="border-y border-border bg-card py-12">
 			<div className="mx-auto max-w-7xl px-6">
-				<p className="mb-8 text-center text-xs font-medium uppercase tracking-[0.25em] text-neutral-500">
+				<p className="mb-8 text-center text-xs font-medium uppercase tracking-[0.25em] text-muted-foreground">
 					Trusted by researchers at
 				</p>
 				<div className="flex flex-wrap items-center justify-center gap-x-12 gap-y-4">
 					{institutions.map((name) => (
-						<span key={name} className="text-base font-semibold tracking-wide text-neutral-500 sm:text-lg">
+						<span
+							key={name}
+							className="text-base font-semibold tracking-wide text-muted-foreground sm:text-lg"
+						>
 							{name}
 						</span>
 					))}
@@ -543,7 +555,7 @@ async function ShopByGoalSection({ params }: { params: Promise<{ channel: string
 	return (
 		<section
 			id="shop-by-goal"
-			className="noise-overlay relative overflow-hidden bg-neutral-950 text-white"
+			className="noise-overlay relative overflow-hidden bg-background text-foreground"
 			aria-label="Shop by Goal"
 		>
 			{/* Background */}
@@ -564,7 +576,7 @@ async function ShopByGoalSection({ params }: { params: Promise<{ channel: string
 						</div>
 						<LinkWithChannel
 							href="/products"
-							className="hidden items-center gap-2 text-sm font-medium text-neutral-400 transition-colors hover:text-white sm:inline-flex"
+							className="hidden items-center gap-2 text-sm font-medium text-muted-foreground transition-colors hover:text-foreground sm:inline-flex"
 						>
 							View All Categories
 							<svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
@@ -596,7 +608,7 @@ async function TabbedProductsSection({ params }: { params: Promise<{ channel: st
 	return (
 		<section
 			id="featured-products"
-			className="bg-neutral-950 py-24 text-white sm:py-32"
+			className="bg-background py-24 text-foreground sm:py-32"
 			aria-label="Products"
 		>
 			<div className="mx-auto max-w-7xl px-6">
@@ -613,7 +625,7 @@ function TestimonialsSection() {
 	const supporting = testimonials.slice(1);
 
 	return (
-		<section className="bg-neutral-950 text-white" aria-label="Testimonials">
+		<section className="bg-background text-foreground" aria-label="Testimonials">
 			<div className="mx-auto max-w-7xl px-6 py-24 sm:py-32">
 				<div className="mb-12 text-center sm:mb-16">
 					<p className="mb-3 text-sm font-medium uppercase tracking-[0.2em] text-emerald-400">
@@ -622,11 +634,13 @@ function TestimonialsSection() {
 					<h2 className="text-3xl font-bold tracking-tight sm:text-4xl lg:text-5xl">
 						Trusted by Researchers Worldwide
 					</h2>
-					<p className="mt-3 text-sm text-neutral-500">4.9/5 average rating across 1,200+ research orders.</p>
+					<p className="mt-3 text-sm text-muted-foreground">
+						4.9/5 average rating across 1,200+ research orders.
+					</p>
 				</div>
 
 				{/* Featured testimonial */}
-				<article className="relative mx-auto max-w-4xl overflow-hidden rounded-2xl border border-neutral-800 bg-neutral-900/60 p-6 text-center sm:rounded-3xl sm:p-12 lg:p-16">
+				<article className="relative mx-auto max-w-4xl overflow-hidden rounded-2xl border border-border bg-card p-6 text-center sm:rounded-3xl sm:p-12 lg:p-16">
 					{/* Decorative quote */}
 					<div className="pointer-events-none absolute -top-6 left-1/2 -translate-x-1/2 font-serif text-[200px] leading-none text-emerald-500/[0.06]">
 						&ldquo;
@@ -641,7 +655,7 @@ function TestimonialsSection() {
 						))}
 					</div>
 
-					<blockquote className="relative text-xl leading-relaxed text-neutral-300 sm:text-2xl">
+					<blockquote className="relative text-xl leading-relaxed text-foreground sm:text-2xl">
 						&ldquo;{featured.quote}&rdquo;
 					</blockquote>
 
@@ -653,8 +667,8 @@ function TestimonialsSection() {
 								.join("")}
 						</div>
 						<div>
-							<p className="text-lg font-semibold text-white">{featured.author}</p>
-							<p className="text-sm text-neutral-500">{featured.role}</p>
+							<p className="text-lg font-semibold text-foreground">{featured.author}</p>
+							<p className="text-sm text-muted-foreground">{featured.role}</p>
 						</div>
 						<span className="inline-flex items-center gap-1.5 rounded-full bg-emerald-500/10 px-3 py-1 text-xs font-medium text-emerald-400">
 							<svg className="h-3.5 w-3.5" viewBox="0 0 20 20" fill="currentColor">
@@ -674,7 +688,7 @@ function TestimonialsSection() {
 					{supporting.map((t, i) => (
 						<article
 							key={i}
-							className="relative flex flex-col overflow-hidden rounded-2xl border border-neutral-800 bg-neutral-900/40 p-5 sm:p-8"
+							className="relative flex flex-col overflow-hidden rounded-2xl border border-border bg-card p-5 sm:p-8"
 						>
 							<div className="mb-4 flex gap-1">
 								{Array.from({ length: t.rating }).map((_, s) => (
@@ -683,10 +697,10 @@ function TestimonialsSection() {
 									</svg>
 								))}
 							</div>
-							<blockquote className="flex-1 text-base leading-relaxed text-neutral-400">
+							<blockquote className="flex-1 text-base leading-relaxed text-muted-foreground">
 								&ldquo;{t.quote}&rdquo;
 							</blockquote>
-							<div className="mt-6 flex items-center gap-3 border-t border-neutral-800 pt-6">
+							<div className="mt-6 flex items-center gap-3 border-t border-border pt-6">
 								<div className="flex h-10 w-10 items-center justify-center rounded-full bg-emerald-500/10 text-sm font-bold text-emerald-400">
 									{t.author
 										.split(" ")
@@ -694,8 +708,8 @@ function TestimonialsSection() {
 										.join("")}
 								</div>
 								<div className="flex-1">
-									<p className="text-sm font-semibold text-white">{t.author}</p>
-									<p className="text-xs text-neutral-500">{t.role}</p>
+									<p className="text-sm font-semibold text-foreground">{t.author}</p>
+									<p className="text-xs text-muted-foreground">{t.role}</p>
 								</div>
 								<span className="inline-flex items-center gap-1 rounded-full bg-emerald-500/10 px-2.5 py-0.5 text-[10px] font-medium text-emerald-400">
 									<svg className="h-3 w-3" viewBox="0 0 20 20" fill="currentColor">
@@ -723,10 +737,10 @@ function TestimonialsSection() {
 							<path strokeLinecap="round" strokeLinejoin="round" d="M13 7l5 5m0 0l-5 5m5-5H6" />
 						</svg>
 					</LinkWithChannel>
-					<span className="hidden text-neutral-700 sm:inline">·</span>
+					<span className="hidden text-border sm:inline">·</span>
 					<LinkWithChannel
 						href="/partners"
-						className="inline-flex items-center gap-2 text-sm font-medium text-neutral-400 transition-colors hover:text-white"
+						className="inline-flex items-center gap-2 text-sm font-medium text-muted-foreground transition-colors hover:text-foreground"
 					>
 						See our RUO partners and case studies
 						<svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
@@ -750,8 +764,8 @@ function NewsletterSection() {
 	];
 
 	return (
-		<section className="bg-neutral-950 px-6 py-24 sm:py-32" aria-label="Newsletter">
-			<div className="relative mx-auto max-w-4xl overflow-hidden rounded-3xl border border-white/[0.06] bg-gradient-to-b from-neutral-800/80 to-neutral-900/90 shadow-2xl shadow-black/30">
+		<section className="bg-background px-6 py-24 sm:py-32" aria-label="Newsletter">
+			<div className="relative mx-auto max-w-4xl overflow-hidden rounded-3xl border border-white/[0.06] bg-gradient-to-b from-secondary to-card shadow-2xl shadow-black/30">
 				{/* Top-edge highlight */}
 				<div className="absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-white/[0.12] to-transparent" />
 
@@ -764,10 +778,10 @@ function NewsletterSection() {
 						<p className="mb-5 text-xs font-semibold uppercase tracking-[0.25em] text-emerald-400">
 							Free Resource
 						</p>
-						<h2 className="text-3xl font-bold tracking-tight text-white sm:text-4xl lg:text-5xl">
+						<h2 className="text-3xl font-bold tracking-tight text-foreground sm:text-4xl lg:text-5xl">
 							Free Peptide Stability &amp; Storage Guide
 						</h2>
-						<p className="mx-auto mt-5 max-w-lg text-base leading-relaxed text-neutral-400">
+						<p className="mx-auto mt-5 max-w-lg text-base leading-relaxed text-muted-foreground">
 							Get our 20‑page reference guide on peptide reconstitution, storage protocols and stability data
 							— plus early access to new compound launches.
 						</p>
@@ -775,7 +789,7 @@ function NewsletterSection() {
 						{/* Checklist */}
 						<ul className="mx-auto mt-6 flex max-w-lg flex-wrap justify-center gap-x-6 gap-y-2">
 							{checklist.map((item) => (
-								<li key={item} className="inline-flex items-center gap-1.5 text-sm text-neutral-400">
+								<li key={item} className="inline-flex items-center gap-1.5 text-sm text-muted-foreground">
 									<svg className="h-4 w-4 shrink-0 text-emerald-500" viewBox="0 0 20 20" fill="currentColor">
 										<path
 											fillRule="evenodd"
@@ -792,17 +806,17 @@ function NewsletterSection() {
 							<input
 								type="email"
 								placeholder="Enter your email"
-								className="h-13 flex-1 rounded-full border border-white/[0.08] bg-white/[0.04] px-6 text-sm text-white placeholder-neutral-500 outline-none transition-all focus:border-emerald-500/60 focus:bg-white/[0.06] focus:ring-1 focus:ring-emerald-500/40"
+								className="h-13 flex-1 rounded-full border border-white/[0.08] bg-white/[0.04] px-6 text-sm text-foreground placeholder-muted-foreground outline-none transition-all focus:border-emerald-500/60 focus:bg-white/[0.06] focus:ring-1 focus:ring-emerald-500/40"
 							/>
 							<button
 								type="button"
-								className="h-13 rounded-full bg-emerald-500 px-8 text-sm font-semibold text-white shadow-lg shadow-emerald-500/20 transition-all hover:bg-emerald-400 hover:shadow-xl hover:shadow-emerald-500/30"
+								className="h-13 rounded-full bg-emerald-500 px-8 text-sm font-semibold text-foreground shadow-lg shadow-emerald-500/20 transition-all hover:bg-emerald-400 hover:shadow-xl hover:shadow-emerald-500/30"
 							>
 								Get the Free Guide
 							</button>
 						</div>
 
-						<p className="mt-5 text-xs leading-relaxed text-neutral-600">
+						<p className="mt-5 text-xs leading-relaxed text-muted-foreground">
 							Used by lab managers and principal investigators in over 18 countries. No spam. Unsubscribe
 							anytime.
 						</p>

@@ -117,19 +117,16 @@ async function ProductsContent({
 
 function ProductsGridSkeleton() {
 	return (
-		<div className="min-h-screen bg-neutral-950">
+		<div className="min-h-screen bg-background">
 			<div className="mx-auto max-w-7xl animate-skeleton-delayed px-4 py-10 opacity-0 sm:px-6 sm:py-12 lg:px-8">
 				<div className="grid grid-cols-2 gap-4 sm:gap-5 lg:grid-cols-3 lg:gap-6 xl:grid-cols-4">
 					{Array.from({ length: 8 }).map((_, i) => (
-						<div
-							key={i}
-							className="animate-pulse overflow-hidden rounded-2xl border border-white/[0.06] bg-neutral-900/60"
-						>
-							<div className="aspect-[3/4] bg-neutral-800/40" />
-							<div className="border-t border-white/[0.05] px-4 py-4">
-								<div className="mb-2 h-3 w-16 rounded bg-neutral-800" />
-								<div className="mb-3 h-4 w-3/4 rounded bg-neutral-800" />
-								<div className="h-4 w-1/3 rounded bg-neutral-800" />
+						<div key={i} className="animate-pulse overflow-hidden rounded-2xl border border-border bg-card">
+							<div className="aspect-[3/4] bg-secondary" />
+							<div className="border-t border-border px-4 py-4">
+								<div className="mb-2 h-3 w-16 rounded bg-secondary" />
+								<div className="mb-3 h-4 w-3/4 rounded bg-secondary" />
+								<div className="h-4 w-1/3 rounded bg-secondary" />
 							</div>
 						</div>
 					))}

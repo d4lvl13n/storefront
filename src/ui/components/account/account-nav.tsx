@@ -43,7 +43,7 @@ export function AccountNav() {
 		<div className="flex flex-col">
 			<LinkWithChannel
 				href="/"
-				className="mb-8 inline-flex items-center gap-1.5 text-[13px] text-neutral-500 transition-colors hover:text-white"
+				className="mb-8 inline-flex items-center gap-1.5 text-[13px] text-muted-foreground transition-colors hover:text-foreground"
 			>
 				<span className="text-base leading-none">&lsaquo;</span>
 				Back to store
@@ -63,10 +63,10 @@ export function AccountNav() {
 						{initials}
 					</div>
 				)}
-				<p className="font-semibold leading-tight text-white">
+				<p className="font-semibold leading-tight text-foreground">
 					{user.firstName} {user.lastName}
 				</p>
-				<p className="mt-0.5 text-sm text-neutral-500">{user.email}</p>
+				<p className="mt-0.5 text-sm text-muted-foreground">{user.email}</p>
 			</div>
 
 			<nav aria-label="Account" className="flex gap-1 overflow-x-auto md:flex-col md:gap-0.5">
@@ -80,8 +80,8 @@ export function AccountNav() {
 								"flex items-center gap-3 rounded-lg px-3.5 py-2.5 text-sm font-medium transition-colors",
 								"whitespace-nowrap",
 								active
-									? "bg-white/[0.08] text-white"
-									: "text-neutral-500 hover:bg-white/[0.04] hover:text-neutral-300",
+									? "bg-white/[0.08] text-foreground"
+									: "text-muted-foreground hover:bg-white/[0.04] hover:text-foreground",
 							)}
 						>
 							<Icon className="h-[18px] w-[18px]" strokeWidth={active ? 2 : 1.75} />
@@ -95,7 +95,7 @@ export function AccountNav() {
 				<form action={logout}>
 					<button
 						type="submit"
-						className="flex items-center gap-3 px-3.5 py-2 text-sm font-medium text-neutral-500 transition-colors hover:text-white"
+						className="flex items-center gap-3 px-3.5 py-2 text-sm font-medium text-muted-foreground transition-colors hover:text-foreground"
 					>
 						<ArrowLeft className="h-[18px] w-[18px]" strokeWidth={1.75} />
 						Sign out

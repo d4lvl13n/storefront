@@ -32,7 +32,7 @@ export default async function ReconstitutionCalculatorPage(props: { params: Prom
 	});
 
 	return (
-		<section className="bg-neutral-950 text-white">
+		<section className="bg-background text-foreground">
 			{/* JSON-LD Structured Data */}
 			{faqJsonLd && (
 				<script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(faqJsonLd) }} />
@@ -59,7 +59,7 @@ export default async function ReconstitutionCalculatorPage(props: { params: Prom
 					<h1 className="mt-3 text-3xl font-bold tracking-tight sm:text-4xl lg:text-5xl">
 						Peptide Reconstitution Calculator
 					</h1>
-					<p className="mx-auto mt-4 max-w-2xl text-neutral-400">
+					<p className="mx-auto mt-4 max-w-2xl text-muted-foreground">
 						Enter your vial size, diluent volume, and desired dose to instantly calculate the exact draw
 						volume and syringe units. No manual unit conversion needed.
 					</p>
@@ -68,7 +68,7 @@ export default async function ReconstitutionCalculatorPage(props: { params: Prom
 				<CalculatorPageClient />
 
 				{/* Disclaimer */}
-				<div className="mt-16 rounded-xl border border-neutral-800 bg-neutral-900/40 px-5 py-4 text-center text-xs leading-relaxed text-neutral-500">
+				<div className="mt-16 rounded-xl border border-border bg-card px-5 py-4 text-center text-xs leading-relaxed text-muted-foreground">
 					This tool is provided for educational and calculation-support purposes only. It is not intended as
 					individualized medical advice. Always consult qualified professionals and follow applicable
 					regulations for your research application.

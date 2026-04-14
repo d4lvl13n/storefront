@@ -6,6 +6,7 @@ import { UserMenuContainer } from "./nav/components/user-menu/user-menu-containe
 import { MobileMenu } from "./nav/components/mobile-menu";
 import { SearchBar } from "./nav/components/search-bar";
 import { ScrollHeader } from "./scroll-header";
+import { ThemeToggle } from "./theme-toggle";
 
 function SearchBarSkeleton() {
 	return <div className="h-10 w-full max-w-md animate-pulse rounded-lg bg-secondary" />;
@@ -51,6 +52,7 @@ export async function Header({ channel }: { channel: string }) {
 
 					{/* Actions */}
 					<div className="flex items-center gap-1">
+						<ThemeToggle />
 						<Suspense fallback={<div className="h-10 w-10" />}>
 							<UserMenuContainer />
 						</Suspense>

@@ -39,10 +39,7 @@ export function CalculatorPageClient() {
 		<div>
 			{/* Tab Navigation */}
 			<div className="mb-8 overflow-x-auto">
-				<nav
-					className="flex min-w-max gap-1 rounded-xl border border-neutral-800 bg-neutral-900/60 p-1"
-					role="tablist"
-				>
+				<nav className="flex min-w-max gap-1 rounded-xl border border-border bg-card p-1" role="tablist">
 					{TABS.map((tab) => (
 						<button
 							key={tab.id}
@@ -52,7 +49,7 @@ export function CalculatorPageClient() {
 							className={`relative rounded-lg px-4 py-2 text-sm font-medium transition-colors ${
 								activeTab === tab.id
 									? "bg-emerald-500/10 text-emerald-400"
-									: "text-neutral-400 hover:text-neutral-200"
+									: "text-muted-foreground hover:text-foreground"
 							}`}
 						>
 							{tab.label}

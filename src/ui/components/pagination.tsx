@@ -34,9 +34,9 @@ export function Pagination({
 			<Link
 				href={pageInfo.hasPreviousPage ? prevPageUrl : "#"}
 				className={clsx("rounded-lg px-5 py-2.5 text-sm font-medium transition-all", {
-					"border border-white/[0.08] bg-white/[0.04] text-neutral-300 hover:border-white/[0.15] hover:bg-white/[0.06] hover:text-white":
+					"border border-border bg-secondary text-foreground hover:border-muted-foreground hover:bg-card hover:text-foreground":
 						pageInfo.hasPreviousPage,
-					"cursor-not-allowed border border-white/[0.04] text-neutral-700": !pageInfo.hasPreviousPage,
+					"cursor-not-allowed border border-border text-muted-foreground": !pageInfo.hasPreviousPage,
 					"pointer-events-none": !pageInfo.hasPreviousPage,
 				})}
 				aria-disabled={!pageInfo.hasPreviousPage}
@@ -47,9 +47,9 @@ export function Pagination({
 			<Link
 				href={pageInfo.hasNextPage ? nextPageUrl : "#"}
 				className={clsx("rounded-lg px-5 py-2.5 text-sm font-medium transition-all", {
-					"border border-white/[0.08] bg-white/[0.04] text-neutral-300 hover:border-white/[0.15] hover:bg-white/[0.06] hover:text-white":
+					"border border-border bg-secondary text-foreground hover:border-muted-foreground hover:bg-card hover:text-foreground":
 						pageInfo.hasNextPage,
-					"cursor-not-allowed border border-white/[0.04] text-neutral-700": !pageInfo.hasNextPage,
+					"cursor-not-allowed border border-border text-muted-foreground": !pageInfo.hasNextPage,
 					"pointer-events-none": !pageInfo.hasNextPage,
 				})}
 				aria-disabled={!pageInfo.hasNextPage}

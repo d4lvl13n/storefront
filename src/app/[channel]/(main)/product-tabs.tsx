@@ -15,9 +15,9 @@ function ProductCard({ product, index }: { product: ProductListItemFragment; ind
 	return (
 		<li className="card-lift group">
 			<LinkWithChannel href={`/products/${product.slug}`} prefetch={false}>
-				<div className="relative overflow-hidden rounded-2xl border border-neutral-800 bg-neutral-900/60 transition-colors duration-300 group-hover:border-neutral-700">
+				<div className="relative overflow-hidden rounded-2xl border border-border bg-card transition-colors duration-300 group-hover:border-border">
 					{hasDiscount && (
-						<div className="absolute left-3 top-3 z-10 rounded-full bg-red-500 px-2.5 py-1 text-[11px] font-bold uppercase tracking-wider text-white">
+						<div className="absolute left-3 top-3 z-10 rounded-full bg-red-500 px-2.5 py-1 text-[11px] font-bold uppercase tracking-wider text-foreground">
 							Sale
 						</div>
 					)}
@@ -35,19 +35,19 @@ function ProductCard({ product, index }: { product: ProductListItemFragment; ind
 					)}
 				</div>
 				<div className="mt-4 space-y-1 px-0.5">
-					<p className="text-[11px] font-medium uppercase tracking-wider text-neutral-500">
+					<p className="text-[11px] font-medium uppercase tracking-wider text-muted-foreground">
 						{product.category?.name}
 					</p>
-					<h3 className="text-sm font-semibold leading-snug text-neutral-200">{product.name}</h3>
+					<h3 className="text-sm font-semibold leading-snug text-foreground">{product.name}</h3>
 					<div className="flex items-center gap-2 pt-1">
-						<span className="text-sm font-bold text-white">
+						<span className="text-sm font-bold text-foreground">
 							{formatMoneyRange({
 								start: startPrice,
 								stop: product?.pricing?.priceRange?.stop?.gross,
 							})}
 						</span>
 						{hasDiscount && (
-							<span className="text-xs text-neutral-500 line-through">
+							<span className="text-xs text-muted-foreground line-through">
 								{formatMoneyRange({
 									start: undiscounted,
 									stop: product?.pricing?.priceRangeUndiscounted?.stop?.gross,
@@ -98,8 +98,8 @@ export function ProductTabs({
 								className={cn(
 									"min-h-11 border-b-2 px-1 pb-2 text-sm font-medium transition-colors",
 									activeTab === tab.key
-										? "border-emerald-500 text-white"
-										: "border-transparent text-neutral-500 hover:text-neutral-300",
+										? "border-emerald-500 text-foreground"
+										: "border-transparent text-muted-foreground hover:text-foreground",
 								)}
 							>
 								{tab.label}
@@ -109,7 +109,7 @@ export function ProductTabs({
 				</div>
 				<LinkWithChannel
 					href="/products"
-					className="hidden items-center gap-2 text-sm font-medium text-neutral-400 transition-colors hover:text-white sm:inline-flex"
+					className="hidden items-center gap-2 text-sm font-medium text-muted-foreground transition-colors hover:text-foreground sm:inline-flex"
 				>
 					View All
 					<svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>

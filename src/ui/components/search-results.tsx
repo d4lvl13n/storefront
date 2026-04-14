@@ -41,9 +41,9 @@ function SearchResultCard({
 	return (
 		<Link
 			href={`/${channel}/products/${product.slug}`}
-			className="group block overflow-hidden rounded-2xl border border-white/[0.06] bg-gradient-to-b from-neutral-800/60 to-neutral-900/80 transition-all duration-300 hover:border-white/[0.12] hover:shadow-xl hover:shadow-black/20"
+			className="group block overflow-hidden rounded-2xl border border-border bg-gradient-to-b from-secondary to-card transition-all duration-300 hover:border-muted-foreground hover:shadow-xl hover:shadow-black/20"
 		>
-			<div className="relative aspect-square overflow-hidden bg-neutral-900">
+			<div className="relative aspect-square overflow-hidden bg-card">
 				{product.thumbnailUrl ? (
 					<Image
 						src={product.thumbnailUrl}
@@ -54,18 +54,18 @@ function SearchResultCard({
 						priority={priority}
 					/>
 				) : (
-					<div className="flex h-full items-center justify-center text-neutral-600">No image</div>
+					<div className="flex h-full items-center justify-center text-muted-foreground">No image</div>
 				)}
 			</div>
 
-			<div className="border-t border-white/[0.05] p-4">
+			<div className="border-t border-border p-4">
 				{product.categoryName && (
 					<p className="mb-1 text-xs font-medium text-emerald-400/80">{product.categoryName}</p>
 				)}
-				<h3 className="font-medium leading-tight text-white transition-colors group-hover:text-emerald-400">
+				<h3 className="font-medium leading-tight text-foreground transition-colors group-hover:text-emerald-400">
 					{product.name}
 				</h3>
-				<p className="mt-2 font-semibold text-white">{formattedPrice}</p>
+				<p className="mt-2 font-semibold text-foreground">{formattedPrice}</p>
 			</div>
 		</Link>
 	);

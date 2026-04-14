@@ -87,7 +87,7 @@ export const SaleorCheckout: FC = () => {
 	};
 
 	return (
-		<div className="min-h-screen overscroll-none bg-neutral-950">
+		<div className="min-h-screen overscroll-none bg-background">
 			{/* Header - full width, white background */}
 			<CheckoutHeader
 				step={currentStep.index}

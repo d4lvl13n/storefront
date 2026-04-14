@@ -58,7 +58,7 @@ export function VerifiedStoryCard() {
 	const reelHeight = reelStep * 3 + reelGap * 2;
 
 	return (
-		<article className="verified-story-card group relative overflow-hidden rounded-[1.9rem] border border-neutral-800 bg-neutral-950/90 shadow-[0_18px_50px_-28px_rgba(0,0,0,0.85)] transition-[transform,border-color,box-shadow,background-color] duration-500 hover:-translate-y-1.5 hover:border-emerald-500/25 hover:bg-neutral-950 hover:shadow-[0_28px_80px_-36px_rgba(16,185,129,0.45)]">
+		<article className="verified-story-card group relative overflow-hidden rounded-[1.9rem] border border-border bg-background shadow-[0_18px_50px_-28px_rgba(0,0,0,0.85)] transition-[transform,border-color,box-shadow,background-color] duration-500 hover:-translate-y-1.5 hover:border-emerald-500/25 hover:bg-background hover:shadow-[0_28px_80px_-36px_rgba(16,185,129,0.45)]">
 			<div className="absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-white/10 to-transparent" />
 			<div className="pointer-events-none absolute -right-16 top-8 h-44 w-44 rounded-full bg-emerald-500/10 blur-3xl [animation:ib-story-breathe_8s_ease-in-out_infinite]" />
 			<div className="bg-teal-400/8 pointer-events-none absolute -left-12 bottom-8 h-40 w-40 rounded-full blur-3xl [animation:ib-story-breathe_10s_ease-in-out_infinite]" />
@@ -72,16 +72,16 @@ export function VerifiedStoryCard() {
 							Verified dossier
 						</span>
 						<div>
-							<p className="text-[11px] font-medium uppercase tracking-[0.22em] text-neutral-500">
+							<p className="text-[11px] font-medium uppercase tracking-[0.22em] text-muted-foreground">
 								Certificate of Analysis
 							</p>
-							<h3 className="mt-2 text-[1.55rem] font-semibold tracking-tight text-white sm:text-[1.75rem]">
+							<h3 className="mt-2 text-[1.55rem] font-semibold tracking-tight text-foreground sm:text-[1.75rem]">
 								BPC-157 — Lot #IB-2026-0847
 							</h3>
 						</div>
 					</div>
 
-					<div className="inline-flex items-center gap-2 rounded-full border border-neutral-800 bg-black/30 px-3 py-1.5 font-mono text-[11px] uppercase tracking-[0.2em] text-neutral-400 transition-transform duration-500 group-hover:-translate-y-0.5">
+					<div className="inline-flex items-center gap-2 rounded-full border border-border bg-black/30 px-3 py-1.5 font-mono text-[11px] uppercase tracking-[0.2em] text-muted-foreground transition-transform duration-500 group-hover:-translate-y-0.5">
 						<span className="h-2 w-2 animate-pulse rounded-full bg-emerald-400/80" />
 						Independent lab
 					</div>
@@ -102,23 +102,25 @@ export function VerifiedStoryCard() {
 										className={`rounded-2xl border px-3 py-2 transition-all duration-500 ${
 											isActive
 												? "border-emerald-500/20 bg-emerald-500/[0.07] shadow-[0_12px_30px_-24px_rgba(16,185,129,0.7)]"
-												: "border-neutral-800/70 bg-neutral-900/45"
+												: "border-border bg-card"
 										}`}
 									>
-										<p className="text-[10px] uppercase tracking-[0.18em] text-neutral-500">{field.label}</p>
-										<p className="mt-1 font-mono text-sm font-semibold text-white">{field.value}</p>
+										<p className="text-[10px] uppercase tracking-[0.18em] text-muted-foreground">
+											{field.label}
+										</p>
+										<p className="mt-1 font-mono text-sm font-semibold text-foreground">{field.value}</p>
 									</div>
 								);
 							})}
 						</div>
 
 						<div className="mb-3 flex flex-col gap-2 xl:flex-row xl:items-center xl:justify-between">
-							<div className="flex items-center justify-between gap-4 rounded-2xl border border-neutral-800/70 bg-neutral-900/35 px-3 py-2.5 xl:min-w-0 xl:flex-1">
+							<div className="flex items-center justify-between gap-4 rounded-2xl border border-border bg-card px-3 py-2.5 xl:min-w-0 xl:flex-1">
 								<div className="min-w-0">
-									<p className="text-[11px] uppercase tracking-[0.18em] text-neutral-500">
+									<p className="text-[11px] uppercase tracking-[0.18em] text-muted-foreground">
 										Verification stack
 									</p>
-									<p className="mt-1 text-sm text-neutral-300">Third-party accredited release workflow.</p>
+									<p className="mt-1 text-sm text-foreground">Third-party accredited release workflow.</p>
 								</div>
 								<div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-2xl border border-emerald-500/20 bg-emerald-500/10 text-emerald-300 transition-transform duration-500 group-hover:-translate-y-0.5 group-hover:scale-[1.04]">
 									<svg className="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
@@ -137,9 +139,9 @@ export function VerifiedStoryCard() {
 										<p className="text-[11px] uppercase tracking-[0.18em] text-emerald-300/80">
 											Release status
 										</p>
-										<p className="mt-1 font-mono text-sm font-semibold text-white">All tests passed</p>
+										<p className="mt-1 font-mono text-sm font-semibold text-foreground">All tests passed</p>
 									</div>
-									<p className="text-right text-xs text-neutral-400">
+									<p className="text-right text-xs text-muted-foreground">
 										Panel {String(activeIndex + 1).padStart(2, "0")}/
 										{String(COA_ROWS.length).padStart(2, "0")}
 									</p>
@@ -154,7 +156,7 @@ export function VerifiedStoryCard() {
 									className={`rounded-full border px-3 py-1.5 text-center font-mono text-[10px] uppercase tracking-[0.16em] transition-all duration-500 ${
 										index === activeMethodIndex
 											? "border-emerald-500/25 bg-emerald-500/[0.08] text-emerald-300"
-											: "border-neutral-800/70 bg-black/20 text-neutral-500"
+											: "border-border bg-black/20 text-muted-foreground"
 									}`}
 								>
 									{method}
@@ -162,11 +164,11 @@ export function VerifiedStoryCard() {
 							))}
 						</div>
 
-						<div className="border-white/6 rounded-[1.35rem] border bg-neutral-950/65 p-3">
-							<div className="mb-3 flex items-center justify-between gap-3 border-b border-neutral-800/70 pb-2.5">
+						<div className="border-white/6 rounded-[1.35rem] border bg-background p-3">
+							<div className="mb-3 flex items-center justify-between gap-3 border-b border-border pb-2.5">
 								<div>
-									<p className="text-[11px] uppercase tracking-[0.18em] text-neutral-500">Assay reel</p>
-									<p className="mt-1 text-sm text-neutral-300">
+									<p className="text-[11px] uppercase tracking-[0.18em] text-muted-foreground">Assay reel</p>
+									<p className="mt-1 text-sm text-foreground">
 										A compact live view of the current test stack.
 									</p>
 								</div>
@@ -176,8 +178,8 @@ export function VerifiedStoryCard() {
 							</div>
 
 							<div className="relative overflow-hidden" style={{ height: `${reelHeight}px` }}>
-								<div className="pointer-events-none absolute inset-x-0 top-0 z-10 h-12 bg-gradient-to-b from-neutral-950/95 to-transparent" />
-								<div className="pointer-events-none absolute inset-x-0 bottom-0 z-10 h-12 bg-gradient-to-t from-neutral-950/95 to-transparent" />
+								<div className="pointer-events-none absolute inset-x-0 top-0 z-10 h-12 bg-gradient-to-b from-background to-transparent" />
+								<div className="pointer-events-none absolute inset-x-0 bottom-0 z-10 h-12 bg-gradient-to-t from-background to-transparent" />
 								<div
 									className={`${isResetting ? "transition-none" : "transition-transform duration-700"}`}
 									style={{
@@ -195,21 +197,21 @@ export function VerifiedStoryCard() {
 												className={`mb-[10px] rounded-2xl border px-3 py-3 transition-all duration-500 sm:px-4 ${
 													isActive
 														? "border-emerald-500/20 bg-emerald-500/[0.07] shadow-[0_10px_30px_-20px_rgba(16,185,129,0.45)]"
-														: "border-neutral-800/70 bg-neutral-900/45"
+														: "border-border bg-card"
 												}`}
 												style={{ minHeight: `${reelStep}px` }}
 											>
 												<div className="flex items-center justify-between gap-4">
 													<div className="min-w-0">
-														<p className="text-sm font-medium text-neutral-300">{row.label}</p>
-														<div className="mt-2 h-1.5 w-28 overflow-hidden rounded-full bg-neutral-800 sm:w-36">
+														<p className="text-sm font-medium text-foreground">{row.label}</p>
+														<div className="mt-2 h-1.5 w-28 overflow-hidden rounded-full bg-secondary sm:w-36">
 															<div
 																className={`h-full rounded-full bg-gradient-to-r from-emerald-400 via-teal-400 to-cyan-400 transition-all duration-700 ${row.meter}`}
 															/>
 														</div>
 													</div>
 													<div className="flex shrink-0 items-center gap-2">
-														<span className="font-mono text-xs font-semibold text-white sm:text-sm">
+														<span className="font-mono text-xs font-semibold text-foreground sm:text-sm">
 															{row.value}
 														</span>
 														<span

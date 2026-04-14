@@ -14,9 +14,9 @@ export const metadata = {
 
 export default function Page(props: { params: Promise<{ channel: string }> }) {
 	return (
-		<div className="min-h-[70vh] bg-neutral-950">
+		<div className="min-h-[70vh] bg-background">
 			<section className="mx-auto max-w-4xl px-4 py-12 sm:px-6 lg:px-8">
-				<h1 className="text-3xl font-bold text-white">Your Shopping Cart</h1>
+				<h1 className="text-3xl font-bold text-foreground">Your Shopping Cart</h1>
 				<Suspense fallback={<CartSkeleton />}>
 					<CartContent params={props.params} />
 				</Suspense>
@@ -33,7 +33,7 @@ async function CartContent({ params: paramsPromise }: { params: Promise<{ channe
 	if (!checkout || checkout.lines.length < 1) {
 		return (
 			<div className="mt-12">
-				<p className="my-12 text-sm text-neutral-400">
+				<p className="my-12 text-sm text-muted-foreground">
 					Looks like you haven&apos;t added any items to the cart yet.
 				</p>
 				<LinkWithChannel
@@ -55,7 +55,7 @@ async function CartContent({ params: paramsPromise }: { params: Promise<{ channe
 			>
 				{checkout.lines.map((item) => (
 					<li key={item.id} className="flex py-5">
-						<div className="aspect-square h-24 w-24 shrink-0 overflow-hidden rounded-xl border border-white/[0.06] bg-neutral-900 sm:h-32 sm:w-32">
+						<div className="aspect-square h-24 w-24 shrink-0 overflow-hidden rounded-xl border border-white/[0.06] bg-card sm:h-32 sm:w-32">
 							{item.variant?.product?.thumbnail?.url && (
 								<Image
 									src={item.variant.product.thumbnail.url}
@@ -75,21 +75,23 @@ async function CartContent({ params: paramsPromise }: { params: Promise<{ channe
 											variantId: item.variant.id,
 										})}
 									>
-										<h2 className="font-medium text-white transition-colors hover:text-emerald-400">
+										<h2 className="font-medium text-foreground transition-colors hover:text-emerald-400">
 											{item.variant?.product?.name}
 										</h2>
 									</LinkWithChannel>
-									<p className="mt-1 text-sm text-neutral-500">{item.variant?.product?.category?.name}</p>
+									<p className="mt-1 text-sm text-muted-foreground">
+										{item.variant?.product?.category?.name}
+									</p>
 									{item.variant.name !== item.variant.id && Boolean(item.variant.name) && (
-										<p className="mt-1 text-sm text-neutral-500">Variant: {item.variant.name}</p>
+										<p className="mt-1 text-sm text-muted-foreground">Variant: {item.variant.name}</p>
 									)}
 								</div>
-								<p className="text-right font-semibold tabular-nums text-white">
+								<p className="text-right font-semibold tabular-nums text-foreground">
 									{formatMoney(item.totalPrice.gross.amount, item.totalPrice.gross.currency)}
 								</p>
 							</div>
 							<div className="flex justify-between">
-								<div className="text-sm font-bold text-neutral-300">Qty: {item.quantity}</div>
+								<div className="text-sm font-bold text-foreground">Qty: {item.quantity}</div>
 								<DeleteLineButton checkoutId={checkoutId} lineId={item.id} channel={params.channel} />
 							</div>
 						</div>
@@ -101,10 +103,12 @@ async function CartContent({ params: paramsPromise }: { params: Promise<{ channe
 				<div className="rounded-2xl border border-white/[0.06] bg-white/[0.03] px-5 py-4">
 					<div className="flex items-center justify-between gap-2 py-2">
 						<div>
-							<p className="font-semibold text-white">Your Total</p>
-							<p className="mt-1 text-sm text-neutral-500">Shipping will be calculated in the next step</p>
+							<p className="font-semibold text-foreground">Your Total</p>
+							<p className="mt-1 text-sm text-muted-foreground">
+								Shipping will be calculated in the next step
+							</p>
 						</div>
-						<div className="text-lg font-semibold tabular-nums text-white">
+						<div className="text-lg font-semibold tabular-nums text-foreground">
 							{formatMoney(checkout.totalPrice.gross.amount, checkout.totalPrice.gross.currency)}
 						</div>
 					</div>
@@ -127,18 +131,18 @@ function CartSkeleton() {
 			<div className="divide-y divide-white/[0.06] border-b border-t border-white/[0.06]">
 				{[1, 2].map((i) => (
 					<div key={i} className="flex py-5">
-						<div className="h-24 w-24 rounded-xl bg-neutral-800 sm:h-32 sm:w-32" />
+						<div className="h-24 w-24 rounded-xl bg-secondary sm:h-32 sm:w-32" />
 						<div className="flex-1 p-4 py-2">
-							<div className="h-5 w-48 rounded bg-neutral-800" />
-							<div className="mt-2 h-4 w-32 rounded bg-neutral-800" />
+							<div className="h-5 w-48 rounded bg-secondary" />
+							<div className="mt-2 h-4 w-32 rounded bg-secondary" />
 						</div>
 					</div>
 				))}
 			</div>
 			<div className="mt-10">
-				<div className="h-20 rounded-2xl bg-neutral-800/50" />
+				<div className="h-20 rounded-2xl bg-secondary" />
 				<div className="mt-8 flex justify-center">
-					<div className="h-12 w-48 rounded-xl bg-neutral-800" />
+					<div className="h-12 w-48 rounded-xl bg-secondary" />
 				</div>
 			</div>
 		</div>

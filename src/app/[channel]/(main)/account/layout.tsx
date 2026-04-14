@@ -31,7 +31,7 @@ async function AccountShell({ children }: { children: ReactNode }) {
 
 	if (!hasCookies) {
 		return (
-			<div className="relative min-h-[80vh] bg-neutral-950">
+			<div className="relative min-h-[80vh] bg-background">
 				<div className="pointer-events-none absolute inset-0 overflow-hidden">
 					<div className="absolute -left-40 top-1/4 h-80 w-80 rounded-full bg-emerald-500/[0.04] blur-[100px]" />
 					<div className="absolute -right-40 bottom-1/4 h-80 w-80 rounded-full bg-teal-500/[0.03] blur-[100px]" />
@@ -47,7 +47,7 @@ async function AccountShell({ children }: { children: ReactNode }) {
 
 	if (!user) {
 		return (
-			<div className="relative min-h-[80vh] bg-neutral-950">
+			<div className="relative min-h-[80vh] bg-background">
 				<div className="pointer-events-none absolute inset-0 overflow-hidden">
 					<div className="absolute -left-40 top-1/4 h-80 w-80 rounded-full bg-emerald-500/[0.04] blur-[100px]" />
 					<div className="absolute -right-40 bottom-1/4 h-80 w-80 rounded-full bg-teal-500/[0.03] blur-[100px]" />
@@ -61,7 +61,7 @@ async function AccountShell({ children }: { children: ReactNode }) {
 
 	return (
 		<AccountProvider user={user}>
-			<div className="min-h-[80vh] bg-neutral-950">
+			<div className="min-h-[80vh] bg-background">
 				<div className="mx-auto max-w-6xl px-4 py-8 sm:px-6 lg:px-8">
 					<div className="flex flex-col gap-8 md:flex-row">
 						<aside className="shrink-0 md:min-h-[60vh] md:w-52">

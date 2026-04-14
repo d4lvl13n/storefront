@@ -2,9 +2,9 @@ export function HandlingGuideView() {
 	return (
 		<div className="mx-auto max-w-2xl space-y-8">
 			{/* Intro */}
-			<div className="rounded-2xl border border-neutral-800 bg-neutral-900/60 p-6 sm:p-8">
-				<h2 className="mb-2 text-xl font-bold text-white">Reconstitution Handling Guide</h2>
-				<p className="text-sm text-neutral-400">
+			<div className="rounded-2xl border border-border bg-card p-6 sm:p-8">
+				<h2 className="mb-2 text-xl font-bold text-foreground">Reconstitution Handling Guide</h2>
+				<p className="text-sm text-muted-foreground">
 					Proper technique preserves peptide integrity and reduces contamination risk. Follow these steps
 					every time you reconstitute.
 				</p>
@@ -87,7 +87,7 @@ export function HandlingGuideView() {
 			/>
 
 			{/* Disclaimer */}
-			<div className="rounded-xl border border-neutral-700 bg-neutral-800/40 px-5 py-4 text-xs leading-relaxed text-neutral-500">
+			<div className="rounded-xl border border-border bg-secondary px-5 py-4 text-xs leading-relaxed text-muted-foreground">
 				This guide is provided for educational and research reference purposes only. It does not constitute
 				medical advice. Always follow your institution&apos;s handling and safety protocols.
 			</div>
@@ -107,10 +107,10 @@ function GuideSection({
 	return (
 		<div
 			className={`rounded-2xl border p-6 sm:p-8 ${
-				highlight ? "border-amber-500/20 bg-amber-500/[0.03]" : "border-neutral-800 bg-neutral-900/60"
+				highlight ? "border-amber-500/20 bg-amber-500/[0.03]" : "border-border bg-card"
 			}`}
 		>
-			<h3 className="mb-5 text-lg font-semibold text-white">{title}</h3>
+			<h3 className="mb-5 text-lg font-semibold text-foreground">{title}</h3>
 			<ul className="space-y-4">
 				{items.map((item, i) => (
 					<li key={i} className="flex gap-3">
@@ -151,7 +151,7 @@ function GuideSection({
 								</span>
 							)}
 						</span>
-						<span className="text-sm leading-relaxed text-neutral-300">{item.text}</span>
+						<span className="text-sm leading-relaxed text-foreground">{item.text}</span>
 					</li>
 				))}
 			</ul>

@@ -15,7 +15,7 @@ export const DeleteLineButton = ({ lineId, checkoutId, channel }: Props) => {
 	return (
 		<button
 			type="button"
-			className="text-sm text-neutral-500 transition-colors hover:text-red-400"
+			className="text-sm text-muted-foreground transition-colors hover:text-red-400"
 			onClick={() => {
 				if (isPending) return;
 				startTransition(() => deleteLineFromCheckout({ lineId, checkoutId, channel }));

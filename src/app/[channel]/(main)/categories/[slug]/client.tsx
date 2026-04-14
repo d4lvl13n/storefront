@@ -18,8 +18,8 @@ interface CategoryPageClientProps {
 function PaginationSkeleton() {
 	return (
 		<nav className="flex items-center justify-center gap-x-4 px-4 pt-12">
-			<span className="h-10 w-24 animate-pulse rounded bg-neutral-800" />
-			<span className="h-10 w-24 animate-pulse rounded bg-neutral-800" />
+			<span className="h-10 w-24 animate-pulse rounded bg-secondary" />
+			<span className="h-10 w-24 animate-pulse rounded bg-secondary" />
 		</nav>
 	);
 }
@@ -44,7 +44,7 @@ export function CategoryPageClient({ products, pageInfo }: CategoryPageClientPro
 	} = useProductFilters({ products });
 
 	return (
-		<div className="min-h-screen bg-neutral-950">
+		<div className="min-h-screen bg-background">
 			<FilterBar
 				resultCount={filteredProducts.length}
 				sortValue={sortValue}
@@ -67,7 +67,7 @@ export function CategoryPageClient({ products, pageInfo }: CategoryPageClientPro
 					<ProductGrid products={filteredProducts} />
 				) : (
 					<div className="py-20 text-center">
-						<p className="text-lg text-neutral-400">No products match your filters.</p>
+						<p className="text-lg text-muted-foreground">No products match your filters.</p>
 						<button
 							onClick={handleClearFilters}
 							className="mt-4 text-sm font-medium text-emerald-400 underline underline-offset-4 transition-colors hover:text-emerald-300"

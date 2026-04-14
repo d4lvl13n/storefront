@@ -82,12 +82,12 @@ export function SignUpForm() {
 	};
 
 	const inputClasses =
-		"h-12 rounded-xl border-white/[0.08] bg-white/[0.04] text-white placeholder-neutral-500 transition-all focus:border-emerald-500/60 focus:bg-white/[0.06] focus:ring-1 focus:ring-emerald-500/40";
+		"h-12 rounded-xl border-white/[0.08] bg-white/[0.04] text-foreground placeholder-muted-foreground transition-all focus:border-emerald-500/60 focus:bg-white/[0.06] focus:ring-1 focus:ring-emerald-500/40";
 
 	if (success) {
 		return (
 			<div className="w-full max-w-md">
-				<div className="relative overflow-hidden rounded-3xl border border-white/[0.06] bg-gradient-to-b from-neutral-800/80 to-neutral-900/90 shadow-2xl shadow-black/30">
+				<div className="relative overflow-hidden rounded-3xl border border-white/[0.06] bg-gradient-to-b from-card to-card shadow-2xl shadow-black/30">
 					<div className="absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-white/[0.12] to-transparent" />
 					<div className="noise-overlay relative p-8 text-center sm:p-10">
 						<div className="mx-auto mb-5 flex h-14 w-14 items-center justify-center rounded-2xl bg-emerald-500/15">
@@ -101,8 +101,8 @@ export function SignUpForm() {
 								<path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
 							</svg>
 						</div>
-						<h2 className="text-xl font-bold text-white">Account Created</h2>
-						<p className="mx-auto mt-3 max-w-xs text-sm leading-relaxed text-neutral-400">
+						<h2 className="text-xl font-bold text-foreground">Account Created</h2>
+						<p className="mx-auto mt-3 max-w-xs text-sm leading-relaxed text-muted-foreground">
 							Please check your email to verify your account before signing in.
 						</p>
 						<Link
@@ -119,20 +119,20 @@ export function SignUpForm() {
 
 	return (
 		<div className="w-full max-w-md">
-			<div className="relative overflow-hidden rounded-3xl border border-white/[0.06] bg-gradient-to-b from-neutral-800/80 to-neutral-900/90 shadow-2xl shadow-black/30">
+			<div className="relative overflow-hidden rounded-3xl border border-white/[0.06] bg-gradient-to-b from-card to-card shadow-2xl shadow-black/30">
 				<div className="absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-white/[0.12] to-transparent" />
 
 				<div className="noise-overlay relative p-8 sm:p-10">
 					<div className="mb-8">
 						<p className="text-xs font-semibold uppercase tracking-[0.25em] text-emerald-400">Get Started</p>
-						<h1 className="mt-3 text-2xl font-bold tracking-tight text-white sm:text-3xl">
+						<h1 className="mt-3 text-2xl font-bold tracking-tight text-foreground sm:text-3xl">
 							Create an account
 						</h1>
-						<p className="mt-3 text-sm leading-relaxed text-neutral-400">
+						<p className="mt-3 text-sm leading-relaxed text-muted-foreground">
 							Already have an account?{" "}
 							<Link
 								href={`/${params.channel}/login`}
-								className="font-medium text-white underline underline-offset-2 transition-colors hover:text-emerald-400 hover:no-underline"
+								className="font-medium text-foreground underline underline-offset-2 transition-colors hover:text-emerald-400 hover:no-underline"
 							>
 								Sign in
 							</Link>
@@ -151,11 +151,11 @@ export function SignUpForm() {
 
 						<div className="grid grid-cols-2 gap-4">
 							<div className="space-y-1.5">
-								<Label htmlFor="firstName" className="text-sm font-medium text-neutral-300">
+								<Label htmlFor="firstName" className="text-sm font-medium text-foreground">
 									First name
 								</Label>
 								<div className="relative">
-									<User className="absolute left-3.5 top-1/2 h-4 w-4 -translate-y-1/2 text-neutral-500" />
+									<User className="absolute left-3.5 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
 									<Input
 										id="firstName"
 										type="text"
@@ -168,7 +168,7 @@ export function SignUpForm() {
 								</div>
 							</div>
 							<div className="space-y-1.5">
-								<Label htmlFor="lastName" className="text-sm font-medium text-neutral-300">
+								<Label htmlFor="lastName" className="text-sm font-medium text-foreground">
 									Last name
 								</Label>
 								<Input
@@ -184,11 +184,11 @@ export function SignUpForm() {
 						</div>
 
 						<div className="space-y-1.5">
-							<Label htmlFor="email" className="text-sm font-medium text-neutral-300">
+							<Label htmlFor="email" className="text-sm font-medium text-foreground">
 								Email address
 							</Label>
 							<div className="relative">
-								<Mail className="absolute left-3.5 top-1/2 h-4 w-4 -translate-y-1/2 text-neutral-500" />
+								<Mail className="absolute left-3.5 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
 								<Input
 									id="email"
 									type="email"
@@ -204,11 +204,11 @@ export function SignUpForm() {
 						</div>
 
 						<div className="space-y-1.5">
-							<Label htmlFor="password" className="text-sm font-medium text-neutral-300">
+							<Label htmlFor="password" className="text-sm font-medium text-foreground">
 								Password
 							</Label>
 							<div className="relative">
-								<Lock className="absolute left-3.5 top-1/2 h-4 w-4 -translate-y-1/2 text-neutral-500" />
+								<Lock className="absolute left-3.5 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
 								<Input
 									id="password"
 									type={showPassword ? "text" : "password"}
@@ -224,7 +224,7 @@ export function SignUpForm() {
 									type="button"
 									onClick={() => setShowPassword(!showPassword)}
 									aria-label={showPassword ? "Hide password" : "Show password"}
-									className="absolute right-3.5 top-1/2 -translate-y-1/2 text-neutral-500 transition-colors hover:text-neutral-300"
+									className="absolute right-3.5 top-1/2 -translate-y-1/2 text-muted-foreground transition-colors hover:text-foreground"
 								>
 									{showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
 								</button>
@@ -232,11 +232,11 @@ export function SignUpForm() {
 						</div>
 
 						<div className="space-y-1.5">
-							<Label htmlFor="confirmPassword" className="text-sm font-medium text-neutral-300">
+							<Label htmlFor="confirmPassword" className="text-sm font-medium text-foreground">
 								Confirm password
 							</Label>
 							<div className="relative">
-								<Lock className="absolute left-3.5 top-1/2 h-4 w-4 -translate-y-1/2 text-neutral-500" />
+								<Lock className="absolute left-3.5 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
 								<Input
 									id="confirmPassword"
 									type={showPassword ? "text" : "password"}
@@ -265,18 +265,18 @@ export function SignUpForm() {
 							{isSubmitting ? "Creating account…" : "Create Account"}
 						</button>
 
-						<p className="text-center text-xs leading-relaxed text-neutral-600">
+						<p className="text-center text-xs leading-relaxed text-muted-foreground">
 							By creating an account, you agree to our{" "}
 							<Link
 								href="/terms"
-								className="text-neutral-500 underline underline-offset-2 hover:text-neutral-300"
+								className="text-muted-foreground underline underline-offset-2 hover:text-foreground"
 							>
 								Terms of Service
 							</Link>{" "}
 							and{" "}
 							<Link
 								href="/privacy"
-								className="text-neutral-500 underline underline-offset-2 hover:text-neutral-300"
+								className="text-muted-foreground underline underline-offset-2 hover:text-foreground"
 							>
 								Privacy Policy
 							</Link>
