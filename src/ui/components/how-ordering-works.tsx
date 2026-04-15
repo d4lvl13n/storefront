@@ -53,7 +53,7 @@ function BrowseBg() {
 			{TAGS.map((tag, index) => (
 				<div
 					key={index}
-					className="absolute rounded-full border border-emerald-500/20 bg-black/55 px-2.5 py-1 text-[10px] font-medium text-emerald-300/75 shadow-[0_0_0_1px_rgba(16,185,129,0.05)] backdrop-blur"
+					className="absolute rounded-full border border-emerald-500/20 bg-white/70 px-2.5 py-1 text-[10px] font-medium text-emerald-700 shadow-[0_0_0_1px_rgba(16,185,129,0.05)] backdrop-blur dark:bg-black/55 dark:text-emerald-300/75"
 					style={{
 						left: tag.x,
 						top: tag.y,
@@ -86,8 +86,8 @@ function CoaBg() {
 				<span>Lot #A204</span>
 				<span>Lab report</span>
 			</div>
-			<div className="absolute inset-x-5 bottom-5 top-12 rounded-2xl border border-border bg-black/20 p-4">
-				<div className="absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-white/10 to-transparent" />
+			<div className="absolute inset-x-5 bottom-5 top-12 rounded-2xl border border-border bg-black/[0.02] p-4 dark:bg-black/20">
+				<div className="absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-black/10 to-transparent dark:via-white/10" />
 				<div className="flex h-full flex-col justify-end gap-2 font-mono text-[11px]">
 					{shown.map((entry, index) => (
 						<div key={index} className={`flex gap-2 ${entry.color}`}>
@@ -124,13 +124,13 @@ function RuoBg() {
 				<span>Compliance</span>
 				<span>One-time waiver</span>
 			</div>
-			<div className="absolute inset-x-5 bottom-5 top-12 rounded-2xl border border-border bg-black/20 p-4">
+			<div className="absolute inset-x-5 bottom-5 top-12 rounded-2xl border border-border bg-black/[0.02] p-4 dark:bg-black/20">
 				<div className="flex h-full flex-col justify-between gap-3">
 					<div className="flex items-center gap-2 text-[11px] text-muted-foreground">
 						<span className="h-1.5 w-1.5 rounded-full bg-emerald-500/60" />
 						Required before checkout
 					</div>
-					<div className="flex items-center gap-3 rounded-xl border border-border bg-black/30 px-3 py-3">
+					<div className="flex items-center gap-3 rounded-xl border border-border bg-black/5 px-3 py-3 dark:bg-black/30">
 						<div
 							className={`flex h-4 w-4 shrink-0 items-center justify-center rounded border transition-all duration-500 ${
 								checked ? "border-emerald-500/50 bg-emerald-500/30" : "border-border"
@@ -176,7 +176,7 @@ function ShippingBg() {
 				<span>Cold-chain route</span>
 				<span>Live tracking</span>
 			</div>
-			<div className="absolute inset-x-5 bottom-5 top-12 rounded-2xl border border-border bg-black/20 px-4 py-5">
+			<div className="absolute inset-x-5 bottom-5 top-12 rounded-2xl border border-border bg-black/[0.02] px-4 py-5 dark:bg-black/20">
 				<div className="relative flex h-full items-start justify-between gap-3">
 					<div className="absolute inset-x-2 top-4 h-px bg-secondary" />
 					<div className="absolute left-2 top-4 h-px w-[61%] bg-gradient-to-r from-emerald-500/50 to-teal-400/50" />
@@ -244,14 +244,14 @@ function Card({
 			className={`group relative overflow-hidden rounded-[1.75rem] border border-border bg-background opacity-0 transition-[transform,border-color,background-color,box-shadow] duration-500 [animation:ib-card-enter_720ms_cubic-bezier(0.22,1,0.36,1)_forwards] hover:-translate-y-1 hover:border-emerald-500/25 hover:bg-card hover:shadow-[0_24px_60px_-32px_rgba(16,185,129,0.45)] ${className}`}
 			style={{ animationDelay: `${step * 90}ms` }}
 		>
-			<div className="absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-white/[0.06] to-transparent" />
-			<div className="pointer-events-none absolute inset-0 bg-gradient-to-br from-emerald-500/[0.03] via-transparent to-transparent opacity-0 transition-opacity duration-500 group-hover:opacity-100" />
-			<div className="pointer-events-none absolute inset-y-0 -left-1/3 w-1/3 bg-gradient-to-r from-transparent via-white/[0.06] to-transparent opacity-0 blur-xl transition-opacity duration-500 [animation:ib-sheen_5.5s_ease-in-out_infinite] group-hover:opacity-100" />
+			<div className="absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-black/[0.06] to-transparent dark:via-white/[0.06]" />
+			<div className="pointer-events-none absolute inset-0 bg-gradient-to-br from-emerald-500/[0.05] via-transparent to-transparent opacity-0 transition-opacity duration-500 group-hover:opacity-100 dark:from-emerald-500/[0.03]" />
+			<div className="pointer-events-none absolute inset-y-0 -left-1/3 w-1/3 bg-gradient-to-r from-transparent via-black/[0.04] to-transparent opacity-0 blur-xl transition-opacity duration-500 [animation:ib-sheen_5.5s_ease-in-out_infinite] group-hover:opacity-100 dark:via-white/[0.06]" />
 			<div className="relative z-10 flex h-full flex-col gap-6 p-5 sm:p-6">
 				<div className="flex items-start justify-between gap-4">
 					<div className="max-w-xl">
 						<div className="mb-4 flex items-center gap-3">
-							<span className="inline-flex rounded-full border border-border bg-black/30 px-2.5 py-1 font-mono text-[11px] uppercase tracking-[0.22em] text-muted-foreground">
+							<span className="inline-flex rounded-full border border-border bg-black/5 px-2.5 py-1 font-mono text-[11px] uppercase tracking-[0.22em] text-muted-foreground dark:bg-black/30">
 								{String(step).padStart(2, "0")}
 							</span>
 							<div className="flex h-10 w-10 items-center justify-center rounded-xl border border-border bg-card text-emerald-400 transition-transform duration-500 group-hover:-translate-y-0.5 group-hover:scale-[1.03]">
@@ -271,7 +271,7 @@ function Card({
 					)}
 				</div>
 				<div
-					className={`relative flex-1 overflow-hidden rounded-2xl border border-white/5 bg-black/20 transition-transform duration-700 group-hover:scale-[1.01] ${sceneClassName}`}
+					className={`relative flex-1 overflow-hidden rounded-2xl border border-border bg-black/[0.02] transition-transform duration-700 group-hover:scale-[1.01] dark:bg-black/20 ${sceneClassName}`}
 					aria-hidden="true"
 				>
 					<div className="absolute inset-0 [animation:ib-breathe_7s_ease-in-out_infinite]">{bg}</div>

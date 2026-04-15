@@ -158,7 +158,7 @@ function WaveScene() {
 				{["Theta", "Delta", "REM"].map((label, index) => (
 					<span
 						key={label}
-						className="rounded-full border border-emerald-500/15 bg-black/35 px-2.5 py-1 font-mono text-[10px] uppercase tracking-[0.15em] text-emerald-300/75 [animation:ib-goal-float_4.4s_ease-in-out_infinite]"
+						className="rounded-full border border-emerald-500/15 bg-black/10 px-2.5 py-1 font-mono text-[10px] uppercase tracking-[0.15em] text-emerald-300/75 [animation:ib-goal-float_4.4s_ease-in-out_infinite] dark:bg-black/35"
 						style={{ animationDelay: `${index * 240}ms` }}
 					>
 						{label}
@@ -378,12 +378,12 @@ export function ShopGoalCard({
 	return (
 		<LinkWithChannel
 			href={`/collections/${collection.slug}`}
-			className="shop-goal-card hover:border-emerald-500/22 group relative flex min-h-[368px] flex-col overflow-hidden rounded-[1.9rem] border border-border bg-background shadow-[0_22px_60px_-34px_rgba(0,0,0,0.95)] transition-[transform,border-color,box-shadow,background-color] duration-500 hover:-translate-y-1.5 hover:shadow-[0_34px_90px_-42px_rgba(16,185,129,0.38)]"
+			className="shop-goal-card hover:border-emerald-500/22 group relative flex min-h-[368px] flex-col overflow-hidden rounded-[1.9rem] border border-border bg-background shadow-[0_22px_60px_-34px_rgba(0,0,0,0.18)] transition-[transform,border-color,box-shadow,background-color] duration-500 hover:-translate-y-1.5 hover:shadow-[0_34px_90px_-42px_rgba(16,185,129,0.22)] dark:shadow-[0_22px_60px_-34px_rgba(0,0,0,0.95)] dark:hover:shadow-[0_34px_90px_-42px_rgba(16,185,129,0.38)]"
 		>
-			<div className="absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-white/10 to-transparent" />
-			<div className="pointer-events-none absolute inset-0 bg-gradient-to-br from-emerald-500/[0.035] via-transparent to-transparent opacity-70 transition-opacity duration-500 group-hover:opacity-100" />
-			<div className="pointer-events-none absolute inset-y-0 -left-1/3 w-1/3 bg-gradient-to-r from-transparent via-white/[0.06] to-transparent opacity-0 blur-xl transition-opacity duration-500 [animation:ib-goal-sheen_5.5s_ease-in-out_infinite] group-hover:opacity-100" />
-			<div className="pointer-events-none absolute -right-10 top-10 h-36 w-36 rounded-full bg-emerald-500/[0.06] blur-3xl [animation:ib-goal-pulse_8s_ease-in-out_infinite]" />
+			<div className="absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-black/10 to-transparent dark:via-white/10" />
+			<div className="pointer-events-none absolute inset-0 bg-gradient-to-br from-emerald-500/[0.02] via-transparent to-transparent opacity-70 transition-opacity duration-500 group-hover:opacity-100 dark:from-emerald-500/[0.035]" />
+			<div className="pointer-events-none absolute inset-y-0 -left-1/3 w-1/3 bg-gradient-to-r from-transparent via-black/[0.03] to-transparent opacity-0 blur-xl transition-opacity duration-500 [animation:ib-goal-sheen_5.5s_ease-in-out_infinite] group-hover:opacity-100 dark:via-white/[0.06]" />
+			<div className="pointer-events-none absolute -right-10 top-10 h-36 w-36 rounded-full bg-emerald-500/[0.03] blur-3xl [animation:ib-goal-pulse_8s_ease-in-out_infinite] dark:bg-emerald-500/[0.06]" />
 
 			<div className="relative z-10 flex h-full flex-col p-6 sm:p-7 lg:p-8">
 				<div className="flex items-start justify-between gap-4">
@@ -406,7 +406,7 @@ export function ShopGoalCard({
 					</p>
 				) : null}
 
-				<div className="relative mt-6 h-[152px] shrink-0 overflow-hidden rounded-[1.5rem] border border-border bg-black/25 sm:h-[164px]">
+				<div className="relative mt-6 h-[152px] shrink-0 overflow-hidden rounded-[1.5rem] border border-border bg-black/5 dark:bg-black/25 sm:h-[164px]">
 					<div className="absolute inset-0 transition-all duration-700 group-hover:scale-[1.02] group-hover:opacity-80">
 						<GoalVisual slug={collection.slug} />
 					</div>
