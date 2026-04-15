@@ -40,7 +40,6 @@ describe("reference example: 5mg + 2mL + 250mcg", () => {
 		doseAmount: 250,
 		doseUnit: "mcg",
 		syringeIndex: 2, // 1 mL U-100
-		vialCount: 1,
 	};
 
 	it("calculates correct concentration", () => {
@@ -84,7 +83,6 @@ describe("10mg + 1mL + 500mcg", () => {
 		doseAmount: 500,
 		doseUnit: "mcg",
 		syringeIndex: 1, // 0.5 mL
-		vialCount: 1,
 	};
 
 	it("calculates correctly", () => {
@@ -106,7 +104,6 @@ describe("dose in mg instead of mcg", () => {
 		doseAmount: 1,
 		doseUnit: "mg",
 		syringeIndex: 2,
-		vialCount: 1,
 	};
 
 	it("handles mg dose input", () => {
@@ -128,7 +125,6 @@ describe("peptide in mcg", () => {
 		doseAmount: 250,
 		doseUnit: "mcg",
 		syringeIndex: 2,
-		vialCount: 1,
 	};
 
 	it("converts peptide mcg to mg for calculation", () => {
@@ -150,7 +146,6 @@ describe("validation", () => {
 		doseAmount: 250,
 		doseUnit: "mcg",
 		syringeIndex: 2,
-		vialCount: 1,
 	};
 
 	it("rejects zero peptide amount", () => {
@@ -174,7 +169,7 @@ describe("validation", () => {
 	it("errors when dose exceeds vial content", () => {
 		const { valid, warnings } = validate({ ...validBase, doseAmount: 10, doseUnit: "mg" });
 		expect(valid).toBe(false);
-		expect(warnings.some((w) => w.message.includes("exceeds total vial content"))).toBe(true);
+		expect(warnings.some((w) => w.message.includes("exceeds vial content"))).toBe(true);
 	});
 
 	it("errors when draw volume exceeds syringe capacity", () => {
@@ -228,7 +223,6 @@ describe("formatResultSummary", () => {
 			doseAmount: 250,
 			doseUnit: "mcg",
 			syringeIndex: 2,
-			vialCount: 1,
 		};
 		const { result } = calculate(inputs);
 		const summary = formatResultSummary(inputs, result!);

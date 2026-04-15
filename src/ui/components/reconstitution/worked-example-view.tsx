@@ -10,7 +10,6 @@ const EXAMPLE_INPUTS: CalculatorInputs = {
 	doseAmount: 250,
 	doseUnit: "mcg",
 	syringeIndex: 2, // 1 mL U-100
-	vialCount: 1,
 };
 
 export function WorkedExampleView() {

@@ -30,7 +30,6 @@ export interface CalculatorInputs {
 	doseAmount: number;
 	doseUnit: DoseUnit;
 	syringeIndex: number;
-	vialCount: number;
 }
 
 export interface CalculatorResult {
@@ -109,14 +108,14 @@ export function validate(inputs: CalculatorInputs): ValidationResult {
 	const doseMg = toMg(inputs.doseAmount, inputs.doseUnit);
 
 	// Dose exceeds vial content
-	if (doseMg > peptideMg * inputs.vialCount) {
+	if (doseMg > peptideMg) {
 		warnings.push({
 			level: "error",
 			field: "doseAmount",
 			message: `Requested dose (${formatDose(
 				inputs.doseAmount,
 				inputs.doseUnit,
-			)}) exceeds total vial content (${formatDose(peptideMg * inputs.vialCount, "mg")}).`,
+			)}) exceeds vial content (${formatDose(peptideMg, "mg")}).`,
 		});
 	}
 
@@ -135,13 +134,15 @@ export function validate(inputs: CalculatorInputs): ValidationResult {
 			});
 		}
 
-		if (drawVolumeMl > 0 && drawVolumeMl < 0.02) {
+		if (drawVolumeMl > 0 && drawVolumeMl < 0.05) {
 			warnings.push({
 				level: "caution",
 				field: "doseAmount",
 				message: `Draw volume is very small (${drawVolumeMl.toFixed(3)} mL / ${(
 					drawVolumeMl * syringe.unitsPerMl
-				).toFixed(1)} units). This may be difficult to measure accurately.`,
+				).toFixed(
+					1,
+				)} units). Below 5 units on a U-100 syringe is difficult to measure accurately — consider reducing diluent volume to concentrate the solution.`,
 			});
 		}
 	}
@@ -173,8 +174,8 @@ export function calculate(inputs: CalculatorInputs): CalculationOutput {
 		peptideLabel: formatDose(inputs.peptideAmount, inputs.peptideUnit),
 		waterMl: inputs.waterVolume,
 		doseLabel,
-		drawMl: drawVolumeMl,
 		units: syringeUnits,
+		unitsPerMl: syringe.unitsPerMl,
 		syringeLabel: syringe.label,
 	});
 
@@ -200,10 +201,6 @@ export function formatDose(amount: number, unit: DoseUnit | MassUnit): string {
 	return `${Number.isInteger(amount) ? amount : amount.toFixed(2)} mg`;
 }
 
-export function formatUnits(units: number): string {
-	return Number.isInteger(units) ? units.toString() : units.toFixed(1);
-}
-
 export function formatVolume(ml: number, precision: "rounded" | "exact" = "rounded"): string {
 	if (precision === "exact") return ml.toFixed(4);
 	// Round to nearest 0.01 for display
@@ -221,17 +218,54 @@ function buildInstruction(p: {
 	peptideLabel: string;
 	waterMl: number;
 	doseLabel: string;
-	drawMl: number;
 	units: number;
+	unitsPerMl: number;
 	syringeLabel: string;
 }): string {
-	const vol = formatVolume(p.drawMl);
 	const u = formatUnitsDisplay(p.units);
+	// Derive displayed mL from the rounded units so the two values agree exactly.
+	const roundedUnits = Math.round(p.units * 10) / 10;
+	const vol = formatVolume(roundedUnits / p.unitsPerMl);
 	return `Step 1: Add ${p.waterMl} mL of bacteriostatic water to the ${p.peptideLabel} vial. Swirl gently until dissolved. Step 2: Using a ${p.syringeLabel} insulin syringe, draw to the ${u}-unit mark (${vol} mL) for a ${p.doseLabel} dose.`;
+}
+
+// ─── Shareable URL encoding ──────────────────────────────────────────────────
+
+export function encodeShareParams(inputs: CalculatorInputs): URLSearchParams {
+	const params = new URLSearchParams();
+	params.set("p", String(inputs.peptideAmount));
+	params.set("pu", inputs.peptideUnit);
+	params.set("w", String(inputs.waterVolume));
+	params.set("d", String(inputs.doseAmount));
+	params.set("du", inputs.doseUnit);
+	params.set("s", String(inputs.syringeIndex));
+	return params;
+}
+
+export function decodeShareParams(search: string | URLSearchParams): Partial<CalculatorInputs> | null {
+	const params = typeof search === "string" ? new URLSearchParams(search) : search;
+	if (!params.has("p") && !params.has("d")) return null;
+
+	const out: Partial<CalculatorInputs> = {};
+	const p = Number(params.get("p"));
+	if (Number.isFinite(p) && p > 0) out.peptideAmount = p;
+	const pu = params.get("pu");
+	if (pu === "mg" || pu === "mcg") out.peptideUnit = pu;
+	const w = Number(params.get("w"));
+	if (Number.isFinite(w) && w > 0) out.waterVolume = w;
+	const d = Number(params.get("d"));
+	if (Number.isFinite(d) && d > 0) out.doseAmount = d;
+	const du = params.get("du");
+	if (du === "mg" || du === "mcg") out.doseUnit = du;
+	const s = Number(params.get("s"));
+	if (Number.isInteger(s) && s >= 0 && s < SYRINGE_TYPES.length) out.syringeIndex = s;
+	return out;
 }
 
 export function formatResultSummary(inputs: CalculatorInputs, result: CalculatorResult): string {
 	const syringe = SYRINGE_TYPES[inputs.syringeIndex]!;
+	const roundedUnits = Math.round(result.syringeUnits * 10) / 10;
+	const drawMlFromUnits = roundedUnits / syringe.unitsPerMl;
 	return [
 		`Peptide: ${formatDose(inputs.peptideAmount, inputs.peptideUnit)}`,
 		`BAC Water: ${inputs.waterVolume} mL`,
@@ -241,7 +275,7 @@ export function formatResultSummary(inputs: CalculatorInputs, result: Calculator
 		`Concentration: ${result.concentrationMgMl.toFixed(2)} mg/mL (${result.concentrationMcgMl.toFixed(
 			0,
 		)} mcg/mL)`,
-		`Draw: ${result.drawVolumeMl.toFixed(3)} mL = ${formatUnits(result.syringeUnits)} units`,
+		`Draw: ${formatVolume(drawMlFromUnits)} mL = ${formatUnitsDisplay(result.syringeUnits)} units`,
 		`Doses per vial: ${Math.floor(result.dosesPerVial)}`,
 		``,
 		result.instruction,

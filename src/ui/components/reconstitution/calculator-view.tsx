@@ -9,11 +9,13 @@ import {
 	PEPTIDE_PRESETS,
 	WATER_PRESETS,
 	calculate,
+	decodeShareParams,
 	formatDose,
 	formatResultSummary,
 	formatVolume,
 	formatUnitsDisplay,
 } from "@/lib/peptide-calculator";
+import { ShareResultModal } from "./share-result-modal";
 
 interface HistoryEntry {
 	id: string;
@@ -35,7 +37,6 @@ const DEFAULT_INPUTS: CalculatorInputs = {
 	doseAmount: 250,
 	doseUnit: "mcg",
 	syringeIndex: 2, // 1 mL
-	vialCount: 1,
 };
 
 export function CalculatorView({ onCalculation }: CalculatorViewProps) {
@@ -43,6 +44,14 @@ export function CalculatorView({ onCalculation }: CalculatorViewProps) {
 	const [showFormula, setShowFormula] = useState(false);
 	const [copied, setCopied] = useState(false);
 	const [showExact, setShowExact] = useState(false);
+	const [shareOpen, setShareOpen] = useState(false);
+
+	// Hydrate from URL on mount (shared-calculation links)
+	useEffect(() => {
+		if (typeof window === "undefined") return;
+		const decoded = decodeShareParams(window.location.search);
+		if (decoded) setInputs((prev) => ({ ...prev, ...decoded }));
+	}, []);
 
 	const output = calculate(inputs);
 
@@ -83,319 +92,332 @@ export function CalculatorView({ onCalculation }: CalculatorViewProps) {
 	}
 
 	return (
-		<div className="grid gap-8 lg:grid-cols-[1fr_1fr] lg:items-start">
-			{/* Input Card */}
-			<div className="rounded-2xl border border-border bg-card p-6 sm:p-8">
-				<h2 className="mb-6 text-lg font-semibold text-foreground">Inputs</h2>
+		<>
+			<div className="grid gap-8 lg:grid-cols-[1fr_1fr] lg:items-start">
+				{/* Input Card */}
+				<div className="rounded-2xl border border-border bg-card p-6 sm:p-8">
+					<h2 className="mb-6 text-lg font-semibold text-foreground">Inputs</h2>
 
-				{/* Peptide Amount */}
-				<FieldGroup label="Peptide Amount" error={fieldErrors.get("peptideAmount")}>
-					<div className="flex gap-2">
-						<div className="flex-1">
-							<NumberInput
-								value={inputs.peptideAmount}
-								onChange={(v) => update("peptideAmount", v)}
-								placeholder="e.g. 5"
-								hasError={fieldErrors.has("peptideAmount")}
+					{/* Peptide Amount */}
+					<FieldGroup label="Peptide Amount" error={fieldErrors.get("peptideAmount")}>
+						<div className="flex gap-2">
+							<div className="flex-1">
+								<NumberInput
+									value={inputs.peptideAmount}
+									onChange={(v) => update("peptideAmount", v)}
+									placeholder="e.g. 5"
+									hasError={fieldErrors.has("peptideAmount")}
+								/>
+							</div>
+							<UnitToggle
+								options={["mg", "mcg"]}
+								value={inputs.peptideUnit}
+								onChange={(v) => update("peptideUnit", v as "mg" | "mcg")}
 							/>
 						</div>
-						<UnitToggle
-							options={["mg", "mcg"]}
-							value={inputs.peptideUnit}
-							onChange={(v) => update("peptideUnit", v as "mg" | "mcg")}
+						<PresetRow
+							values={PEPTIDE_PRESETS as unknown as number[]}
+							unit="mg"
+							active={inputs.peptideUnit === "mg" ? inputs.peptideAmount : null}
+							onSelect={(v) => {
+								update("peptideAmount", v);
+								update("peptideUnit", "mg");
+							}}
 						/>
-					</div>
-					<PresetRow
-						values={PEPTIDE_PRESETS as unknown as number[]}
-						unit="mg"
-						active={inputs.peptideUnit === "mg" ? inputs.peptideAmount : null}
-						onSelect={(v) => {
-							update("peptideAmount", v);
-							update("peptideUnit", "mg");
-						}}
-					/>
-				</FieldGroup>
+					</FieldGroup>
 
-				{/* BAC Water Volume */}
-				<FieldGroup label="BAC Water Volume" error={fieldErrors.get("waterVolume")}>
-					<div className="flex gap-2">
-						<div className="flex-1">
-							<NumberInput
-								value={inputs.waterVolume}
-								onChange={(v) => update("waterVolume", v)}
-								placeholder="e.g. 2"
-								hasError={fieldErrors.has("waterVolume")}
-							/>
+					{/* BAC Water Volume */}
+					<FieldGroup label="BAC Water Volume" error={fieldErrors.get("waterVolume")}>
+						<div className="flex gap-2">
+							<div className="flex-1">
+								<NumberInput
+									value={inputs.waterVolume}
+									onChange={(v) => update("waterVolume", v)}
+									placeholder="e.g. 2"
+									hasError={fieldErrors.has("waterVolume")}
+								/>
+							</div>
+							<span className="flex items-center rounded-lg border border-border bg-background px-3 text-sm text-muted-foreground">
+								mL
+							</span>
 						</div>
-						<span className="flex items-center rounded-lg border border-border bg-background px-3 text-sm text-muted-foreground">
-							mL
-						</span>
-					</div>
-					<PresetRow
-						values={WATER_PRESETS as unknown as number[]}
-						unit="mL"
-						active={inputs.waterVolume}
-						onSelect={(v) => update("waterVolume", v)}
-					/>
-				</FieldGroup>
-
-				{/* Desired Dose */}
-				<FieldGroup label="Desired Dose" error={fieldErrors.get("doseAmount")}>
-					<div className="flex gap-2">
-						<div className="flex-1">
-							<NumberInput
-								value={inputs.doseAmount}
-								onChange={(v) => update("doseAmount", v)}
-								placeholder="e.g. 250"
-								hasError={fieldErrors.has("doseAmount")}
-							/>
-						</div>
-						<UnitToggle
-							options={["mcg", "mg"]}
-							value={inputs.doseUnit}
-							onChange={(v) => update("doseUnit", v as "mg" | "mcg")}
+						<PresetRow
+							values={WATER_PRESETS as unknown as number[]}
+							unit="mL"
+							active={inputs.waterVolume}
+							onSelect={(v) => update("waterVolume", v)}
 						/>
-					</div>
-				</FieldGroup>
+					</FieldGroup>
 
-				{/* Syringe Type */}
-				<FieldGroup
-					label="Syringe Type"
-					error={fieldErrors.get("syringeIndex")}
-					hint="U-100 insulin syringes. 1 unit = 0.01 mL."
-				>
-					<div className="grid grid-cols-3 gap-2">
-						{SYRINGE_TYPES.map((s, i) => (
+					{/* Desired Dose */}
+					<FieldGroup label="Desired Dose" error={fieldErrors.get("doseAmount")}>
+						<div className="flex gap-2">
+							<div className="flex-1">
+								<NumberInput
+									value={inputs.doseAmount}
+									onChange={(v) => update("doseAmount", v)}
+									placeholder="e.g. 250"
+									hasError={fieldErrors.has("doseAmount")}
+								/>
+							</div>
+							<UnitToggle
+								options={["mcg", "mg"]}
+								value={inputs.doseUnit}
+								onChange={(v) => update("doseUnit", v as "mg" | "mcg")}
+							/>
+						</div>
+					</FieldGroup>
+
+					{/* Syringe Type */}
+					<FieldGroup
+						label="Syringe Type"
+						error={fieldErrors.get("syringeIndex")}
+						hint="U-100 insulin syringes. 1 unit = 0.01 mL."
+						last
+					>
+						<div className="grid grid-cols-3 gap-2">
+							{SYRINGE_TYPES.map((s, i) => (
+								<button
+									key={s.label}
+									type="button"
+									onClick={() => update("syringeIndex", i)}
+									className={`rounded-lg border px-3 py-2.5 text-sm font-medium transition-colors ${
+										inputs.syringeIndex === i
+											? "border-emerald-500/50 bg-emerald-500/10 text-emerald-400"
+											: "border-border bg-background text-foreground hover:border-muted-foreground"
+									}`}
+								>
+									{s.capacityMl} mL
+								</button>
+							))}
+						</div>
+					</FieldGroup>
+				</div>
+
+				{/* Results Card — sticky on desktop */}
+				<div className="lg:sticky lg:top-24">
+					{/* Caution-level warnings (non-blocking) */}
+					{output.warnings.filter((w) => w.level === "caution").length > 0 && (
+						<div className="mb-4 space-y-2">
+							{output.warnings
+								.filter((w) => w.level === "caution")
+								.map((w, i) => (
+									<WarningBanner key={i} warning={w} />
+								))}
+						</div>
+					)}
+
+					{output.result ? (
+						<div className="rounded-2xl border border-emerald-500/20 bg-emerald-500/[0.04] p-6 sm:p-8">
+							{/* Input recap */}
+							<div className="mb-5 flex flex-wrap gap-2 text-xs text-foreground">
+								<span className="rounded bg-secondary px-2 py-1">
+									{formatDose(inputs.peptideAmount, inputs.peptideUnit)}
+								</span>
+								<span className="rounded bg-secondary px-2 py-1">{inputs.waterVolume} mL BAC water</span>
+								<span className="rounded bg-secondary px-2 py-1">
+									{formatDose(inputs.doseAmount, inputs.doseUnit)} dose
+								</span>
+								<span className="rounded bg-secondary px-2 py-1">
+									{SYRINGE_TYPES[inputs.syringeIndex]?.label}
+								</span>
+							</div>
+
+							<h2 className="mb-6 text-lg font-semibold text-foreground">Results</h2>
+
+							<div className="space-y-4">
+								<ResultRow
+									label="Concentration"
+									value={`${output.result.concentrationMgMl.toFixed(2)} mg/mL`}
+									sub={`${output.result.concentrationMcgMl.toFixed(0)} mcg/mL`}
+								/>
+								<ResultRow
+									label="Draw Volume"
+									value={`${formatVolume(output.result.drawVolumeMl, showExact ? "exact" : "rounded")} mL`}
+									highlight
+								/>
+								<ResultRow
+									label={`Syringe Units (${
+										SYRINGE_TYPES[inputs.syringeIndex]?.label.includes("U-100") ? "U-100" : "U-100"
+									})`}
+									value={`${formatUnitsDisplay(
+										output.result.syringeUnits,
+										showExact ? "exact" : "rounded",
+									)} units`}
+									highlight
+								/>
+								<ResultRow label="Doses per Vial" value={`${Math.floor(output.result.dosesPerVial)} doses`} />
+							</div>
+
+							{/* Precision toggle */}
 							<button
-								key={s.label}
 								type="button"
-								onClick={() => update("syringeIndex", i)}
-								className={`rounded-lg border px-3 py-2.5 text-sm font-medium transition-colors ${
-									inputs.syringeIndex === i
-										? "border-emerald-500/50 bg-emerald-500/10 text-emerald-400"
-										: "border-border bg-background text-foreground hover:border-muted-foreground"
+								onClick={() => setShowExact(!showExact)}
+								className="mt-3 flex items-center gap-1.5 text-xs text-muted-foreground transition-colors hover:text-foreground"
+							>
+								<svg
+									xmlns="http://www.w3.org/2000/svg"
+									width="12"
+									height="12"
+									viewBox="0 0 24 24"
+									fill="none"
+									stroke="currentColor"
+									strokeWidth="2"
+									strokeLinecap="round"
+									strokeLinejoin="round"
+								>
+									<circle cx="11" cy="11" r="8" />
+									<path d="m21 21-4.3-4.3" />
+								</svg>
+								{showExact ? "Show rounded values" : "Show exact values"}
+							</button>
+
+							{/* Human-readable instruction */}
+							<div className="mt-5 rounded-xl border border-emerald-500/20 bg-emerald-500/[0.06] p-4">
+								<p className="mb-1 text-xs font-medium uppercase tracking-wider text-emerald-400/70">
+									Instructions
+								</p>
+								<p className="text-sm leading-relaxed text-emerald-100">{output.result.instruction}</p>
+							</div>
+
+							{/* Copy + Share buttons */}
+							<div className="mt-4 grid grid-cols-1 gap-2 sm:grid-cols-2">
+								<button
+									type="button"
+									onClick={handleCopy}
+									className="flex items-center justify-center gap-2 rounded-lg border border-border bg-secondary px-4 py-2.5 text-sm text-foreground transition-colors hover:border-muted-foreground"
+								>
+									<svg
+										xmlns="http://www.w3.org/2000/svg"
+										width="14"
+										height="14"
+										viewBox="0 0 24 24"
+										fill="none"
+										stroke="currentColor"
+										strokeWidth="2"
+										strokeLinecap="round"
+										strokeLinejoin="round"
+									>
+										<rect width="14" height="14" x="8" y="8" rx="2" ry="2" />
+										<path d="M4 16c-1.1 0-2-.9-2-2V4c0-1.1.9-2 2-2h10c1.1 0 2 .9 2 2" />
+									</svg>
+									{copied ? "Copied!" : "Copy Result"}
+								</button>
+								<button
+									type="button"
+									onClick={() => setShareOpen(true)}
+									className="flex items-center justify-center gap-2 rounded-lg border border-emerald-500/30 bg-emerald-500/10 px-4 py-2.5 text-sm font-medium text-emerald-300 transition-all hover:-translate-y-0.5 hover:border-emerald-500/50 hover:bg-emerald-500/15 hover:shadow-[0_12px_30px_-16px_rgba(16,185,129,0.5)]"
+								>
+									<svg
+										xmlns="http://www.w3.org/2000/svg"
+										width="14"
+										height="14"
+										viewBox="0 0 24 24"
+										fill="none"
+										stroke="currentColor"
+										strokeWidth="2"
+										strokeLinecap="round"
+										strokeLinejoin="round"
+									>
+										<circle cx="18" cy="5" r="3" />
+										<circle cx="6" cy="12" r="3" />
+										<circle cx="18" cy="19" r="3" />
+										<path d="m8.59 13.51 6.83 3.98M15.41 6.51l-6.82 3.98" />
+									</svg>
+									Share Result
+								</button>
+							</div>
+
+							{/* Formula drawer */}
+							<button
+								type="button"
+								onClick={() => setShowFormula(!showFormula)}
+								className="mt-3 flex w-full items-center justify-between text-sm text-muted-foreground hover:text-foreground"
+							>
+								<span>How is this calculated?</span>
+								<svg
+									xmlns="http://www.w3.org/2000/svg"
+									width="16"
+									height="16"
+									viewBox="0 0 24 24"
+									fill="none"
+									stroke="currentColor"
+									strokeWidth="2"
+									strokeLinecap="round"
+									strokeLinejoin="round"
+									className={`transition-transform ${showFormula ? "rotate-180" : ""}`}
+								>
+									<path d="m6 9 6 6 6-6" />
+								</svg>
+							</button>
+							<div
+								className={`grid transition-[grid-template-rows] duration-300 ${
+									showFormula ? "grid-rows-[1fr]" : "grid-rows-[0fr]"
 								}`}
 							>
-								{s.capacityMl} mL
-							</button>
-						))}
-					</div>
-				</FieldGroup>
-
-				{/* Vial Count */}
-				<FieldGroup label="Number of Vials" last>
-					<div className="flex items-center gap-3">
-						<button
-							type="button"
-							onClick={() => update("vialCount", Math.max(1, inputs.vialCount - 1))}
-							className="flex h-10 w-10 items-center justify-center rounded-lg border border-border bg-background text-foreground transition-colors hover:border-muted-foreground"
-						>
-							-
-						</button>
-						<span className="min-w-[2ch] text-center text-lg font-semibold text-foreground">
-							{inputs.vialCount}
-						</span>
-						<button
-							type="button"
-							onClick={() => update("vialCount", Math.min(3, inputs.vialCount + 1))}
-							className="flex h-10 w-10 items-center justify-center rounded-lg border border-border bg-background text-foreground transition-colors hover:border-muted-foreground"
-						>
-							+
-						</button>
-					</div>
-				</FieldGroup>
-			</div>
-
-			{/* Results Card — sticky on desktop */}
-			<div className="lg:sticky lg:top-24">
-				{/* Caution-level warnings (non-blocking) */}
-				{output.warnings.filter((w) => w.level === "caution").length > 0 && (
-					<div className="mb-4 space-y-2">
-						{output.warnings
-							.filter((w) => w.level === "caution")
-							.map((w, i) => (
-								<WarningBanner key={i} warning={w} />
-							))}
-					</div>
-				)}
-
-				{output.result ? (
-					<div className="rounded-2xl border border-emerald-500/20 bg-emerald-500/[0.04] p-6 sm:p-8">
-						{/* Input recap */}
-						<div className="mb-5 flex flex-wrap gap-2 text-xs text-foreground">
-							<span className="rounded bg-secondary px-2 py-1">
-								{formatDose(inputs.peptideAmount, inputs.peptideUnit)}
-							</span>
-							<span className="rounded bg-secondary px-2 py-1">{inputs.waterVolume} mL BAC water</span>
-							<span className="rounded bg-secondary px-2 py-1">
-								{formatDose(inputs.doseAmount, inputs.doseUnit)} dose
-							</span>
-							<span className="rounded bg-secondary px-2 py-1">
-								{SYRINGE_TYPES[inputs.syringeIndex]?.label}
-							</span>
-						</div>
-
-						<h2 className="mb-6 text-lg font-semibold text-foreground">Results</h2>
-
-						<div className="space-y-4">
-							<ResultRow
-								label="Concentration"
-								value={`${output.result.concentrationMgMl.toFixed(2)} mg/mL`}
-								sub={`${output.result.concentrationMcgMl.toFixed(0)} mcg/mL`}
-							/>
-							<ResultRow
-								label="Draw Volume"
-								value={`${formatVolume(output.result.drawVolumeMl, showExact ? "exact" : "rounded")} mL`}
-								highlight
-							/>
-							<ResultRow
-								label={`Syringe Units (${
-									SYRINGE_TYPES[inputs.syringeIndex]?.label.includes("U-100") ? "U-100" : "U-100"
-								})`}
-								value={`${formatUnitsDisplay(
-									output.result.syringeUnits,
-									showExact ? "exact" : "rounded",
-								)} units`}
-								highlight
-							/>
-							<ResultRow label="Doses per Vial" value={`${Math.floor(output.result.dosesPerVial)} doses`} />
-						</div>
-
-						{/* Precision toggle */}
-						<button
-							type="button"
-							onClick={() => setShowExact(!showExact)}
-							className="mt-3 flex items-center gap-1.5 text-xs text-muted-foreground transition-colors hover:text-foreground"
-						>
-							<svg
-								xmlns="http://www.w3.org/2000/svg"
-								width="12"
-								height="12"
-								viewBox="0 0 24 24"
-								fill="none"
-								stroke="currentColor"
-								strokeWidth="2"
-								strokeLinecap="round"
-								strokeLinejoin="round"
-							>
-								<circle cx="11" cy="11" r="8" />
-								<path d="m21 21-4.3-4.3" />
-							</svg>
-							{showExact ? "Show rounded values" : "Show exact values"}
-						</button>
-
-						{/* Human-readable instruction */}
-						<div className="mt-5 rounded-xl border border-emerald-500/20 bg-emerald-500/[0.06] p-4">
-							<p className="mb-1 text-xs font-medium uppercase tracking-wider text-emerald-400/70">
-								Instructions
-							</p>
-							<p className="text-sm leading-relaxed text-emerald-100">{output.result.instruction}</p>
-						</div>
-
-						{/* Copy button */}
-						<button
-							type="button"
-							onClick={handleCopy}
-							className="mt-4 flex w-full items-center justify-center gap-2 rounded-lg border border-border bg-secondary px-4 py-2.5 text-sm text-foreground transition-colors hover:border-border hover:text-foreground"
-						>
-							<svg
-								xmlns="http://www.w3.org/2000/svg"
-								width="14"
-								height="14"
-								viewBox="0 0 24 24"
-								fill="none"
-								stroke="currentColor"
-								strokeWidth="2"
-								strokeLinecap="round"
-								strokeLinejoin="round"
-							>
-								<rect width="14" height="14" x="8" y="8" rx="2" ry="2" />
-								<path d="M4 16c-1.1 0-2-.9-2-2V4c0-1.1.9-2 2-2h10c1.1 0 2 .9 2 2" />
-							</svg>
-							{copied ? "Copied!" : "Copy Result"}
-						</button>
-
-						{/* Formula drawer */}
-						<button
-							type="button"
-							onClick={() => setShowFormula(!showFormula)}
-							className="mt-3 flex w-full items-center justify-between text-sm text-muted-foreground hover:text-foreground"
-						>
-							<span>How is this calculated?</span>
-							<svg
-								xmlns="http://www.w3.org/2000/svg"
-								width="16"
-								height="16"
-								viewBox="0 0 24 24"
-								fill="none"
-								stroke="currentColor"
-								strokeWidth="2"
-								strokeLinecap="round"
-								strokeLinejoin="round"
-								className={`transition-transform ${showFormula ? "rotate-180" : ""}`}
-							>
-								<path d="m6 9 6 6 6-6" />
-							</svg>
-						</button>
-						<div
-							className={`grid transition-[grid-template-rows] duration-300 ${
-								showFormula ? "grid-rows-[1fr]" : "grid-rows-[0fr]"
-							}`}
-						>
-							<div className="overflow-hidden">
-								<div className="pt-3 text-sm leading-relaxed text-muted-foreground">
-									<div className="mb-4 rounded-lg border border-border bg-secondary px-3 py-2.5 text-xs text-muted-foreground">
-										All inputs are normalized to base units before calculation: peptide mass to{" "}
-										<strong className="text-foreground">mg</strong>, dose to{" "}
-										<strong className="text-foreground">mg</strong>, volume to{" "}
-										<strong className="text-foreground">mL</strong>. If you enter a dose in mcg, the engine
-										divides by 1,000 to convert to mg first.
+								<div className="overflow-hidden">
+									<div className="pt-3 text-sm leading-relaxed text-muted-foreground">
+										<div className="mb-4 rounded-lg border border-border bg-secondary px-3 py-2.5 text-xs text-muted-foreground">
+											All inputs are normalized to base units before calculation: peptide mass to{" "}
+											<strong className="text-foreground">mg</strong>, dose to{" "}
+											<strong className="text-foreground">mg</strong>, volume to{" "}
+											<strong className="text-foreground">mL</strong>. If you enter a dose in mcg, the engine
+											divides by 1,000 to convert to mg first.
+										</div>
+										<p className="mb-3">
+											<strong className="text-foreground">Concentration</strong> = Peptide Amount (mg) / Water
+											Volume (mL)
+										</p>
+										<p className="mb-3">
+											<strong className="text-foreground">Draw Volume</strong> = Desired Dose (mg) /
+											Concentration (mg/mL)
+										</p>
+										<p className="mb-3">
+											<strong className="text-foreground">Syringe Units</strong> = Draw Volume (mL) x 100
+											<span className="ml-1 text-xs text-muted-foreground">
+												(U-100 standard: 100 units = 1 mL, so 1 unit = 0.01 mL)
+											</span>
+										</p>
+										<p>
+											<strong className="text-foreground">Doses per Vial</strong> = Total Peptide (mg) / Dose
+											Amount (mg)
+										</p>
 									</div>
-									<p className="mb-3">
-										<strong className="text-foreground">Concentration</strong> = Peptide Amount (mg) / Water
-										Volume (mL)
-									</p>
-									<p className="mb-3">
-										<strong className="text-foreground">Draw Volume</strong> = Desired Dose (mg) /
-										Concentration (mg/mL)
-									</p>
-									<p className="mb-3">
-										<strong className="text-foreground">Syringe Units</strong> = Draw Volume (mL) x 100
-										<span className="ml-1 text-xs text-muted-foreground">
-											(U-100 standard: 100 units = 1 mL, so 1 unit = 0.01 mL)
-										</span>
-									</p>
-									<p>
-										<strong className="text-foreground">Doses per Vial</strong> = Total Peptide (mg) / Dose
-										Amount (mg)
-									</p>
 								</div>
 							</div>
 						</div>
-					</div>
-				) : (
-					<div className="rounded-2xl border border-border bg-card p-6 sm:p-8">
-						{/* Error-level warnings when no result */}
-						{output.warnings.filter((w) => w.level === "error").length > 0 ? (
-							<div className="space-y-3">
-								<h2 className="text-lg font-semibold text-foreground">Cannot Calculate</h2>
-								<div className="space-y-2">
-									{output.warnings
-										.filter((w) => w.level === "error")
-										.map((w, i) => (
-											<WarningBanner key={i} warning={w} />
-										))}
+					) : (
+						<div className="rounded-2xl border border-border bg-card p-6 sm:p-8">
+							{/* Error-level warnings when no result */}
+							{output.warnings.filter((w) => w.level === "error").length > 0 ? (
+								<div className="space-y-3">
+									<h2 className="text-lg font-semibold text-foreground">Cannot Calculate</h2>
+									<div className="space-y-2">
+										{output.warnings
+											.filter((w) => w.level === "error")
+											.map((w, i) => (
+												<WarningBanner key={i} warning={w} />
+											))}
+									</div>
 								</div>
-							</div>
-						) : (
-							<div className="flex min-h-[250px] items-center justify-center">
-								<p className="text-sm text-muted-foreground">Enter valid inputs to see results.</p>
-							</div>
-						)}
-					</div>
-				)}
+							) : (
+								<div className="flex min-h-[250px] items-center justify-center">
+									<p className="text-sm text-muted-foreground">Enter valid inputs to see results.</p>
+								</div>
+							)}
+						</div>
+					)}
+				</div>
 			</div>
-		</div>
+			{output.result && (
+				<ShareResultModal
+					open={shareOpen}
+					onClose={() => setShareOpen(false)}
+					inputs={inputs}
+					result={output.result}
+				/>
+			)}
+		</>
 	);
 }
 

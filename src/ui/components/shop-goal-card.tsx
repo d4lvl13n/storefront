@@ -158,7 +158,7 @@ function WaveScene() {
 				{["Theta", "Delta", "REM"].map((label, index) => (
 					<span
 						key={label}
-						className="rounded-full border border-emerald-500/15 bg-black/10 px-2.5 py-1 font-mono text-[10px] uppercase tracking-[0.15em] text-emerald-300/75 [animation:ib-goal-float_4.4s_ease-in-out_infinite] dark:bg-black/35"
+						className="rounded-full border border-emerald-500/15 bg-black/35 px-2.5 py-1 font-mono text-[10px] uppercase tracking-[0.15em] text-emerald-300/75 [animation:ib-goal-float_4.4s_ease-in-out_infinite]"
 						style={{ animationDelay: `${index * 240}ms` }}
 					>
 						{label}
@@ -406,7 +406,7 @@ export function ShopGoalCard({
 					</p>
 				) : null}
 
-				<div className="relative mt-6 h-[152px] shrink-0 overflow-hidden rounded-[1.5rem] border border-border bg-black/5 dark:bg-black/25 sm:h-[164px]">
+				<div className="relative mt-6 h-[152px] shrink-0 overflow-hidden rounded-[1.5rem] border border-white/5 bg-black/25 sm:h-[164px]">
 					<div className="absolute inset-0 transition-all duration-700 group-hover:scale-[1.02] group-hover:opacity-80">
 						<GoalVisual slug={collection.slug} />
 					</div>
