@@ -1,0 +1,362 @@
+---PRODUCT START---
+product_name: BPC-157
+product_slug: bpc-157
+alt_names: Body Protection Compound 157, Stable Gastric Pentadecapeptide, GEPPPGKPADDAGLV
+
+category: Cytoprotective Peptides
+product_type: Peptide
+
+description: BPC-157 is a synthetic pentadecapeptide with the sequence GEPPPGKPADDAGLV, corresponding to a fragment of a protection protein originally isolated from human gastric juice.[web:118][web:121] It has the empirical formula C62H98N16O22 and a molecular weight of approximately 1419.5 Da.[web:121][web:124] The peptide is proline-rich and classified as a cytoprotective reference compound in preclinical literature.[web:125][web:127]
+
+BPC-157 has been used as a reference standard in in-vitro and ex-vivo studies of endothelial nitric oxide synthase (eNOS) signalling, angiogenic responses, and Src–Caveolin‑1–eNOS pathway modulation in vascular tissues.[web:120][web:119] It is also employed in cell-based assays exploring cytoprotection and stress-response pathways in gastrointestinal and musculoskeletal models.[web:125][web:127]
+
+Supplied as an HPLC-verified lyophilized powder at >98% purity for research use.[web:121] Typically reconstituted in sterile water or buffered aqueous media for in‑vitro applications, and stored lyophilized at 2–8°C, with aliquots maintained at −20°C after reconstitution, protected from light and moisture.[web:7][web:118] Reference standard for in-vitro research on cytoprotective and angiogenic signalling pathways. For Research Use Only. Not for human consumption. Not intended for therapeutic, diagnostic, or clinical use.
+
+seo_title: BPC-157 Reference Standard | Cytoprotective Peptide
+seo_description: Synthetic pentadecapeptide (GEPPPGKPADDAGLV) reference standard for in-vitro cytoprotective and angiogenic signalling research. >98% HPLC. RUO.
+
+purity: >98% HPLC
+form: Lyophilized powder
+storage: 2–8°C lyophilized; -20°C reconstituted; protect from light
+molecular_weight: 1419.5 Da
+cas_number: 137525-51-0
+sequence: GEPPPGKPADDAGLV
+origin: Synthetic
+solubility: Water, buffered aqueous solutions
+research_category: Cytoprotective peptide
+
+faq_1_q: What is the amino acid sequence and length of BPC-157?
+faq_1_a: BPC-157 is a 15-amino-acid peptide with the sequence GEPPPGKPADDAGLV, derived from a larger gastric protection protein.[web:118][web:121]
+
+faq_2_q: Which in-vitro pathways is BPC-157 commonly used to study?
+faq_2_a: It is frequently used in vascular and cell-culture models investigating eNOS activation, VEGF/VEGFR2-related angiogenic signalling, and cytoprotective stress-response pathways.[web:120][web:119]
+
+faq_3_q: Is the identity of BPC-157 supported by public chemical databases?
+faq_3_a: Yes. BPC-157 and its salt forms are listed in PubChem (e.g., CID 78169625 and CID 9941957) with standardized structural and physicochemical data.[web:121][web:4]
+
+ref_1: PubChem CID 78169625. BPC 157 trifluoroacetate. National Center for Biotechnology Information, 2024.
+ref_2: Wu C-H et al., 2020. Modulatory effects of BPC 157 on vasomotor tone and Src–Caveolin‑1–eNOS signalling in rat aorta. Scientific Reports.[web:120]
+ref_3: Sikiric P. et al., 2024. Stable gastric pentadecapeptide BPC 157 pleiotropic activity review. Inflammopharmacology.[web:125]
+---PRODUCT END---
+
+---PRODUCT START---
+product_name: TB-500 (Thymosin Beta-4)
+product_slug: tb-500-thymosin-beta-4
+alt_names: Thymosin beta-4, Tβ4, TB500, timbetasin
+
+category: Thymic Peptides
+product_type: Peptide
+
+description: Thymosin beta-4 (TB-500) is a highly conserved 43-amino-acid peptide originally isolated from calf thymus and encoded in humans by the TMSB4X gene.[web:2][web:8] It has the sequence Ac-SDKPDMAEIEKFDKSKLKKTETQEKNPLPSKETIEQEKQAGES and a molecular weight of approximately 4963 Da.[web:5][web:8][web:105] Thymosin beta-4 is an actin-sequestering peptide and a prototypical member of the beta-thymosin family.[web:2][web:14]
+
+In research, TB-500 is used as a reference peptide in in-vitro and in-vivo studies of actin polymerization, cell migration, and cytoskeletal dynamics, and in models of connective tissue matrix deposition.[web:2][web:14] It has been studied in experimental wound-chamber systems and other preclinical models investigating extracellular-matrix gene expression and tissue remodelling pathways.[web:91][web:103]
+
+The peptide is supplied as a lyophilized acetate salt with typical research-grade purity ≥98% (HPLC).[web:109][web:107] Reconstitution in sterile water or buffered aqueous solutions is commonly used for in-vitro assays, with lyophilized material stored at −20°C and protected from light and moisture.[web:109] Reference standard for in-vitro research on actin dynamics and thymosin-family signalling. For Research Use Only. Not for human consumption. Not intended for therapeutic, diagnostic, or clinical use.
+
+seo_title: TB-500 (Thymosin Beta-4) Reference | Thymic Peptide
+seo_description: Thymosin beta-4 reference peptide for in-vitro studies of actin dynamics and connective tissue pathways. ≥98% HPLC. Lyophilized. RUO.
+
+purity: ≥98% HPLC
+form: Lyophilized acetate salt
+storage: -20°C lyophilized; avoid repeated freeze–thaw; protect from light
+molecular_weight: 4963.4 Da
+cas_number: 77591-33-4
+sequence: Ac-SDKPDMAEIEKFDKSKLKKTETQEKNPLPSKETIEQEKQAGES
+origin: Synthetic
+solubility: Water, dilute aqueous buffers
+research_category: Thymic peptide
+
+faq_1_q: What is the relationship between TB-500 and endogenous thymosin beta-4?
+faq_1_a: TB-500 is the research-grade synthetic form of thymosin beta-4, corresponding to the full 43-amino-acid human peptide encoded by TMSB4X.[web:2][web:105]
+
+faq_2_q: Which cellular systems is thymosin beta-4 commonly studied in?
+faq_2_a: It is widely used in cell-culture and tissue models examining actin polymerization, cell migration, and extracellular-matrix gene regulation.[web:2][web:14]
+
+faq_3_q: Does thymosin beta-4 have a registered CAS number and chemical identifiers?
+faq_3_a: Yes. Thymosin beta-4 is registered under CAS 77591-33-4 with defined molecular formula C212H350N56O78S in chemical databases.[web:105][web:107]
+
+ref_1: Hannappel E. et al., 1981. Complete amino acid sequence of bovine thymosin beta 4: a thymic peptide. Proc Natl Acad Sci USA 78:1162–1166.[web:8]
+ref_2: ChemicalBook entry for Thymosin beta 4, CAS 77591-33-4. ChemicalBook, 2026.[web:105]
+ref_3: Thymosin beta-4 overview. ScienceDirect Topics, Elsevier.[web:14]
+---PRODUCT END---
+
+---PRODUCT START---
+product_name: Semaglutide
+product_slug: semaglutide
+alt_names: NN9931, GLP-1 (7-37) analog, Ozempic active pharmaceutical ingredient
+
+category: GLP-1 Receptor Agonists
+product_type: Peptide
+
+description: Semaglutide is a synthetic peptide analog of human glucagon-like peptide‑1 (GLP‑1) (7–37) in which Ala8 is replaced by α‑aminobutyric acid, Lys26 is acylated with a C18 diacid-containing spacer, and Lys34 is substituted with Arg.[web:3][web:6] It has the empirical formula C187H291N45O59 and a molecular weight around 4113 Da in its peptide form.[web:6][web:9] These structural modifications confer high affinity for serum albumin and increased resistance to DPP‑4-mediated degradation while retaining GLP‑1 receptor agonist pharmacology.[web:3]
+
+Semaglutide is widely used as a reference GLP‑1 receptor agonist in in‑vitro studies of class B GPCR signalling, including cAMP accumulation, β‑arrestin recruitment, and receptor internalization in GLP‑1R‑expressing cell lines.[web:3][web:6] It has also been employed in ex‑vivo systems examining pancreatic and cardiovascular GLP‑1R signalling cascades.[web:3]
+
+Research-grade semaglutide is typically supplied as a lyophilized peptide with ≥98% HPLC purity.[web:6] It is commonly reconstituted in sterile water or aqueous buffer for biochemical and cell-based assays, and stored lyophilized at −20°C with reconstituted aliquots kept frozen and protected from light.[web:6] Reference standard for in-vitro research on GLP‑1 receptor signalling and incretin-pathway pharmacology. For Research Use Only. Not for human consumption. Not intended for therapeutic, diagnostic, or clinical use.
+
+seo_title: Semaglutide Reference Standard | GLP-1 Analog
+seo_description: Modified GLP-1 analog reference standard for in-vitro GLP-1 receptor signalling studies. Lyophilized peptide, ≥98% HPLC. RUO.
+
+purity: ≥98% HPLC
+form: Lyophilized peptide
+storage: -20°C lyophilized; -20°C reconstituted; protect from light
+molecular_weight: ~4113 Da
+cas_number: 910463-68-2
+sequence: HAEGTFTSDVSSYLEGQAAKEFIAWLVKGRG (modified at positions 8, 26, 34)
+origin: Synthetic
+solubility: Water, aqueous buffers
+research_category: GLP-1 analog
+
+faq_1_q: What structural features distinguish semaglutide from native GLP‑1?
+faq_1_a: It incorporates Aib at position 8, Arg at position 34, and a C18 diacid-containing acyl chain attached to Lys26, increasing albumin binding and proteolytic stability.[web:3][web:6]
+
+faq_2_q: In which assay formats is semaglutide commonly used as a reference compound?
+faq_2_a: It is used in GLP‑1R cell lines for cAMP, β‑arrestin recruitment, receptor internalization, and binding assays, and in ex‑vivo tissue models of GLP‑1R signalling.[web:3]
+
+faq_3_q: Where can structural and identifier data for semaglutide be found?
+faq_3_a: Detailed structural, formula, and identifier data are provided in PubChem semaglutide compound and substance records.[web:6][web:9]
+
+ref_1: IUPHAR/BPS Guide to Pharmacology ligand entry for semaglutide, GLP‑1 receptor agonist.[web:3]
+ref_2: PubChem CID 56843331. Semaglutide. National Center for Biotechnology Information.[web:6]
+---PRODUCT END---
+
+---PRODUCT START---
+product_name: Tirzepatide
+product_slug: tirzepatide
+alt_names: LY3298176, Twincretin, Tirzepatide (JAN/USAN)
+
+category: GLP-1 Receptor Agonists
+product_type: Peptide
+
+description: Tirzepatide is a synthetic linear polypeptide incretin mimetic that functions as a dual agonist at the glucose-dependent insulinotropic polypeptide (GIP) receptor and GLP‑1 receptor.[web:25][web:27] It is a 39-amino-acid peptide incorporating a C20 fatty-diacidated lysine side chain to enhance albumin binding and extend circulation time.[web:19][web:25] The peptide has an approximate molecular weight of 4813 Da and is registered in PubChem under CID 166567236.[web:16][web:22]
+
+As a dual GIP/GLP‑1 receptor ligand, tirzepatide is used in in‑vitro assays probing class B GPCR pharmacology, including cAMP signalling, β‑arrestin recruitment, and biased agonism at GIPR and GLP‑1R in recombinant and native cell systems.[web:25][web:27] It is also applied as a reference compound in mechanistic studies of incretin receptor co‑agonism and receptor trafficking.[web:25]
+
+Research formulations are supplied as lyophilized peptide with typical purity ≥98–99% by HPLC.[web:16] For in‑vitro work, tirzepatide is reconstituted in sterile water or aqueous buffer, with lyophilized vials stored at −20°C and protected from light; reconstituted aliquots are kept frozen to maintain integrity.[web:16] Reference standard for in-vitro research on dual GIP and GLP‑1 receptor signalling. For Research Use Only. Not for human consumption. Not intended for therapeutic, diagnostic, or clinical use.
+
+seo_title: Tirzepatide Reference Standard | Dual Incretin Peptide
+seo_description: Dual GIP/GLP‑1 receptor agonist peptide reference for in-vitro incretin signalling research. Lyophilized, high-purity. RUO.
+
+purity: ≥99% HPLC
+form: Lyophilized peptide
+storage: -20°C lyophilized; -20°C reconstituted; protect from light
+molecular_weight: ~4813 Da
+cas_number: 2023788-19-2
+sequence: 39-residue GIP/GLP‑1 analog with C20 fatty-diacidated Lys side chain
+origin: Synthetic
+solubility: Water, aqueous buffers
+research_category: Incretin co-agonist peptide
+
+faq_1_q: What receptors does tirzepatide target in in-vitro assays?
+faq_1_a: Tirzepatide is a dual agonist at the GIP receptor and GLP‑1 receptor and is used to study signalling at both class B GPCRs.[web:25][web:27]
+
+faq_2_q: Why does tirzepatide include a fatty-acid side chain?
+faq_2_a: The C20 fatty-diacidated lysine side chain increases albumin binding and prolongs circulation in vivo, and is retained in research-grade material to mirror clinical pharmacokinetics.[web:19][web:25]
+
+faq_3_q: Which public resources document tirzepatide's structure?
+faq_3_a: Structural and identifier data are available in PubChem compound and substance records and in IUPHAR/BPS ligand entries.[web:16][web:22][web:25]
+
+ref_1: Frias J.P. et al., 2020. Tirzepatide, a dual GIP and GLP‑1 receptor agonist: preclinical pharmacology. Diabetes Obes Metab.[web:25]
+ref_2: PubChem CID 166567236. Tirzepatide. National Center for Biotechnology Information.[web:16]
+---PRODUCT END---
+
+---PRODUCT START---
+product_name: Cagrilintide
+product_slug: cagrilintide
+alt_names: AM833, Cagrilintide (INN)
+
+category: Metabolic Injectables
+product_type: Peptide
+
+description: Cagrilintide is a long-acting, acylated analog of the human amylin–calcitonin family peptide that acts as an agonist at amylin and calcitonin receptors.[web:28][web:20] It is a 35-amino-acid peptide with multiple non‑canonical substitutions and intramolecular modifications, and has the empirical formula C194H312N54O59S2 with molecular weight approximately 4413 Da.[web:20][web:28] The peptide is cyclized and lipidated to extend pharmacokinetic half‑life.[web:17][web:20]
+
+Cagrilintide is used as a reference agonist in in‑vitro studies of calcitonin and amylin receptor pharmacology, including cAMP signalling, receptor internalization, and receptor complex stoichiometry in cell systems expressing CTR/RAMP combinations.[web:28] It is also applied in preclinical research interrogating amylin-family signalling in metabolic and gastrointestinal pathways.[web:20]
+
+Research-grade cagrilintide is generally supplied as lyophilized peptide with ≥98% purity by HPLC.[web:20] It is reconstituted in sterile water or aqueous buffer for in‑vitro work, with lyophilized material stored at −20°C and reconstituted aliquots maintained frozen and protected from light.[web:17][web:20] Reference standard for in-vitro research on amylin and calcitonin receptor signalling. For Research Use Only. Not for human consumption. Not intended for therapeutic, diagnostic, or clinical use.
+
+seo_title: Cagrilintide Reference Standard | Amylin Analog
+seo_description: Long-acting amylin receptor agonist analog for in-vitro calcitonin family receptor research. Lyophilized, ≥98% HPLC. RUO.
+
+purity: ≥98% HPLC
+form: Lyophilized peptide
+storage: -20°C lyophilized; -20°C reconstituted; protect from light
+molecular_weight: ~4413 Da
+cas_number: 1809103-79-8
+sequence: Modified 35-residue amylin-family peptide with lipidated side chain
+origin: Synthetic
+solubility: Water, aqueous buffers
+research_category: Amylin analog peptide
+
+faq_1_q: What receptor systems are typically interrogated with cagrilintide?
+faq_1_a: Cagrilintide is used in assays on calcitonin and amylin receptors, commonly in CTR/RAMP heterodimer systems analyzing cAMP and related signalling outputs.[web:28]
+
+faq_2_q: How is cagrilintide structurally related to native amylin?
+faq_2_a: It is a modified amylin analog incorporating non‑canonical residues, intramolecular constraints, and acylation to enhance stability and receptor engagement.[web:20][web:17]
+
+faq_3_q: Where is cagrilintide structurally characterized?
+faq_3_a: Detailed structural descriptors and identifiers are available in PubChem compound and patent entries.[web:20][web:17]
+
+ref_1: PubChem CID 171397054. Cagrilintide. National Center for Biotechnology Information.[web:20]
+ref_2: CN-114249808-A. Synthetic method of Cagrilintide. Chinese patent summary via PubChem.[web:17]
+---PRODUCT END---
+
+---PRODUCT START---
+product_name: GHK-Cu
+product_slug: ghk-cu
+alt_names: Copper glycyl-histidyl-lysine, Copper tripeptide, Cu-GHK
+
+category: Copper Peptide Complexes
+product_type: Peptide
+
+description: GHK‑Cu is a copper(II) complex of the endogenous tripeptide glycyl‑L‑histidyl‑L‑lysine, forming a 1:1 peptide–metal chelate.[web:18][web:21][web:26] The peptide ligand (GHK) has the empirical formula C14H24N6O4, while the copper complex is reported with molecular weight around 400.9–744.3 g/mol depending on counterions and hydration state.[web:21][web:18][web:24] GHK displays high affinity for Cu(II), coordinating via the histidine imidazole and terminal amine groups.[web:94][web:100]
+
+GHK‑Cu is widely used as a reference copper tripeptide in in‑vitro and in‑vivo models examining extracellular-matrix gene expression, connective-tissue remodelling, and metalloproteinase–inhibitor balance.[web:91][web:100][web:103] It has also been employed in transport and penetration studies across model stratum corneum membranes, and in cell systems exploring copper trafficking and redox-related signalling.[web:94]
+
+Research-grade GHK‑Cu is supplied as a lyophilized powder with typical purity ≥98% by HPLC.[web:18] It is readily soluble in water and aqueous buffers, forming blue solutions characteristic of Cu(II) complexes, and is stored at −20°C protected from light and moisture to limit oxidation.[web:18][web:21] Reference standard for in-vitro research on copper-peptide signalling and extracellular-matrix regulation pathways. For Research Use Only. Not for human consumption. Not intended for therapeutic, diagnostic, or clinical use.
+
+seo_title: GHK-Cu Reference Standard | Copper Tripeptide
+seo_description: Copper tripeptide (glycyl-histidyl-lysine Cu(II)) reference standard for in-vitro copper signalling and matrix-pathway research. Lyophilized. RUO.
+
+purity: ≥98% HPLC
+form: Lyophilized powder
+storage: -20°C; protect from light and moisture
+molecular_weight: 400.9–744.3 Da (form-dependent)
+cas_number: 300801-03-0
+sequence: GHK (Gly-His-Lys), Cu(II) complex
+origin: Synthetic
+solubility: Water, aqueous buffers
+research_category: Copper peptide
+
+faq_1_q: What is the ligand structure in GHK‑Cu?
+faq_1_a: The ligand is the tripeptide glycyl‑L‑histidyl‑L‑lysine (GHK), which chelates Cu(II) primarily via the N‑terminal amine and histidine imidazole nitrogens.[web:26][web:94]
+
+faq_2_q: In what types of models is GHK‑Cu commonly studied?
+faq_2_a: It is used in connective-tissue and skin models, wound-chamber systems, and cell cultures analyzing extracellular-matrix gene expression and copper transport.[web:91][web:94][web:103]
+
+faq_3_q: Does GHK‑Cu have defined chemical identifiers?
+faq_3_a: Yes. GHK‑Cu and related copper tripeptide entries are listed in PubChem with CIDs 378611, 133697840, and 139035031, among others.[web:18][web:21][web:24]
+
+ref_1: Pickart L. et al., 1991. In vivo stimulation of connective tissue accumulation by the tripeptide–copper complex GHK‑Cu2+ in rat experimental wounds. J Surg Res 50:216–225.[web:91][web:103]
+ref_2: Mazurowska L., Mojski M., 2007. ESI‑MS study of GHK‑Cu(II) complex transport through model stratum corneum membrane. Talanta 72:650–654.[web:94]
+ref_3: Pickart L. et al., 2018. Regenerative and protective actions of the GHK‑Cu peptide in the light of the new gene data. Int J Mol Sci 19:1987.[web:100]
+---PRODUCT END---
+
+---PRODUCT START---
+product_name: MOTS-c
+product_slug: mots-c
+alt_names: Mitochondrial ORF of the 12S rRNA-c peptide, MRWQEMGYIFYPRKLR
+
+category: Mitochondrial Peptides
+product_type: Peptide
+
+description: MOTS‑c (mitochondrial open reading frame of the 12S rRNA‑c) is a 16‑amino‑acid peptide encoded by a short open reading frame within the mitochondrial 12S rRNA gene.[web:30][web:33] The sequence is MRWQEMGYIFYPRKLR, and the peptide is synthesized in the cytoplasm using the nuclear genetic code before localizing to mitochondria under basal conditions.[web:30][web:39] MOTS‑c is classified as a mitochondrial-derived regulatory peptide with reported interactions with metabolic pathways in preclinical models.[web:33][web:42]
+
+In research, MOTS‑c is used as a reference peptide in in‑vitro studies of cellular energy-sensing networks, including assays examining AMPK activation, folate cycle modulation, and downstream gene-expression programs under metabolic stress.[web:33][web:42] It is also applied in cell and animal models exploring mitochondrial–nuclear communication and stress‑response signalling.[web:39]
+
+Research-grade MOTS‑c is supplied as a lyophilized peptide at high purity (≥98% HPLC) for experimental use.[web:36] It is typically reconstituted in sterile water or aqueous buffer immediately prior to use, with lyophilized vials stored at −20°C and reconstituted aliquots kept frozen and protected from repeated freeze–thaw.[web:36] Reference standard for in-vitro research on mitochondrial-derived peptide signalling and AMPK-associated pathways. For Research Use Only. Not for human consumption. Not intended for therapeutic, diagnostic, or clinical use.
+
+seo_title: MOTS-c Reference Standard | Mitochondrial Peptide
+seo_description: 16-residue mitochondrial-derived peptide (MRWQEMGYIFYPRKLR) for in-vitro studies of AMPK and metabolic stress signalling. ≥98% HPLC. RUO.
+
+purity: ≥98% HPLC
+form: Lyophilized powder
+storage: -20°C lyophilized; -20°C reconstituted; protect from light
+molecular_weight: ~2170 Da
+cas_number: 627580-64-6
+sequence: MRWQEMGYIFYPRKLR
+origin: Synthetic
+solubility: Water, aqueous buffers
+research_category: Mitochondrial peptide
+
+faq_1_q: What is the genetic origin of MOTS‑c?
+faq_1_a: MOTS‑c is encoded by a short open reading frame within the mitochondrial 12S rRNA gene but is translated in the cytoplasm using the standard genetic code.[web:30][web:33][web:39]
+
+faq_2_q: Which signalling pathways are commonly interrogated using MOTS‑c?
+faq_2_a: It is frequently used in studies of AMPK signalling, folate-cycle modulation, and metabolic-stress responses in cultured cells and animal models.[web:33][web:42]
+
+faq_3_q: How is research-grade MOTS‑c typically supplied?
+faq_3_a: Vendors provide MOTS‑c as a lyophilized, >98% pure peptide intended for reconstitution in aqueous media for in‑vitro applications.[web:36]
+
+ref_1: Kim K.H. et al., 2023. MOTS‑c: a promising mitochondrial-derived peptide for therapeutic applications. Front Endocrinol.[web:33]
+ref_2: Lin J. et al., 2023. MOTS‑c functionally prevents metabolic disorders. Front Endocrinol.[web:42]
+---PRODUCT END---
+
+---PRODUCT START---
+product_name: Epithalon
+product_slug: epithalon
+alt_names: Epitalon, Epithalone, AEDG, Ala-Glu-Asp-Gly
+
+category: Pineal Peptides
+product_type: Peptide
+
+description: Epithalon (Epitalon, AEDG) is a synthetic tetrapeptide with the sequence Ala‑Glu‑Asp‑Gly, originally designed based on the amino-acid composition of epithalamin, an extract from bovine pineal gland.[web:31][web:34][web:40] It has the molecular formula C14H22N4O9 and a molecular weight of approximately 390.35 Da.[web:31][web:34] Epithalon is classified as a pineal regulatory peptide in the short-peptide literature.[web:40]
+
+Epithalon is employed as a reference compound in in‑vitro and animal studies investigating telomere biology, chromatin regulation, and pineal‑associated signalling pathways.[web:40] It has been studied in cellular models for its effects on telomerase activity and gene-expression patterns associated with stress resistance and circadian regulation.[web:40]
+
+Research-grade Epithalon is typically supplied as a lyophilized powder with ≥98% HPLC purity.[web:34] It is readily soluble in water and aqueous buffers, and lyophilized material is stored at −20°C with reconstituted aliquots maintained frozen and protected from light.[web:43][web:34] Reference standard for in-vitro research on pineal peptide signalling and telomere-associated pathways. For Research Use Only. Not for human consumption. Not intended for therapeutic, diagnostic, or clinical use.
+
+seo_title: Epithalon Reference Standard | Pineal Tetrapeptide
+seo_description: Synthetic tetrapeptide (Ala-Glu-Asp-Gly) reference standard for in-vitro research on pineal peptides and telomere-associated pathways. ≥98% HPLC. RUO.
+
+purity: ≥98% HPLC
+form: Lyophilized powder
+storage: -20°C; protect from light and moisture
+molecular_weight: 390.35 Da
+cas_number: 307297-39-8
+sequence: AEDG (Ala-Glu-Asp-Gly)
+origin: Synthetic
+solubility: Water, aqueous buffers
+research_category: Pineal peptide
+
+faq_1_q: What is the structural basis for Epithalon?
+faq_1_a: Epithalon reproduces the tetrapeptide Ala‑Glu‑Asp‑Gly identified from analysis of epithalamin, a pineal-gland polypeptide preparation.[web:31][web:34][web:40]
+
+faq_2_q: Which cellular pathways are most commonly studied with Epithalon?
+faq_2_a: It is used in cell culture and animal models examining telomerase regulation, chromatin state, and gene networks associated with stress resistance and circadian signalling.[web:40]
+
+faq_3_q: Is Epithalon registered in public chemical databases?
+faq_3_a: Yes. Epithalon is listed in PubChem and other databases with defined structure, molecular weight, and identifiers.[web:34][web:43]
+
+ref_1: Khavinson V.K. et al., 2025. Overview of Epitalon—highly bioactive pineal tetrapeptide with pleiotropic geroprotective effects. Biogerontology.[web:40]
+ref_2: PubChem substance SID 135141173. Epithalon. National Center for Biotechnology Information.[web:34]
+---PRODUCT END---
+
+---PRODUCT START---
+product_name: Sermorelin
+product_slug: sermorelin
+alt_names: GHRH (1-29)-amide, Geref, Sermorelin acetate
+
+category: Growth Hormone Secretagogues
+product_type: Peptide
+
+description: Sermorelin is a synthetic peptide corresponding to the 1–29 N‑terminal fragment of human growth hormone-releasing hormone (GHRH), amidated at the C‑terminus.[web:32][web:35][web:44] It comprises 29 amino acids with molecular formula approximately C149H246N44O42S and molecular weight about 3357–3418 Da depending on salt form.[web:35][web:38] This fragment retains the full GHRH receptor agonist activity of the native hormone.[web:35][web:44]
+
+Sermorelin is widely used as a reference GHRH analog in in‑vitro pituitary and heterologous expression systems to study class B GHRH receptor pharmacology.[web:35][web:44] It is applied in assays of receptor binding, cAMP accumulation, and growth-hormone secretagogue signalling pathways in somatotroph cell models and transfected cell lines.[web:35]
+
+Research-grade sermorelin is supplied predominantly as the acetate salt in lyophilized form with ≥98% HPLC purity.[web:32] It is soluble in water and dilute aqueous buffers and is stored lyophilized at −20°C, with reconstituted solutions kept frozen and protected from light to maintain peptide integrity.[web:32][web:38] Reference standard for in-vitro research on GHRH receptor signalling and growth hormone secretagogue pathways. For Research Use Only. Not for human consumption. Not intended for therapeutic, diagnostic, or clinical use.
+
+seo_title: Sermorelin Reference Standard | GHRH (1-29) Analog
+seo_description: GHRH (1–29)-amide reference peptide for in-vitro GHRH receptor and growth hormone secretagogue signalling research. Lyophilized, high-purity. RUO.
+
+purity: ≥98% HPLC
+form: Lyophilized acetate salt
+storage: -20°C lyophilized; -20°C reconstituted; protect from light
+molecular_weight: ~3357–3418 Da
+cas_number: 86168-78-7
+sequence: H-Tyr-Ala-Asp-Ala-Ile-Phe-Thr-Asn-Ser-Tyr-Arg-Lys-Val-Leu-Gly-Gln-Leu-Ser-Ala-Arg-Lys-Leu-Leu-Gln-Asp-Ile-Met-Ser-Arg-NH2
+origin: Synthetic
+solubility: Water, dilute aqueous buffers
+research_category: GHRH analog
+
+faq_1_q: How does sermorelin relate structurally to native GHRH?
+faq_1_a: It reproduces the first 29 amino acids of human GHRH with a C‑terminal amide, representing the shortest fully functional fragment for GHRH receptor activation.[web:32][web:44]
+
+faq_2_q: In what systems is sermorelin commonly used as a reference compound?
+faq_2_a: It is used in pituitary cell cultures and recombinant GHRH receptor-expressing lines for binding, cAMP, and downstream signalling assays.[web:35]
+
+faq_3_q: What are the common forms and identifiers of sermorelin?
+faq_3_a: Sermorelin and its acetate salt are registered with CAS numbers 86168‑78‑7 and 114466‑38‑5 and are catalogued in PubChem with detailed structural data.[web:32][web:38][web:41]
+
+ref_1: PubChem CID 16132413. Sermorelin. National Center for Biotechnology Information.[web:35]
+ref_2: Wikipedia. Sermorelin. GHRH(1–29)-amide overview.[web:44]
+---PRODUCT END---

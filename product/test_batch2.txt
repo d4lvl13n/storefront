@@ -1,0 +1,399 @@
+---PRODUCT START---
+product_name: CJC-1295 (with DAC)
+product_slug: cjc-1295-with-dac
+alt_names: CJC-1295 DAC, DAC:GRF, Drug Affinity Complex–GHRH(1-29)
+
+category: Growth Hormone Secretagogues
+product_type: Peptide
+
+description: CJC-1295 with DAC is a synthetic analog of human growth hormone-releasing hormone (GHRH) (1–29) that incorporates a drug affinity complex (DAC) moiety to enable covalent binding to serum albumin.[web:48][web:132] The peptide backbone is a modified GHRH(1–29) sequence (e.g., Tyr‑D‑Ala‑Asp‑Ala‑Ile‑Phe‑Thr‑Gln‑Ser‑Tyr‑Arg‑Lys‑Val‑Leu‑Ala‑Gln‑Leu‑Ser‑Ala‑Arg‑Lys‑Leu‑…) with empirical formula C165H269N47O46 reported for the DAC-conjugated form.[web:132][web:48] The DAC group is typically attached via a lysine side chain to form a stable albumin-reactive entity.[web:48][web:132]
+
+CJC-1295 DAC is used as a long-acting GHRH analog in in‑vitro and in‑vivo models examining class B GHRH receptor pharmacology and growth hormone secretagogue signalling.[web:48] It serves as a reference compound in studies of receptor binding, cAMP generation, and pharmacokinetic extension via albumin bioconjugation.[web:48]
+
+Research-grade CJC-1295 DAC is supplied as a lyophilized peptide at ≥98% purity by HPLC, typically as an acetate or trifluoroacetate salt.[web:54][web:132] The material is reconstituted in sterile water or aqueous buffer immediately prior to use and stored lyophilized at −20°C, with reconstituted aliquots kept frozen and protected from light.[web:54] Reference standard for in-vitro research on GHRH receptor signalling and albumin bioconjugation strategies. For Research Use Only. Not for human consumption. Not intended for therapeutic, diagnostic, or clinical use.
+
+seo_title: CJC-1295 DAC Reference Standard | GHRH Analog
+seo_description: Long-acting GHRH(1–29) analog with DAC for in-vitro studies of growth hormone secretagogue receptor signalling. ≥98% HPLC. RUO.
+
+purity: ≥98% HPLC
+form: Lyophilized peptide
+storage: -20°C lyophilized; -20°C reconstituted; protect from light
+molecular_weight:
+cas_number: 863288-34-0
+sequence: Modified GHRH(1–29) peptide with albumin-binding DAC moiety
+origin: Synthetic
+solubility: Water, aqueous buffers
+research_category: GHRH analog peptide
+
+faq_1_q: What is the structural relationship between CJC-1295 DAC and native GHRH?
+faq_1_a: CJC-1295 DAC is based on the 1–29 N-terminal fragment of human GHRH with sequence modifications and an added drug affinity complex that enables albumin binding.[web:48][web:132]
+
+faq_2_q: Why is the DAC group incorporated into CJC-1295?
+faq_2_a: The DAC moiety forms covalent or quasi-covalent bonds with circulating albumin, extending the peptide's residence time and enabling long-acting receptor engagement in preclinical models.[web:48]
+
+faq_3_q: How is CJC-1295 DAC typically formulated for research?
+faq_3_a: Vendors supply CJC-1295 DAC as a lyophilized, high-purity peptide salt intended for reconstitution in aqueous media for biochemical and cell-based assays.[web:54][web:132]
+
+ref_1: Wikipedia. CJC-1295 – long-acting GHRH analog with DAC.[web:48]
+ref_2: Particle Peptides safety data sheet for CJC-1295 + DAC, listing CAS 863288-34-0 and peptide formula.[web:132]
+---PRODUCT END---
+
+---PRODUCT START---
+product_name: Ipamorelin
+product_slug: ipamorelin
+alt_names: NNC 26-0161, Aib-His-D-2-Nal-D-Phe-Lys-NH2
+
+category: Growth Hormone Secretagogues
+product_type: Peptide
+
+description: Ipamorelin is a synthetic pentapeptide with the sequence Aib‑His‑D‑2‑Nal‑D‑Phe‑Lys‑NH2, where Aib is α‑aminoisobutyric acid and 2‑Nal is 3‑(2‑naphthyl)‑D‑alanine.[web:133][web:138] It has the empirical formula C38H49N9O5 and a molecular weight of approximately 711.85 Da.[web:133][web:138] Ipamorelin is a highly selective agonist of the ghrelin/growth hormone secretagogue receptor (GHSR‑1a) and belongs to the class of non‑endogenous growth hormone secretagogues.[web:138]
+
+In research, ipamorelin is widely used as a reference GHSR agonist in in‑vitro assays and ex‑vivo pituitary or hypothalamic systems.[web:138] It is applied in binding, calcium-flux, and cAMP assays, as well as in perfused organ and animal models studying growth hormone secretagogue receptor signalling.[web:133][web:138]
+
+Research-grade ipamorelin is provided mainly as the acetate salt in lyophilized form with purity ≥98% by HPLC.[web:138] It shows good stability when stored at −20°C protected from light and moisture, and is typically reconstituted in water, dilute acids, or mixed aqueous–organic solvents for experimental use.[web:133][web:138] Reference standard for in-vitro research on ghrelin/growth hormone secretagogue receptor pathways. For Research Use Only. Not for human consumption. Not intended for therapeutic, diagnostic, or clinical use.
+
+seo_title: Ipamorelin Reference Standard | GHSR Peptide
+seo_description: Pentapeptide GHSR agonist (Aib-His-D-2-Nal-D-Phe-Lys-NH2) for in-vitro growth hormone secretagogue receptor research. ≥98% HPLC. RUO.
+
+purity: ≥98% HPLC
+form: Lyophilized acetate salt
+storage: -20°C; protect from light and moisture
+molecular_weight: 711.85 Da
+cas_number: 170851-70-4
+sequence: Aib-His-D-2-Nal-D-Phe-Lys-NH2
+origin: Synthetic
+solubility: Water (slight), acetic acid (dilute), aqueous-organic mixtures
+research_category: GHSR agonist peptide
+
+faq_1_q: What receptor does ipamorelin target in research models?
+faq_1_a: Ipamorelin is a selective agonist at the ghrelin/growth hormone secretagogue receptor GHSR‑1a and is used to study this receptor's signalling in vitro.[web:133][web:138]
+
+faq_2_q: What is the amino acid composition of ipamorelin?
+faq_2_a: It is a pentapeptide composed of Aib, His, D‑2‑Nal, D‑Phe, and Lys, with a C‑terminal amide.[web:133][web:138]
+
+faq_3_q: How is ipamorelin typically supplied for laboratory use?
+faq_3_a: Vendors offer ipamorelin predominantly as a lyophilized acetate salt with ≥98% HPLC purity, intended for reconstitution immediately before experiments.[web:138]
+
+ref_1: ChemicalBook entry for Ipamorelin, CAS 170851-70-4, including formula and sequence.[web:138]
+ref_2: CymitQuimica technical description of Ipamorelin, listing formula and molecular weight.[web:133]
+---PRODUCT END---
+
+---PRODUCT START---
+product_name: 5-Amino-1MQ
+product_slug: 5-amino-1mq
+alt_names: 5-Amino-1-methylquinolinium iodide, NNMTi, 5-amino-1-methylquinolinium
+
+category: Research Small Molecules
+product_type: Injectable
+
+description: 5-Amino-1MQ is a synthetic small-molecule research probe belonging to the quaternary quinolinium class.[web:137][web:117] It is commonly referenced by the cation name 5-amino-1-methylquinolinium (C10H11N2+) and is frequently supplied as an iodide salt (C10H11IN2) with CAS number 42464-96-0.[web:137][web:108][web:117] The compound has been discussed in preclinical literature as a substrate-site–targeting inhibitor candidate for nicotinamide N‑methyltransferase (NNMT).[web:137]
+
+In vitro, 5-Amino-1MQ is used as a reference NNMT-modulating small molecule in enzymatic assays, metabolite profiling workflows, and pathway studies assessing methylation-related biochemical readouts.[web:137] It is applied in cell-free and cell-based systems interrogating NNMT activity and downstream metabolite changes in controlled experimental settings.[web:53][web:137]
+
+Research-grade 5-Amino-1MQ iodide is typically supplied as a solid powder with ≥98% HPLC purity.[web:111][web:108] It is soluble in polar solvents such as water and DMSO, and stability data and catalog guidance recommend storage at −20°C in a dry environment to preserve integrity.[web:108][web:137] Reference standard for in-vitro research on NNMT-associated biochemical pathways. For Research Use Only. Not for human consumption. Not intended for therapeutic, diagnostic, or clinical use.
+
+seo_title: 5-Amino-1MQ Reference Standard | NNMT Probe
+seo_description: Quinolinium NNMT research probe (5-Amino-1-methylquinolinium iodide) for in-vitro nicotinamide N-methyltransferase pathway studies. ≥98% HPLC. RUO.
+
+purity: ≥98% HPLC
+form: Solid powder (iodide salt)
+storage: -20°C; dry; protect from light
+molecular_weight: ~286.1 Da (iodide salt form)
+cas_number: 42464-96-0
+sequence:
+origin: Synthetic
+solubility: Water, DMSO, polar organic solvents
+research_category: Small-molecule NNMT probe
+
+faq_1_q: What is the preferred chemical form of 5-Amino-1MQ for research use?
+faq_1_a: Many catalogs provide the iodide salt of 5-amino-1-methylquinolinium, which offers defined composition and good aqueous solubility.[web:137][web:108]
+
+faq_2_q: What enzyme system is commonly interrogated with 5-Amino-1MQ?
+faq_2_a: 5-Amino-1MQ is used in in‑vitro assays of nicotinamide N‑methyltransferase (NNMT) to explore substrate-site modulation and downstream metabolite shifts.[web:137]
+
+faq_3_q: Are there public database entries for 5-Amino-1MQ?
+faq_3_a: Yes. The cation and its salt forms appear in PubChem (e.g., CID 950107) and commercial chemical databases with structural and analytical data.[web:117][web:108]
+
+ref_1: BlkcellResearch technical monograph for 5-Amino-1MQ, summarizing NNMT probe usage and identifiers.[web:137]
+ref_2: ChemicalBook entry for 5-amino-1-methylquinolinium chloride/iodide, CAS 42464-96-0.[web:108]
+---PRODUCT END---
+
+---PRODUCT START---
+product_name: NAD+
+product_slug: nad-plus
+alt_names: Nicotinamide adenine dinucleotide (oxidized), Nadide, β-NAD+
+
+category: Metabolic Injectables
+product_type: Injectable
+
+description: NAD+ (nicotinamide adenine dinucleotide, oxidized form) is a ubiquitous pyridine nucleotide cofactor composed of an adenosine diphosphate ribose moiety linked via pyrophosphate to nicotinamide riboside.[web:60][web:69][web:66] The oxidized species has empirical formula C21H26N7O14P2− (for the anionic form) and a molecular weight around 662.4 g/mol.[web:66] NAD+ participates in redox reactions as an electron acceptor and is central to dehydrogenase-catalyzed metabolic transformations in biochemical systems.[web:66][web:60]
+
+In research, NAD+ is used as a reference cofactor in enzyme-kinetic assays, mitochondrial function studies, and in‑vitro models of energy metabolism.[web:66] It is routinely employed in spectrophotometric dehydrogenase assays, sirtuin activity measurements, and other in‑vitro systems that require defined pyridine nucleotide pools.[web:60][web:69]
+
+Research-grade NAD+ is typically supplied as the disodium or free acid salt in lyophilized powder form with ≥98% purity.[web:60][web:69] It is highly water-soluble and generally stored at −20°C in sealed containers protected from moisture and repeated freeze–thaw; reconstituted solutions are kept refrigerated or frozen depending on experimental timelines.[web:66] Reference standard for in-vitro research on redox biochemistry and pyridine-nucleotide–dependent metabolic pathways. For Research Use Only. Not for human consumption. Not intended for therapeutic, diagnostic, or clinical use.
+
+seo_title: NAD+ Reference Standard | Pyridine Nucleotide
+seo_description: Oxidized nicotinamide adenine dinucleotide cofactor for in-vitro redox enzyme and metabolic pathway studies. Lyophilized, ≥98% purity. RUO.
+
+purity: ≥98% (HPLC or enzymatic assay)
+form: Lyophilized powder (often disodium salt)
+storage: -20°C; dry; protect from moisture and light
+molecular_weight: 662.4 Da
+cas_number:
+sequence:
+origin: Synthetic or fermentation-derived
+solubility: Water
+research_category: Pyridine nucleotide cofactor
+
+faq_1_q: What is the primary chemical role of NAD+ in research assays?
+faq_1_a: NAD+ acts as an oxidizing cofactor, accepting hydride equivalents in dehydrogenase and related enzyme reactions during in‑vitro kinetic studies.[web:66][web:60]
+
+faq_2_q: In which assay formats is NAD+ most frequently used?
+faq_2_a: It is a standard component in spectrophotometric dehydrogenase assays, mitochondrial respiration studies, and diverse enzyme systems requiring defined pyridine nucleotide concentrations.[web:66][web:69]
+
+faq_3_q: How is research-grade NAD+ typically formulated and stored?
+faq_3_a: Vendors supply NAD+ as a lyophilized powder that is reconstituted with water immediately before use and stored at low temperature in the dark to limit degradation.[web:60][web:66]
+
+ref_1: PubChem CID 15938971. Nad+. National Center for Biotechnology Information.[web:66]
+ref_2: PubChem entries for nicotinamide–adenine dinucleotide and Nadide.[web:60][web:69]
+---PRODUCT END---
+
+---PRODUCT START---
+product_name: Semax
+product_slug: semax
+alt_names: MEHFPGP, ACTH(4-7)–Pro-Gly-Pro analog
+
+category: Nootropic Peptides
+product_type: Peptide
+
+description: Semax is a synthetic heptapeptide analogue of the adrenocorticotropic hormone fragment ACTH(4–10) with the sequence Met‑Glu‑His‑Phe‑Pro‑Gly‑Pro (MEHFPGP).[web:67][web:134] It preserves the core ACTH(4–7) sequence and incorporates an additional Pro‑Gly‑Pro motif at the C‑terminus.[web:134] The peptide has been characterized as a regulatory neuropeptide analog with high affinity for copper(II) ions in solution.[web:70]
+
+Semax is used as a reference ACTH-derived peptide in in‑vitro and ex‑vivo models investigating neuropeptide signalling, neurotrophin expression, and metal-ion–associated oxidative processes.[web:70][web:67] It has been studied in cell cultures for its interactions with copper(II) and for effects on viability under metal-induced stress conditions.[web:70]
+
+Research-grade semax is supplied as a lyophilized acetate salt at ≥98% HPLC purity for experimental work.[web:61] It is water-soluble and generally stored at −20°C protected from light, with reconstituted solutions maintained at low temperature and used promptly.[web:61][web:64] Reference standard for in-vitro research on ACTH-fragment neuropeptides, metal–peptide interactions, and neurotrophin-related pathways. For Research Use Only. Not for human consumption. Not intended for therapeutic, diagnostic, or clinical use.
+
+seo_title: Semax Reference Standard | ACTH Fragment Peptide
+seo_description: Heptapeptide ACTH(4–10) analog (MEHFPGP) for in-vitro neuropeptide and metal–peptide signalling research. Lyophilized, ≥98% HPLC. RUO.
+
+purity: ≥98% HPLC
+form: Lyophilized acetate salt
+storage: -20°C lyophilized; -20°C reconstituted; protect from light
+molecular_weight: ~868 Da
+cas_number: 80714-61-0
+sequence: MEHFPGP (Met-Glu-His-Phe-Pro-Gly-Pro)
+origin: Synthetic
+solubility: Water, aqueous buffers
+research_category: ACTH-fragment peptide
+
+faq_1_q: What is the sequence origin of Semax?
+faq_1_a: Semax is derived from the ACTH(4–10) fragment and extended with a C‑terminal Pro‑Gly‑Pro motif, yielding the heptapeptide MEHFPGP.[web:67][web:134]
+
+faq_2_q: Which experimental systems commonly employ Semax?
+faq_2_a: It is used in neuronal and glial cell models, as well as biochemical systems, to study neuropeptide signalling and copper(II)-associated oxidative stress responses.[web:70]
+
+faq_3_q: Does Semax form complexes with metal ions?
+faq_3_a: Yes. A detailed study reported high-affinity complexation of Semax with Cu(II) in solution, associated with protective effects in metal-induced toxicity models.[web:70]
+
+ref_1: Wikipedia. Semax – ACTH(4–10) analog with sequence MEHFPGP.[web:67]
+ref_2: Palacios C. et al., 2015. Semax, an ACTH 4–10 peptide analog with high affinity for copper(II) ion and protective ability against metal-induced cell toxicity. J Inorg Biochem.[web:70]
+---PRODUCT END---
+
+---PRODUCT START---
+product_name: Selank
+product_slug: selank
+alt_names: TKPRPGP, Tuftsin analog
+
+category: Nootropic Peptides
+product_type: Peptide
+
+description: Selank is a synthetic heptapeptide with the sequence Thr‑Lys‑Pro‑Arg‑Pro‑Gly‑Pro (TKPRPGP), designed as an analog of the endogenous tetrapeptide tuftsin (Thr‑Lys‑Pro‑Arg).[web:74][web:139] The C‑terminal Pro‑Gly‑Pro extension enhances peptide stability while preserving the tuftsin motif.[web:74] Selank is classified as a regulatory neuropeptide analog in the Russian peptide literature.[web:74]
+
+Selank is used as a reference peptide in in‑vitro and animal models assessing neuropeptide signalling, synaptic plasticity markers, and neurotrophin expression.[web:74] It has been examined in systems measuring brain-derived neurotrophic factor (BDNF) expression and in receptor-binding or gene-expression assays relevant to stress-response pathways.[web:74][web:139]
+
+Research-grade Selank is supplied as a lyophilized acetate salt with typical purity ≥98% by HPLC.[web:62][web:68] It is soluble in water and aqueous buffers and is stored at −20°C protected from light and moisture; reconstituted solutions are kept refrigerated or frozen according to experimental schedules.[web:62][web:68] Reference standard for in-vitro research on tuftsin-related neuropeptides and BDNF-associated signalling pathways. For Research Use Only. Not for human consumption. Not intended for therapeutic, diagnostic, or clinical use.
+
+seo_title: Selank Reference Standard | Tuftsin Analog Peptide
+seo_description: Heptapeptide tuftsin analog (TKPRPGP) for in-vitro neuropeptide and BDNF-pathway research. Lyophilized acetate salt, ≥98% HPLC. RUO.
+
+purity: ≥98% HPLC
+form: Lyophilized acetate salt
+storage: -20°C lyophilized; -20°C reconstituted; protect from light
+molecular_weight: ~863 Da
+cas_number: 129954-34-3
+sequence: TKPRPGP (Thr-Lys-Pro-Arg-Pro-Gly-Pro)
+origin: Synthetic
+solubility: Water, aqueous buffers
+research_category: Tuftsin analog peptide
+
+faq_1_q: What structural motif does Selank contain?
+faq_1_a: Selank contains the tuftsin tetrapeptide Thr‑Lys‑Pro‑Arg extended by Pro‑Gly‑Pro at the C‑terminus, improving stability while preserving the core motif.[web:74]
+
+faq_2_q: What research areas commonly employ Selank?
+faq_2_a: It is used in neurobiology models studying neuropeptide signalling, BDNF expression, and gene-expression changes associated with stress-response pathways.[web:74][web:139]
+
+faq_3_q: How is Selank typically formulated?
+faq_3_a: Vendors provide Selank as a lyophilized acetate salt of ≥98% purity, intended for reconstitution in water or buffer prior to in‑vitro or preclinical use.[web:62][web:68]
+
+ref_1: Wikipedia. Selank – heptapeptide tuftsin analog TKPRPGP.[web:74]
+ref_2: ChemicalBook entry for Selank peptide, CAS 129954-34-3.[web:68]
+---PRODUCT END---
+
+---PRODUCT START---
+product_name: Kisspeptin-10
+product_slug: kisspeptin-10
+alt_names: KP-10, Metastin (45-54), H-YNWNSFGLRF-NH2
+
+category: Reproductive Hormones
+product_type: Peptide
+
+description: Kisspeptin-10 (KP‑10) is a decapeptide fragment of the human KISS1 gene product, corresponding to residues 45–54 (Metastin 45–54) with the sequence Tyr‑Asn‑Trp‑Asn‑Ser‑Phe‑Gly‑Leu‑Arg‑Phe‑NH2 (YNWNSFGLRF‑NH2).[web:78][web:140] It has the empirical formula C63H83N17O14 and a molecular weight of approximately 1302.4 g/mol.[web:140][web:78] Kisspeptin‑10 is a high-affinity ligand for the G protein–coupled receptor KISS1R (GPR54), which plays a key role in the hypothalamic–pituitary–gonadal axis.[web:140][web:87]
+
+In vitro, kisspeptin‑10 is widely used as a reference peptide in receptor-binding, calcium-mobilization, and cAMP signalling assays in KISS1R‑expressing cell systems.[web:140] It is also applied in pituitary and hypothalamic models exploring GnRH neuron activation and downstream gonadotropin-related pathways.[web:87]
+
+Research-grade kisspeptin‑10 is supplied as a lyophilized acetate or trifluoroacetate salt with ≥98% HPLC purity.[web:78][web:84] It is soluble in water and dilute acetic acid, and is stored at −20°C protected from light; once reconstituted, aliquots are typically frozen to maintain peptide stability.[web:78][web:84] Reference standard for in-vitro research on KISS1R signalling and hypothalamic–pituitary–gonadal axis regulation. For Research Use Only. Not for human consumption. Not intended for therapeutic, diagnostic, or clinical use.
+
+seo_title: Kisspeptin-10 Reference Standard | KISS1R Peptide
+seo_description: Decapeptide KISS1R ligand (YNWNSFGLRF-NH2) for in-vitro GnRH neuron and hypothalamic–pituitary–gonadal signalling research. ≥98% HPLC. RUO.
+
+purity: ≥98% HPLC
+form: Lyophilized peptide (acetate or TFA salt)
+storage: -20°C lyophilized; -20°C reconstituted; protect from light
+molecular_weight: 1302.4 Da
+cas_number: 374675-21-5
+sequence: YNWNSFGLRF-NH2
+origin: Synthetic
+solubility: Water, dilute acetic acid
+research_category: Kisspeptin peptide
+
+faq_1_q: What is the sequence of kisspeptin‑10?
+faq_1_a: The human KP‑10 sequence is Tyr‑Asn‑Trp‑Asn‑Ser‑Phe‑Gly‑Leu‑Arg‑Phe‑NH2 (YNWNSFGLRF‑NH2).[web:78][web:140]
+
+faq_2_q: Which receptor does kisspeptin‑10 activate in research systems?
+faq_2_a: Kisspeptin‑10 is a high-affinity agonist of KISS1R (GPR54) and is commonly used to probe this receptor's signalling in vitro.[web:140][web:87]
+
+faq_3_q: How is kisspeptin‑10 typically used in endocrine research?
+faq_3_a: It is employed in pituitary and hypothalamic models to study GnRH neuron activation and related hypothalamic–pituitary–gonadal axis signalling.[web:87]
+
+ref_1: PubChem CID 25240297. Kisspeptin-10. National Center for Biotechnology Information.[web:140]
+ref_2: Dhillo W.S. et al., 2011. Kisspeptin‑10 is a potent stimulator of LH and increases pulse frequency. J Clin Endocrinol Metab.[web:87]
+---PRODUCT END---
+
+---PRODUCT START---
+product_name: Oxytocin
+product_slug: oxytocin
+alt_names: OXT, Pitocin active peptide, CYIQNCPLG-NH2
+
+category: Neuropeptides
+product_type: Hormone
+
+description: Oxytocin is a cyclic nonapeptide hormone and neuropeptide with the sequence Cys‑Tyr‑Ile‑Gln‑Asn‑Cys‑Pro‑Leu‑Gly‑NH2 (CYIQNCPLG‑NH2), featuring a disulfide bridge between Cys1 and Cys6.[web:135][web:79][web:88] It has the empirical formula C43H66N12O12S2 and is classified as a member of the vasopressin/oxytocin peptide family.[web:135][web:79] Oxytocin acts via the oxytocin receptor (OXTR), a class A GPCR.[web:79]
+
+In research, oxytocin is used as a reference ligand in receptor-binding and functional assays investigating OXTR-mediated G‑protein signalling, intracellular calcium flux, and β‑arrestin recruitment.[web:79] It is also applied in myometrial strip preparations, neuronal cultures, and ex‑vivo tissue systems to characterize oxytocin receptor pharmacology and downstream signalling cascades.[web:79][web:135]
+
+Research-grade oxytocin is supplied as a lyophilized peptide, often as an acetate salt, with ≥98% HPLC purity.[web:135] It is readily soluble in water and dilute acids, and is stored at −20°C protected from light and moisture; reconstituted solutions are typically kept refrigerated or frozen and used within defined stability windows.[web:135] Reference standard for in-vitro research on oxytocin receptor signalling and vasopressin/oxytocin-family neuropeptides. For Research Use Only. Not for human consumption. Not intended for therapeutic, diagnostic, or clinical use.
+
+seo_title: Oxytocin Reference Standard | Neuropeptide Hormone
+seo_description: Cyclic nonapeptide hormone (CYIQNCPLG-NH2) for in-vitro oxytocin receptor and vasopressin-family signalling research. Lyophilized, ≥98% HPLC. RUO.
+
+purity: ≥98% HPLC
+form: Lyophilized peptide (often acetate salt)
+storage: -20°C lyophilized; -20°C reconstituted; protect from light
+molecular_weight: ~1007 Da
+cas_number: 50-56-6
+sequence: CYIQNCPLG-NH2 (disulfide bridge between Cys1–Cys6)
+origin: Synthetic
+solubility: Water, dilute acetic acid
+research_category: Neuropeptide hormone
+
+faq_1_q: What is the primary receptor target of oxytocin?
+faq_1_a: Oxytocin is an endogenous ligand for the oxytocin receptor (OXTR), a G protein–coupled receptor studied in many biochemical and tissue-based assays.[web:79][web:135]
+
+faq_2_q: What structural feature stabilizes oxytocin's conformation?
+faq_2_a: A disulfide bridge between residues Cys1 and Cys6 cyclizes the peptide backbone, constraining its conformation.[web:135][web:88]
+
+faq_3_q: How is oxytocin typically supplied for experimental use?
+faq_3_a: It is sold as a lyophilized peptide of high purity, commonly as the acetate salt, for reconstitution in aqueous media before in‑vitro or ex‑vivo experiments.[web:135]
+
+ref_1: PubChem substance record for oxytocin [USP:INN:BAN:JAN].[web:79]
+ref_2: CymitQuimica entry for oxytocin, CAS 50-56-6, with structural description.[web:135]
+---PRODUCT END---
+
+---PRODUCT START---
+product_name: LL-37
+product_slug: ll-37
+alt_names: Human cathelicidin antimicrobial peptide, hCAP-18 (LL-37 fragment)
+
+category: Antimicrobial Peptides
+product_type: Peptide
+
+description: LL‑37 is a 37‑amino‑acid cationic α‑helical peptide generated by proteolytic processing of the human cathelicidin precursor hCAP‑18.[web:77][web:116][web:110] Its sequence is LLGDFFRKSKEKIGKEFKRIVQRIKDFLRNLVPRTES, and it carries a net positive charge under physiological conditions.[web:106][web:116] LL‑37 is the only human cathelicidin identified to date and is classified as an antimicrobial host-defense peptide.[web:77][web:80]
+
+In research, LL‑37 is widely used as a reference antimicrobial peptide in in‑vitro assays evaluating bactericidal activity, membrane permeabilization, and peptide–lipid interactions.[web:80][web:89] It is also applied in studies of innate immune signalling, nucleic-acid complex formation, and cytokine induction in various cell types.[web:86][web:136]
+
+Research-grade LL‑37 is typically supplied as a lyophilized trifluoroacetate or acetate salt at ≥95–98% HPLC purity.[web:113] It is soluble in water and aqueous buffers, especially at slightly acidic pH, and is stored at −20°C protected from light and moisture, with reconstituted aliquots maintained frozen to preserve activity.[web:113][web:110] Reference standard for in-vitro research on antimicrobial host-defense peptides, membrane interactions, and innate immune signalling pathways. For Research Use Only. Not for human consumption. Not intended for therapeutic, diagnostic, or clinical use.
+
+seo_title: LL-37 Reference Standard | Human Cathelicidin Peptide
+seo_description: Human cathelicidin peptide (37 aa) for in-vitro antimicrobial, membrane-interaction, and innate immune signalling research. Lyophilized. RUO.
+
+purity: ≥95–98% HPLC
+form: Lyophilized peptide (acetate or TFA salt)
+storage: -20°C lyophilized; -20°C reconstituted; protect from light
+molecular_weight: ~4493 Da
+cas_number:
+sequence: LLGDFFRKSKEKIGKEFKRIVQRIKDFLRNLVPRTES
+origin: Synthetic
+solubility: Water, aqueous buffers
+research_category: Antimicrobial peptide
+
+faq_1_q: What is LL‑37's sequence origin?
+faq_1_a: LL‑37 is derived from the C‑terminal region of the human cathelicidin precursor hCAP‑18 by proteolytic processing.[web:77][web:116]
+
+faq_2_q: Which in-vitro assays commonly employ LL‑37?
+faq_2_a: It is used in bacterial killing assays, liposome leakage experiments, and cell-based studies dissecting innate immune signalling and nucleic-acid complexation.[web:80][web:86][web:136]
+
+faq_3_q: How is LL‑37 typically formulated for laboratory use?
+faq_3_a: Vendors supply LL‑37 as a lyophilized peptide salt of high purity that is reconstituted in water or buffer immediately before antimicrobial and mechanistic assays.[web:113]
+
+ref_1: Wikipedia. Cathelicidin antimicrobial peptide – LL‑37 overview.[web:77]
+ref_2: Nijnik A. et al., 2013. The human cathelicidin LL-37 as a multifunctional peptide in infection and inflammation. Expert Rev Anti Infect Ther.[web:86]
+---PRODUCT END---
+
+---PRODUCT START---
+product_name: KPV
+product_slug: kpv
+alt_names: α-MSH(11-13), Lys-Pro-Val, H-Lys-Pro-Val-OH
+
+category: Melanocortin Receptor Modulators
+product_type: Peptide
+
+description: KPV is a tripeptide corresponding to residues 11–13 of α‑melanocyte-stimulating hormone (α‑MSH) with the sequence Lys‑Pro‑Val (H‑Lys‑Pro‑Val‑OH).[web:96][web:93] It has the empirical formula C16H30N4O4 and a molecular weight of approximately 342.43 g/mol.[web:96] KPV retains the C‑terminal motif of α‑MSH and is categorized as a melanocortin-related peptide fragment in the experimental peptide literature.[web:93][web:102]
+
+In research, KPV is used as a reference peptide in in‑vitro models studying melanocortin receptor signalling and inflammatory pathway markers.[web:93][web:95] It has been examined in cell and tissue systems for its effects on cytokine readouts, NF‑κB pathway components, and epithelial barrier-associated parameters in controlled experimental contexts.[web:98][web:101]
+
+Research-grade KPV is supplied as a lyophilized peptide at ≥95–98% HPLC purity.[web:96] It is highly hydrophilic and soluble in water and aqueous buffers, and is stored at −20°C protected from light and moisture; reconstituted solutions are typically aliquoted and frozen to maintain stability.[web:96] Reference standard for in-vitro research on melanocortin-related peptides and inflammatory-signalling pathways. For Research Use Only. Not for human consumption. Not intended for therapeutic, diagnostic, or clinical use.
+
+seo_title: KPV Reference Standard | Melanocortin Fragment
+seo_description: α-MSH(11–13) fragment (Lys-Pro-Val) for in-vitro melanocortin receptor and inflammatory-signalling research. Lyophilized peptide, ≥95–98% HPLC. RUO.
+
+purity: ≥95–98% HPLC
+form: Lyophilized powder
+storage: -20°C; protect from light and moisture
+molecular_weight: 342.43 Da
+cas_number:
+sequence: KPV (Lys-Pro-Val)
+origin: Synthetic
+solubility: Water, aqueous buffers
+research_category: Melanocortin fragment peptide
+
+faq_1_q: What is the structural origin of KPV?
+faq_1_a: KPV corresponds to the C‑terminal three residues (11–13) of α‑MSH and represents a minimal melanocortin-related peptide fragment.[web:93][web:96]
+
+faq_2_q: Which research areas commonly employ KPV?
+faq_2_a: It is used in studies of melanocortin receptor engagement and in in‑vitro models assessing inflammatory-signalling markers and epithelial responses.[web:93][web:95][web:98]
+
+faq_3_q: How is KPV typically supplied and stored?
+faq_3_a: Vendors provide KPV as a synthetic, lyophilized tripeptide with high HPLC purity, stored at −20°C and reconstituted in aqueous media before experiments.[web:96]
+
+ref_1: Getting S.J. et al., 2004. α‑MSH tripeptide analogs activate melanocortin 1 receptor and modulate inflammatory responses. J Pharmacol Exp Ther.[web:102][web:93]
+ref_2: NovoPro Bioscience product sheet for α‑MSH(11–13)/KPV, including sequence and analytical data.[web:96]
+---PRODUCT END---

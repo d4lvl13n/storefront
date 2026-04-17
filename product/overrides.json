@@ -1,0 +1,25 @@
+{
+	"_comment": "Overrides applied when Perplexity's pharmacology-based categorisation conflicts with the admin catalog's merchandising grouping. Key = product_name exactly as emitted by Perplexity.",
+
+	"Cagrilintide": {
+		"category": "GLP-1 Receptor Agonists"
+	},
+	"Mazdutide": {
+		"category": "GLP-1 Receptor Agonists"
+	},
+	"Survodutide": {
+		"category": "GLP-1 Receptor Agonists"
+	},
+
+	"NAD+": {
+		"category": "Research Small Molecules"
+	},
+
+	"Oxytocin": {
+		"category": "Reproductive Hormones"
+	},
+
+	"KPV": {
+		"category": "Cytoprotective Peptides"
+	}
+}

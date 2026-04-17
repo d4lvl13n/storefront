@@ -38,6 +38,12 @@ WAREHOUSE_ID = None
 SCRIPT_DIR = os.path.dirname(os.path.abspath(__file__))
 CSV_PATH = os.environ.get("CSV_PATH", os.path.join(SCRIPT_DIR, "infinitybio_products_catalog.csv"))
 
+# ─────────────────────────────────────────────────────────────────────
+# Product Types — physical/chemical form templates.
+# These are DIFFERENT from Categories (mechanism class). A product has one
+# product_type (how it's supplied) AND one category (what it is).
+# ─────────────────────────────────────────────────────────────────────
+
 PRODUCT_TYPES = [
     "Peptide",
     "Peptide Blend",
@@ -47,34 +53,57 @@ PRODUCT_TYPES = [
     "Supply",
 ]
 
+# ─────────────────────────────────────────────────────────────────────
+# Mechanism Categories (the compliant taxonomy applied by the admin CC
+# on 2026-04-17). These replace the previous benefit-labeled Categories.
+#
+# Each Category describes what the compound IS (chemical class / receptor
+# target), not what it's for. See Frier Levitt Peptide Guidance
+# Memorandum, April 2026, Section III.B.a.
+#
+# Do NOT re-introduce generic labels ("Peptides", "Injectables",
+# "Hormones", "Growth Hormone") — those were retired as part of the
+# compliance pass.
+# ─────────────────────────────────────────────────────────────────────
+
 CATEGORIES = [
     "GLP-1 Receptor Agonists",
-    "Growth Factors",
-    "Growth Hormone",
     "Growth Hormone Secretagogues",
-    "Hormones",
-    "Injectables",
+    "Growth Hormone Derivatives",
+    "Growth Factors",
+    "Cytoprotective Peptides",
+    "Thymic Peptides",
+    "Melanocortin Receptor Modulators",
+    "Copper Peptide Complexes",
+    "Mitochondrial Peptides",
+    "Pineal Peptides",
     "Nootropic Peptides",
+    "Antimicrobial Peptides",
+    "Neuropeptides",
+    "Reproductive Hormones",
+    "Research Small Molecules",
     "Peptide Blends",
-    "Peptides",
+    "Reference Peptides (Miscellaneous)",
+    "Cosmetic Injectables",
+    "Metabolic Injectables",
     "Supplies",
 ]
 
+# ─────────────────────────────────────────────────────────────────────
+# Merchandising Collections — NOT mechanism taxonomy.
+#
+# Per memo Section III.B.a, Collections carry marketing intent ("what
+# it's for") and must remain compliance-neutral. The three supported
+# Collections are internal merchandising slots only. Do NOT add
+# benefit-labeled Collections (Weight Management, Anti-Aging, etc.) —
+# those were deleted as part of the compliance pass and any reference
+# here would re-create them.
+# ─────────────────────────────────────────────────────────────────────
+
 COLLECTIONS = [
-    "Accessories",
-    "Aesthetics",
-    "Anti-Aging & Longevity",
-    "Cognitive & Mood",
-    "Fertility & Hormonal",
-    "Growth & Recovery",
-    "Immune Support",
-    "Performance",
-    "Recovery & Healing",
-    "Sexual Health",
-    "Sleep & Recovery",
-    "Tanning & Skin",
-    "Vitamins & Supplements",
-    "Weight Management",
+    "Best Sellers",
+    "Featured Products",
+    "Research Accessories",
 ]
 
 
@@ -448,211 +477,71 @@ def delete_all_products(client):
     print(f"  Done. Deleted {len(all_ids)} products.")
 
 
-def delete_all_product_types(client):
-    """Delete all existing product types."""
-    print("\n" + "=" * 60)
-    print("STEP 2: Deleting all existing product types...")
-    print("=" * 60)
-
-    has_next = True
-    cursor = None
-    all_ids = []
-
-    while has_next:
-        after_clause = f', after: "{cursor}"' if cursor else ""
-        result = client.execute(f"""
-            query {{
-                productTypes(first: 100{after_clause}) {{
-                    edges {{
-                        node {{
-                            id
-                            name
-                        }}
-                        cursor
-                    }}
-                    pageInfo {{
-                        hasNextPage
-                    }}
-                }}
-            }}
-        """)
-        pt = result.get("productTypes", {})
-        edges = pt.get("edges", [])
-        for edge in edges:
-            all_ids.append((edge["node"]["id"], edge["node"]["name"]))
-            cursor = edge["cursor"]
-        has_next = pt.get("pageInfo", {}).get("hasNextPage", False)
-
-    print(f"  Found {len(all_ids)} product types to delete.")
-
-    for i, (ptid, ptname) in enumerate(all_ids, 1):
-        result = client.execute(
-            """
-            mutation ProductTypeDelete($id: ID!) {
-                productTypeDelete(id: $id) {
-                    errors {
-                        field
-                        message
-                    }
-                }
-            }
-            """,
-            {"id": ptid},
-        )
-        errors = result.get("productTypeDelete", {}).get("errors", [])
-        if errors:
-            print(f"  [{i}/{len(all_ids)}] FAILED to delete '{ptname}': {errors}")
-        else:
-            print(f"  [{i}/{len(all_ids)}] Deleted '{ptname}'")
-
-    print(f"  Done. Deleted {len(all_ids)} product types.")
-
-
-def delete_all_categories(client):
-    """Delete all categories."""
-    print("\n" + "=" * 60)
-    print("STEP 3: Deleting all categories...")
-    print("=" * 60)
-
-    has_next = True
-    cursor = None
-    all_ids = []
-
-    while has_next:
-        after_clause = f', after: "{cursor}"' if cursor else ""
-        result = client.execute(f"""
-            query {{
-                categories(first: 100{after_clause}) {{
-                    edges {{
-                        node {{
-                            id
-                            name
-                        }}
-                        cursor
-                    }}
-                    pageInfo {{
-                        hasNextPage
-                    }}
-                }}
-            }}
-        """)
-        cats = result.get("categories", {})
-        edges = cats.get("edges", [])
-        for edge in edges:
-            all_ids.append((edge["node"]["id"], edge["node"]["name"]))
-            cursor = edge["cursor"]
-        has_next = cats.get("pageInfo", {}).get("hasNextPage", False)
-
-    print(f"  Found {len(all_ids)} categories to delete.")
-
-    for i, (cid, cname) in enumerate(all_ids, 1):
-        result = client.execute(
-            """
-            mutation CategoryDelete($id: ID!) {
-                categoryDelete(id: $id) {
-                    errors {
-                        field
-                        message
-                    }
-                }
-            }
-            """,
-            {"id": cid},
-        )
-        errors = result.get("categoryDelete", {}).get("errors", [])
-        if errors:
-            print(f"  [{i}/{len(all_ids)}] FAILED to delete '{cname}': {errors}")
-        else:
-            print(f"  [{i}/{len(all_ids)}] Deleted '{cname}'")
-
-    print(f"  Done. Deleted {len(all_ids)} categories.")
-
-
-def delete_all_collections(client):
-    """Delete all existing collections."""
-    print("\n" + "=" * 60)
-    print("STEP 4: Deleting all existing collections...")
-    print("=" * 60)
-
-    has_next = True
-    cursor = None
-    all_ids = []
-
-    while has_next:
-        after_clause = f', after: "{cursor}"' if cursor else ""
-        result = client.execute(f"""
-            query {{
-                collections(first: 100{after_clause}, channel: "{CHANNEL_SLUG}") {{
-                    edges {{
-                        node {{
-                            id
-                            name
-                        }}
-                        cursor
-                    }}
-                    pageInfo {{
-                        hasNextPage
-                    }}
-                }}
-            }}
-        """)
-        cols = result.get("collections", {})
-        edges = cols.get("edges", [])
-        for edge in edges:
-            all_ids.append((edge["node"]["id"], edge["node"]["name"]))
-            cursor = edge["cursor"]
-        has_next = cols.get("pageInfo", {}).get("hasNextPage", False)
-
-    print(f"  Found {len(all_ids)} collections to delete.")
-
-    for i, (cid, cname) in enumerate(all_ids, 1):
-        result = client.execute(
-            """
-            mutation CollectionDelete($id: ID!) {
-                collectionDelete(id: $id) {
-                    errors {
-                        field
-                        message
-                    }
-                }
-            }
-            """,
-            {"id": cid},
-        )
-        errors = result.get("collectionDelete", {}).get("errors", [])
-        if errors:
-            print(f"  [{i}/{len(all_ids)}] FAILED to delete '{cname}': {errors}")
-        else:
-            print(f"  [{i}/{len(all_ids)}] Deleted '{cname}'")
-
-    print(f"  Done. Deleted {len(all_ids)} collections.")
 
 
 # =============================================================================
 # Create operations
 # =============================================================================
 
-def create_product_types(client):
-    """Create all product types. Returns dict: name -> ID."""
+def _fetch_all_product_types(client):
+    """Page through all existing product types. Returns dict: slug -> (id, name)."""
+    existing = {}
+    has_next = True
+    cursor = None
+    while has_next:
+        after_clause = f', after: "{cursor}"' if cursor else ""
+        result = client.execute(f"""
+            query {{
+                productTypes(first: 100{after_clause}) {{
+                    edges {{
+                        node {{ id name slug }}
+                        cursor
+                    }}
+                    pageInfo {{ hasNextPage }}
+                }}
+            }}
+        """)
+        pt = result.get("productTypes", {})
+        edges = pt.get("edges", [])
+        for edge in edges:
+            node = edge["node"]
+            slug = node.get("slug") or slugify(node["name"])
+            existing[slug] = (node["id"], node["name"])
+            cursor = edge["cursor"]
+        has_next = pt.get("pageInfo", {}).get("hasNextPage", False)
+    return existing
+
+
+def ensure_product_types(client):
+    """Ensure each product type exists. Returns dict: name -> ID.
+
+    Idempotent — does NOT delete anything. Queries existing product types,
+    uses them if present, creates only what's missing. Safe to re-run.
+    """
     print("\n" + "=" * 60)
-    print("STEP 5: Creating product types...")
+    print("STEP 5: Ensuring product types exist (idempotent)...")
     print("=" * 60)
 
+    existing = _fetch_all_product_types(client)
     pt_map = {}
+    created_count = 0
+    reused_count = 0
+
     for pt_name in PRODUCT_TYPES:
         slug = slugify(pt_name)
+        if slug in existing:
+            pt_id, actual_name = existing[slug]
+            pt_map[pt_name] = pt_id
+            reused_count += 1
+            print(f"  [EXISTS] '{pt_name}' -> {pt_id}")
+            continue
+
         result = client.execute(
             """
             mutation ProductTypeCreate($input: ProductTypeInput!) {
                 productTypeCreate(input: $input) {
-                    productType {
-                        id
-                        name
-                    }
-                    errors {
-                        field
-                        message
-                    }
+                    productType { id name }
+                    errors { field message }
                 }
             }
             """,
@@ -670,133 +559,206 @@ def create_product_types(client):
         data = result.get("productTypeCreate", {})
         errors = data.get("errors", [])
         if errors:
-            print(f"  FAILED '{pt_name}': {errors}")
+            print(f"  [FAIL] '{pt_name}': {errors}")
         else:
             pt = data.get("productType", {})
             pt_map[pt_name] = pt["id"]
-            print(f"  Created '{pt_name}' -> {pt['id']}")
+            created_count += 1
+            print(f"  [CREATED] '{pt_name}' -> {pt['id']}")
 
+    print(f"  Summary: {reused_count} existed, {created_count} created.")
     return pt_map
 
 
-def create_categories(client):
-    """Create all categories. Returns dict: name -> ID."""
+def _fetch_all_categories(client):
+    """Page through all existing categories. Returns dict: slug -> (id, name)."""
+    existing = {}
+    has_next = True
+    cursor = None
+    while has_next:
+        after_clause = f', after: "{cursor}"' if cursor else ""
+        result = client.execute(f"""
+            query {{
+                categories(first: 100{after_clause}) {{
+                    edges {{
+                        node {{ id name slug }}
+                        cursor
+                    }}
+                    pageInfo {{ hasNextPage }}
+                }}
+            }}
+        """)
+        cats = result.get("categories", {})
+        edges = cats.get("edges", [])
+        for edge in edges:
+            node = edge["node"]
+            slug = node.get("slug") or slugify(node["name"])
+            existing[slug] = (node["id"], node["name"])
+            cursor = edge["cursor"]
+        has_next = cats.get("pageInfo", {}).get("hasNextPage", False)
+    return existing
+
+
+def ensure_categories(client):
+    """Ensure each category exists. Returns dict: name -> ID.
+
+    Idempotent — does NOT delete anything. Queries existing categories,
+    uses them if present, creates only what's missing. Safe to re-run.
+    """
     print("\n" + "=" * 60)
-    print("STEP 6: Creating categories...")
+    print("STEP 6: Ensuring categories exist (idempotent)...")
     print("=" * 60)
 
+    existing = _fetch_all_categories(client)
     cat_map = {}
+    created_count = 0
+    reused_count = 0
+
     for cat_name in CATEGORIES:
         slug = slugify(cat_name)
+        if slug in existing:
+            cat_id, _ = existing[slug]
+            cat_map[cat_name] = cat_id
+            reused_count += 1
+            print(f"  [EXISTS] '{cat_name}' -> {cat_id}")
+            continue
+
         result = client.execute(
             """
             mutation CategoryCreate($input: CategoryInput!) {
                 categoryCreate(input: $input) {
-                    category {
-                        id
-                        name
-                    }
-                    errors {
-                        field
-                        message
-                    }
+                    category { id name }
+                    errors { field message }
                 }
             }
             """,
-            {
-                "input": {
-                    "name": cat_name,
-                    "slug": slug,
-                }
-            },
+            {"input": {"name": cat_name, "slug": slug}},
         )
         data = result.get("categoryCreate", {})
         errors = data.get("errors", [])
         if errors:
-            print(f"  FAILED '{cat_name}': {errors}")
+            print(f"  [FAIL] '{cat_name}': {errors}")
         else:
             cat = data.get("category", {})
             cat_map[cat_name] = cat["id"]
-            print(f"  Created '{cat_name}' -> {cat['id']}")
+            created_count += 1
+            print(f"  [CREATED] '{cat_name}' -> {cat['id']}")
 
+    print(f"  Summary: {reused_count} existed, {created_count} created.")
     return cat_map
 
 
-def create_collections(client):
-    """Create all collections and publish them in default-channel. Returns dict: name -> ID."""
+def _fetch_all_collections(client):
+    """Page through all existing collections in the channel. Returns dict: slug -> (id, name)."""
+    existing = {}
+    has_next = True
+    cursor = None
+    while has_next:
+        after_clause = f', after: "{cursor}"' if cursor else ""
+        result = client.execute(f"""
+            query {{
+                collections(first: 100{after_clause}, channel: "{CHANNEL_SLUG}") {{
+                    edges {{
+                        node {{ id name slug }}
+                        cursor
+                    }}
+                    pageInfo {{ hasNextPage }}
+                }}
+            }}
+        """)
+        cols = result.get("collections", {})
+        edges = cols.get("edges", [])
+        for edge in edges:
+            node = edge["node"]
+            slug = node.get("slug") or slugify(node["name"])
+            existing[slug] = (node["id"], node["name"])
+            cursor = edge["cursor"]
+        has_next = cols.get("pageInfo", {}).get("hasNextPage", False)
+    return existing
+
+
+def _publish_collection_in_channel(client, col_id, col_name):
+    """Ensure a collection is published in CHANNEL_SLUG. No-op if already published."""
+    result2 = client.execute(
+        """
+        mutation CollectionChannelListingUpdate($id: ID!, $input: CollectionChannelListingUpdateInput!) {
+            collectionChannelListingUpdate(id: $id, input: $input) {
+                collection { id }
+                errors { field message }
+            }
+        }
+        """,
+        {
+            "id": col_id,
+            "input": {
+                "addChannels": [{"channelId": CHANNEL_ID, "isPublished": True}],
+            },
+        },
+    )
+    errors2 = result2.get("collectionChannelListingUpdate", {}).get("errors", [])
+    if errors2:
+        # Duplicate-channel errors are harmless — already published
+        non_dup_errors = [e for e in errors2 if "already" not in (e.get("message") or "").lower()]
+        if non_dup_errors:
+            print(f"    [WARN] Failed to publish '{col_name}' in channel: {errors2}")
+
+
+def ensure_collections(client):
+    """Ensure each merchandising collection exists. Returns dict: name -> ID.
+
+    Idempotent — does NOT delete anything. Queries existing collections by
+    slug, reuses if present, creates only what's missing. Safe to re-run.
+
+    Note: this function should NEVER re-create benefit-labeled collections
+    that the admin CC explicitly deleted. The COLLECTIONS constant at the
+    top of this file is the single source of truth for supported slugs.
+    """
     print("\n" + "=" * 60)
-    print("STEP 7: Creating collections...")
+    print("STEP 7: Ensuring collections exist (idempotent)...")
     print("=" * 60)
 
+    existing = _fetch_all_collections(client)
     col_map = {}
+    created_count = 0
+    reused_count = 0
+
     for col_name in COLLECTIONS:
         slug = slugify(col_name)
+        if slug in existing:
+            col_id, _ = existing[slug]
+            col_map[col_name] = col_id
+            reused_count += 1
+            print(f"  [EXISTS] '{col_name}' -> {col_id}")
+            # Ensure channel publication even for existing collections
+            _publish_collection_in_channel(client, col_id, col_name)
+            continue
+
         result = client.execute(
             """
             mutation CollectionCreate($input: CollectionCreateInput!) {
                 collectionCreate(input: $input) {
-                    collection {
-                        id
-                        name
-                    }
-                    errors {
-                        field
-                        message
-                    }
+                    collection { id name }
+                    errors { field message }
                 }
             }
             """,
-            {
-                "input": {
-                    "name": col_name,
-                    "slug": slug,
-                }
-            },
+            {"input": {"name": col_name, "slug": slug}},
         )
         data = result.get("collectionCreate", {})
         errors = data.get("errors", [])
         if errors:
-            print(f"  FAILED to create '{col_name}': {errors}")
+            print(f"  [FAIL] '{col_name}': {errors}")
             continue
 
         col = data.get("collection", {})
         col_id = col["id"]
         col_map[col_name] = col_id
-        print(f"  Created '{col_name}' -> {col_id}")
+        created_count += 1
+        print(f"  [CREATED] '{col_name}' -> {col_id}")
+        _publish_collection_in_channel(client, col_id, col_name)
+        print(f"    Published in {CHANNEL_SLUG}")
 
-        # Now make it visible in default-channel
-        result2 = client.execute(
-            """
-            mutation CollectionChannelListingUpdate($id: ID!, $input: CollectionChannelListingUpdateInput!) {
-                collectionChannelListingUpdate(id: $id, input: $input) {
-                    collection {
-                        id
-                    }
-                    errors {
-                        field
-                        message
-                    }
-                }
-            }
-            """,
-            {
-                "id": col_id,
-                "input": {
-                    "addChannels": [
-                        {
-                            "channelId": CHANNEL_ID,
-                            "isPublished": True,
-                        }
-                    ],
-                },
-            },
-        )
-        errors2 = result2.get("collectionChannelListingUpdate", {}).get("errors", [])
-        if errors2:
-            print(f"    WARNING: Failed to publish '{col_name}' in channel: {errors2}")
-        else:
-            print(f"    Published in {CHANNEL_SLUG}")
-
+    print(f"  Summary: {reused_count} existed, {created_count} created.")
     return col_map
 
 
@@ -1049,14 +1011,33 @@ def import_products(client, pt_map, cat_map, col_map):
 # Main
 # =============================================================================
 
+def _confirm_destructive_op(env_var, prompt_msg):
+    """Interactive y/N confirmation before a destructive operation.
+
+    Bypass with env var (e.g. `CONFIRM_DELETE_PRODUCTS=yes`) for CI / batch runs.
+    """
+    if os.environ.get(env_var, "").strip().lower() in ("yes", "y", "1", "true"):
+        print(f"  [auto-confirmed via {env_var}]")
+        return True
+
+    try:
+        answer = input(f"\n{prompt_msg} [y/N]: ").strip().lower()
+    except EOFError:
+        answer = ""
+    return answer in ("y", "yes")
+
+
 def main():
     print("=" * 60)
-    print("InfinityBio Saleor Product Import Script")
+    print("InfinityBio Saleor Product Import Script (non-destructive taxonomy)")
     print("=" * 60)
     print(f"API:       {SALEOR_URL}")
     print(f"Admin:     {ADMIN_EMAIL}")
     print(f"Channel:   {CHANNEL_SLUG}")
     print(f"CSV:       {CSV_PATH}")
+    print()
+    print("  Product types, categories, collections: ENSURE-EXISTS (preserved)")
+    print("  Products:                               DESTRUCTIVE (all replaced)")
 
     client = SaleorClient(SALEOR_URL)
     client.authenticate()
@@ -1065,32 +1046,42 @@ def main():
     ensure_channel(client)
     ensure_warehouse(client)
 
-    # Phase 1: Delete existing data
+    # Phase 1: Ensure taxonomy exists BEFORE any destructive operation.
+    # This guarantees the mechanism taxonomy is in place even if this is
+    # the first run against a fresh Saleor.
+    pt_map = ensure_product_types(client)
+    cat_map = ensure_categories(client)
+    col_map = ensure_collections(client)
+
+    print("\n--- Taxonomy ready ---")
+    print(f"  Product Types: {len(pt_map)}")
+    print(f"  Categories:    {len(cat_map)}")
+    print(f"  Collections:   {len(col_map)}")
+
+    # Phase 2: Destructive — delete existing products.
+    # Taxonomy is NOT touched; only product rows are wiped so the CSV can
+    # reseed them cleanly. Use env CONFIRM_DELETE_PRODUCTS=yes to bypass
+    # the interactive confirmation (e.g. from CI).
+    if not _confirm_destructive_op(
+        "CONFIRM_DELETE_PRODUCTS",
+        "About to DELETE ALL PRODUCTS on this Saleor instance. "
+        "Taxonomy will be preserved. Continue?",
+    ):
+        print("Aborted by user. No changes made.")
+        return
+
     delete_all_products(client)
-    delete_all_product_types(client)
-    delete_all_categories(client)
-    delete_all_collections(client)
 
-    # Phase 2: Create taxonomy
-    pt_map = create_product_types(client)
-    cat_map = create_categories(client)
-    col_map = create_collections(client)
-
-    print("\n--- Lookup maps ---")
-    print(f"  Product Types: {len(pt_map)} created")
-    print(f"  Categories:    {len(cat_map)} created")
-    print(f"  Collections:   {len(col_map)} created")
-
-    # Phase 3: Import products
+    # Phase 3: Import products from CSV
     success, failed = import_products(client, pt_map, cat_map, col_map)
 
     # Summary
     print("\n" + "=" * 60)
     print("IMPORT COMPLETE")
     print("=" * 60)
-    print(f"  Product Types: {len(pt_map)}")
-    print(f"  Categories:    {len(cat_map)}")
-    print(f"  Collections:   {len(col_map)}")
+    print(f"  Product Types: {len(pt_map)} (preserved/ensured)")
+    print(f"  Categories:    {len(cat_map)} (preserved/ensured)")
+    print(f"  Collections:   {len(col_map)} (preserved/ensured)")
     print(f"  Products:      {success} created, {failed} failed")
     print("=" * 60)
 

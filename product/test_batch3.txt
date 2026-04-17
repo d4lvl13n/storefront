@@ -1,0 +1,281 @@
+---PRODUCT START---
+product_name: Bacteriostatic Water
+product_slug: bacteriostatic-water
+alt_names: BAC Water, Bacteriostatic Water for Injection, 0.9% Benzyl Alcohol Water
+
+category: Supplies
+product_type: Supply
+
+description: Bacteriostatic Water is sterile, non-pyrogenic water preserved with 0.9% (w/v) benzyl alcohol as a bacteriostatic agent. It is supplied in multi-use vials for laboratory reconstitution of lyophilized research peptides and reference compounds. The benzyl alcohol preservative inhibits microbial growth in multi-use vials, allowing repeat access over defined storage periods in research protocols.
+
+Bacteriostatic Water is used as a reconstitution solvent in in-vitro and ex-vivo research workflows requiring sterile aqueous diluent with defined composition. It is not a therapeutic product and is not characterized for human or animal administration.
+
+Supplied as a sterile clear colorless solution in sealed multi-use vials. Store at room temperature (15-25°C) away from direct light. Once entered, discard within 28 days of first use per laboratory best practice for preserved sterile solutions. For Research Use Only. Not for human consumption. Not intended for therapeutic, diagnostic, or clinical use.
+
+seo_title: Bacteriostatic Water for Research | Reconstitution Supply
+seo_description: Sterile water with 0.9% benzyl alcohol preservative for laboratory reconstitution of lyophilized research peptides. Multi-use vials. RUO.
+
+purity: USP-grade sterile
+form: Clear colorless solution
+storage: 15-25°C; protect from light; discard 28 days after first entry
+molecular_weight:
+cas_number:
+sequence:
+origin: USP-grade
+solubility: N/A (solvent)
+research_category: Laboratory reconstitution solvent
+
+faq_1_q: What is the purpose of the benzyl alcohol in Bacteriostatic Water?
+faq_1_a: Benzyl alcohol at 0.9% (w/v) acts as a bacteriostatic preservative, inhibiting microbial growth in multi-use vials during the permitted in-use period.
+
+faq_2_q: How is Bacteriostatic Water typically used in research workflows?
+faq_2_a: It is used as a sterile aqueous diluent for reconstitution of lyophilized research peptides prior to in-vitro assay work, per published reconstitution protocols for each compound.
+
+faq_3_q: What is the recommended in-use period for a single vial?
+faq_3_a: Standard laboratory practice for preserved sterile solutions is to discard multi-use vials within 28 days of first entry, stored at room temperature away from light.
+
+ref_1: United States Pharmacopeia monograph for Bacteriostatic Water for Injection (USP <1>).
+ref_2: Meyer BK et al., 2007. Antimicrobial preservative use in parenteral products. Journal of Pharmaceutical Sciences 96:3155-3167.
+---PRODUCT END---
+
+---PRODUCT START---
+product_name: BPC-157 + TB-500 Blend
+product_slug: bpc-157-tb-500-blend
+alt_names: BPC-157 + Thymosin Beta-4 research blend, BPC-157/TB-500 multi-peptide preparation
+
+category: Peptide Blends
+product_type: Peptide Blend
+
+description: The BPC-157 + TB-500 blend is a multi-peptide research preparation combining the synthetic gastric pentadecapeptide BPC-157 (GEPPPGKPADDAGLV, ~1419.5 Da) with the 43-amino-acid thymic peptide Thymosin Beta-4 (TB-500, ~4963 Da).[web:118][web:121][web:2][web:105] BPC-157 is classified as a cytoprotective peptide fragment derived from a protein isolated from human gastric juice, whereas Thymosin Beta-4 is an actin-sequestering beta-thymosin family peptide encoded by the TMSB4X gene.[web:118][web:2][web:14]
+
+Commercial research vials typically contain equal mass fractions of BPC-157 and TB-500 (for example, 5 mg of each peptide in a 10 mg lyophilized blend), corresponding to a 1:1 mass ratio.[web:148][web:155] When normalized for molecular weight, this mass ratio translates to an approximate molar ratio of ~3.5:1 for BPC-157:TB-500.[web:121][web:105] The blend is used as a multi-component reference standard in in-vitro and ex-vivo models where cytoprotective and actin-associated peptide pathways are studied in parallel.[web:2][web:120][web:91]
+
+The BPC-157 + TB-500 blend is supplied as a lyophilized powder of high HPLC purity, intended for reconstitution in aqueous media for analytical and cell-based assays.[web:149][web:155] Lyophilized vials are stored at −20°C protected from light and moisture, with reconstituted aliquots maintained at low temperature to preserve peptide integrity.[web:149] Reference standard for in-vitro research on cytoprotective and thymosin-family signalling pathways. For Research Use Only. Not for human consumption. Not intended for therapeutic, diagnostic, or clinical use.
+
+seo_title: BPC-157 + TB-500 Reference Blend | Multi-Peptide Standard
+seo_description: Dual-peptide reference blend (BPC-157 + Thymosin Beta-4) in an approximate 3.5:1 molar ratio for in-vitro pathway studies. Lyophilized. RUO.
+
+purity: ≥98% HPLC (each peptide component)
+form: Lyophilized multi-peptide powder
+storage: -20°C lyophilized; -20°C reconstituted; protect from light and moisture
+molecular_weight: Blend of ~1419.5 Da (BPC-157) and ~4963 Da (Thymosin Beta-4)
+cas_number:
+sequence: BPC-157: GEPPPGKPADDAGLV; Thymosin Beta-4: Ac-SDKPDMAEIEKFDKSKLKKTETQEKNPLPSKETIEQEKQAGES
+origin: Synthetic
+solubility: Water, buffered aqueous solutions
+research_category: Multi-peptide cytoprotective/thymic blend
+
+faq_1_q: What are the individual peptide components in the BPC-157 + TB-500 blend?
+faq_1_a: The blend combines BPC-157, a 15-residue gastric cytoprotective peptide fragment, with Thymosin Beta-4, a 43-residue thymic beta-thymosin peptide involved in actin binding.[web:118][web:2][web:14]
+
+faq_2_q: What is the typical mass ratio and corresponding molar ratio in this blend?
+faq_2_a: A common research configuration contains equal masses of BPC-157 and TB-500 (1:1 by weight), corresponding to an approximate molar ratio of ~3.5:1 (BPC-157:TB-500) when molecular weights are considered.[web:148][web:155][web:121][web:105]
+
+faq_3_q: How is this blend typically used in laboratory research?
+faq_3_a: It is used as a multi-component reference standard in in-vitro and ex-vivo models that investigate cytoprotective signalling alongside thymosin-family, actin-associated pathways.[web:2][web:120][web:91]
+
+ref_1: PubChem CID 78169625. BPC-157 trifluoroacetate – structural and analytical data.[web:121]
+ref_2: ChemicalBook entry for Thymosin Beta-4, CAS 77591-33-4 – molecular weight and sequence.[web:105]
+ref_3: Peptide Protocols. BPC-157 + TB-500 blend technical description (5 mg + 5 mg per vial).[web:148]
+---PRODUCT END---
+
+---PRODUCT START---
+product_name: Glow Blend (BPC-157 + TB-500 + GHK-Cu)
+product_slug: glow-blend-bpc-157-tb-500-ghk-cu
+alt_names: GHK-Cu/BPC-157/TB-500 blend, Glow multi-peptide copper complex blend
+
+category: Peptide Blends
+product_type: Peptide Blend
+
+description: The Glow Blend is a three-component research preparation containing the copper tripeptide complex GHK-Cu (glycyl-L-histidyl-L-lysine–Cu(II)), the gastric pentadecapeptide BPC-157 (GEPPPGKPADDAGLV), and the 43-residue thymic peptide Thymosin Beta-4 (TB-500).[web:18][web:21][web:118][web:2][web:105] GHK-Cu is a high-affinity Cu(II) chelate of the endogenous tripeptide GHK, whereas BPC-157 and TB-500 represent cytoprotective and actin-binding peptide classes, respectively.[web:91][web:94][web:120][web:14]
+
+Commercial Glow Blend vials are often formulated at a 5:1:1 mass ratio of GHK-Cu:BPC-157:TB-500; for example, 50 mg GHK-Cu, 10 mg BPC-157, and 10 mg TB-500 in a 70 mg vial.[web:143] When molecular weights are taken into account (GHK-Cu ~400–744 Da, BPC-157 ~1419.5 Da, Thymosin Beta-4 ~4963 Da), this 5:1:1 mass ratio corresponds approximately to a molar ratio on the order of ~62:3.5:1 (GHK-Cu:BPC-157:TB-500).[web:21][web:18][web:121][web:105] The blend is used as a multi-peptide reference standard in in-vitro models where copper-peptide signalling, cytoprotective pathways, and thymosin-family mechanisms are studied concurrently.[web:91][web:100][web:120]
+
+The Glow Blend is supplied as a lyophilized, water-soluble powder with each component manufactured to high HPLC purity suitable for analytical and cell-based work.[web:143] Lyophilized vials are stored at −20°C, protected from light and moisture, and reconstituted with aqueous media immediately prior to use; aliquots are typically maintained frozen for short-term use.[web:143] Reference standard for in-vitro research on copper tripeptides, cytoprotective peptides, and thymosin-family signalling pathways. For Research Use Only. Not for human consumption. Not intended for therapeutic, diagnostic, or clinical use.
+
+seo_title: Glow Blend Reference Standard | Multi-Peptide Copper Complex
+seo_description: Three-component reference blend (GHK-Cu, BPC-157, TB-500) at ~62:3.5:1 molar ratio for in-vitro multi-pathway peptide research. Lyophilized. RUO.
+
+purity: ≥98% HPLC (each peptide component)
+form: Lyophilized multi-peptide powder
+storage: -20°C; protect from light and moisture
+molecular_weight: Blend of GHK-Cu (~400–744 Da), BPC-157 (~1419.5 Da), Thymosin Beta-4 (~4963 Da)
+cas_number:
+sequence: GHK-Cu: Gly-His-Lys–Cu(II); BPC-157: GEPPPGKPADDAGLV; Thymosin Beta-4: Ac-SDKPDMAEIEKFDKSKLKKTETQEKNPLPSKETIEQEKQAGES
+origin: Synthetic
+solubility: Water, aqueous buffers
+research_category: Multi-peptide copper/cytoprotective blend
+
+faq_1_q: Which peptides are included in the Glow Blend?
+faq_1_a: The Glow Blend contains GHK-Cu (copper tripeptide), BPC-157 (gastric cytoprotective peptide), and Thymosin Beta-4 (beta-thymosin actin-binding peptide).[web:18][web:21][web:118][web:2]
+
+faq_2_q: What is the typical formulation ratio and approximate molar ratio?
+faq_2_a: A common configuration uses a 5:1:1 mass ratio of GHK-Cu:BPC-157:TB-500, which corresponds roughly to a ~62:3.5:1 molar ratio given their different molecular weights.[web:143][web:21][web:121][web:105]
+
+faq_3_q: How is the Glow Blend applied in experimental work?
+faq_3_a: It is used as a reference preparation in experiments that simultaneously interrogate copper-peptide signalling, cytoprotective pathways, and thymosin-family peptide biology.[web:91][web:94][web:100]
+
+ref_1: PubChem CID 378611. Cu-GHK – copper tripeptide complex.[web:24]
+ref_2: Pickart L. et al., 1991. GHK-Cu2+ in connective tissue models. J Surg Res.[web:91][web:103]
+ref_3: Peptides Explorer. GHK-Cu + BPC-157 + TB-500 blend technical description (5:1:1).[web:143]
+---PRODUCT END---
+
+---PRODUCT START---
+product_name: CJC-1295 + Ipamorelin Blend
+product_slug: cjc-1295-ipamorelin-blend
+alt_names: CJC-1295 NO DAC + Ipamorelin blend, Mod GRF(1-29)/Ipamorelin multi-peptide preparation
+
+category: Peptide Blends
+product_type: Peptide Blend
+
+description: The CJC-1295 + Ipamorelin Blend is a two-component reference preparation containing CJC-1295 NO DAC (also termed Mod GRF(1–29)), a 29-residue GHRH analog, together with Ipamorelin, a synthetic pentapeptide growth hormone secretagogue receptor (GHSR-1a) agonist.[web:48][web:144][web:138] CJC-1295 NO DAC has a reported molecular weight around 3367.9 Da, while Ipamorelin (Aib-His-D-2-Nal-D-Phe-Lys-NH2) has a molecular weight of approximately 711.8 Da.[web:144][web:133][web:138]
+
+Typical research vials contain 10 mg total peptide comprising 5 mg CJC-1295 NO DAC and 5 mg Ipamorelin, corresponding to a 1:1 mass ratio.[web:151][web:144] When normalized for molecular weight, this equates to an approximate molar ratio of ~1:4.8 (CJC-1295:Ipamorelin), reflecting the lower molecular weight and higher molar concentration of Ipamorelin at equal mass.[web:144][web:138] The blend is used as a dual-peptide reference standard in in-vitro and ex-vivo models investigating GHRH receptor and GHSR-1a signalling in parallel.[web:48][web:138]
+
+The CJC-1295 + Ipamorelin Blend is supplied as a lyophilized powder of ≥99% HPLC purity suitable for reconstitution in aqueous media.[web:151] Lyophilized vials are stored at −20°C protected from light, with reconstituted aliquots frozen or refrigerated as appropriate for the experimental schedule.[web:151] Reference standard for in-vitro research on growth hormone-releasing hormone and growth hormone secretagogue receptor pathways. For Research Use Only. Not for human consumption. Not intended for therapeutic, diagnostic, or clinical use.
+
+seo_title: CJC-1295 + Ipamorelin Reference Blend | Dual Secretagogue
+seo_description: Dual-peptide blend (CJC-1295 NO DAC + Ipamorelin) at ~1:4.8 molar ratio for in-vitro GHRH and GHSR-1a signalling research. ≥99% HPLC. RUO.
+
+purity: ≥99% HPLC (blend)
+form: Lyophilized multi-peptide powder
+storage: -20°C lyophilized; -20°C reconstituted; protect from light
+molecular_weight: Blend of ~3367.9 Da (CJC-1295 NO DAC) and ~711.8 Da (Ipamorelin)
+cas_number:
+sequence: CJC-1295 NO DAC: modified GHRH(1–29); Ipamorelin: Aib-His-D-2-Nal-D-Phe-Lys-NH2
+origin: Synthetic
+solubility: Water, aqueous buffers
+research_category: Dual GHRH/GHSR peptide blend
+
+faq_1_q: What peptides are present in the CJC-1295 + Ipamorelin Blend?
+faq_1_a: The blend contains CJC-1295 NO DAC (Mod GRF(1–29)), a GHRH analog, together with Ipamorelin, a selective GHSR-1a agonist pentapeptide.[web:48][web:144][web:138]
+
+faq_2_q: What is the typical mass ratio and molar ratio of the components?
+faq_2_a: A common configuration is 5 mg CJC-1295 and 5 mg Ipamorelin (1:1 mass ratio), corresponding to roughly a 1:4.8 molar ratio (CJC-1295:Ipamorelin) given their different molecular weights.[web:151][web:144][web:138]
+
+faq_3_q: How is this blend used in signalling studies?
+faq_3_a: It serves as a multi-peptide reference standard for experiments that concurrently interrogate GHRH receptor and ghrelin/secretagogue receptor signalling pathways.[web:48][web:138]
+
+ref_1: Biotech/Core Peptides. CJC-1295 & Ipamorelin 10 mg blend technical specifications.[web:144][web:151]
+ref_2: ChemicalBook/CymitQuimica entries for Ipamorelin, CAS 170851-70-4.[web:133][web:138]
+---PRODUCT END---
+
+---PRODUCT START---
+product_name: Retatrutide
+product_slug: retatrutide
+alt_names: LY3437943, Retatrutide acetate
+
+category: GLP-1 Receptor Agonists
+product_type: Peptide
+
+description: Retatrutide (LY3437943) is a synthetic 39-amino-acid polypeptide based on a glucose-dependent insulinotropic polypeptide (GIP) backbone, incorporating non-coded residues (such as Aib at select positions) and a C20 fatty diacid side chain to enhance albumin binding.[web:160][web:159] It has the molecular formula C221H342N46O68 and a reported molecular weight of approximately 4731.3 Da.[web:159] Retatrutide is classified as a multi-receptor incretin-family peptide.[web:167][web:163]
+
+In functional in-vitro assays, retatrutide acts as a potent full agonist at three class B G protein–coupled receptors: the glucagon receptor (GCGR), the GIP receptor (GIPR), and the GLP-1 receptor (GLP-1R).[web:159][web:157][web:145] cAMP accumulation studies in human receptor-expressing cell lines report EC50 values of 5.79 nM at GCGR, 0.064 nM at GIPR, and 0.775 nM at GLP-1R, with corresponding nanomolar binding affinities in radioligand-displacement experiments.[web:159][web:157]
+
+Research-grade retatrutide is supplied as a lyophilized acetate or related salt at high HPLC purity for biochemical and cell-based studies.[web:159][web:166] It is typically reconstituted in aqueous buffer or DMSO for in-vitro work and stored lyophilized at −20°C protected from light, with reconstituted aliquots kept frozen to maintain stability.[web:159] Reference standard for in-vitro research on triple agonism at GLP-1R, GIPR, and glucagon receptors and incretin-pathway signalling. For Research Use Only. Not for human consumption. Not intended for therapeutic, diagnostic, or clinical use.
+
+seo_title: Retatrutide Reference Standard | Triple Incretin Agonist
+seo_description: GIP-based peptide triple agonist (GCGR/GIPR/GLP-1R) for in-vitro incretin receptor signalling research. Lyophilized, high-purity. RUO.
+
+purity: ≥98% HPLC
+form: Lyophilized peptide (acetate or related salt)
+storage: -20°C lyophilized; -20°C reconstituted; protect from light
+molecular_weight: 4731.3 Da
+cas_number: 2381089-83-2
+sequence: 39-residue GIP-based analog with Aib substitutions and C20 fatty diacid conjugation
+origin: Synthetic
+solubility: DMSO, aqueous buffers
+research_category: Incretin triple agonist peptide
+
+faq_1_q: What receptors does retatrutide activate in in-vitro assays?
+faq_1_a: Retatrutide is a full agonist at the glucagon receptor (GCGR), GIP receptor (GIPR), and GLP-1 receptor (GLP-1R), with nanomolar potency in cAMP assays.[web:159][web:157][web:145]
+
+faq_2_q: How is retatrutide structurally engineered relative to native GIP?
+faq_2_a: It is derived from a GIP backbone with non-coded residues such as Aib and a C20 fatty diacid side chain that confers albumin binding and extended pharmacokinetic properties in preclinical studies.[web:160][web:159]
+
+faq_3_q: In what experimental formats is retatrutide typically used?
+faq_3_a: It is used as a reference ligand in receptor-binding, cAMP, and signalling-bias assays across GLP-1R, GIPR, and GCGR-expressing cell systems.[web:159][web:145]
+
+ref_1: Probechem/TargetMol entries for Retatrutide (LY3437943): GCGR/GIPR/GLP-1R triple agonist EC50 profile.[web:159][web:156]
+ref_2: Yang J. et al., 2024. Structural insights into triple agonism at GLP-1R, GIPR and GCGR manifested by retatrutide. Cell Discov 10:77.[web:145]
+---PRODUCT END---
+
+---PRODUCT START---
+product_name: PT-141 (Bremelanotide)
+product_slug: pt-141-bremelanotide
+alt_names: Bremelanotide, PT-141 free base, Ac-Nle-cyclo(Asp-His-D-Phe-Arg-Trp-Lys)-OH
+
+category: Melanocortin Receptor Modulators
+product_type: Peptide
+
+description: PT-141 (Bremelanotide) is a synthetic cyclic heptapeptide analog of the endogenous melanocortin peptide α-melanocyte-stimulating hormone (α-MSH).[web:158][web:164] It is structurally described as Ac-Nle-cyclo(Asp-His-D-Phe-Arg-Trp-Lys)-OH and has the empirical formula C50H68N14O10 with a molecular weight of approximately 1025.16 Da.[web:164][web:161][web:158] The lactam bridge between the Asp and Lys side chains constrains the peptide into a cyclized conformation characteristic of melanocortin analogs.[web:164]
+
+PT-141 is studied as a non-selective melanocortin receptor agonist with prominent activity at MC3R and MC4R, both G protein–coupled receptors expressed in central and peripheral tissues.[web:164][web:153][web:146] In vitro, it is used as a reference ligand in receptor-binding assays, cAMP accumulation studies, and signalling-bias experiments across melanocortin receptor subtypes.[web:153][web:146]
+
+Research-grade PT-141 is commonly supplied as a lyophilized acetate or free-base peptide of ≥97–98% HPLC purity.[web:161][web:164] It is soluble in water and dilute acids and is stored at −20°C protected from light and moisture, with reconstituted solutions maintained at low temperature.[web:161] Reference standard for in-vitro research on melanocortin receptor signalling, especially MC3R and MC4R pharmacology. For Research Use Only. Not for human consumption. Not intended for therapeutic, diagnostic, or clinical use.
+
+seo_title: PT-141 (Bremelanotide) Reference | Melanocortin Agonist
+seo_description: Cyclic α-MSH analog for in-vitro melanocortin receptor (MC3R/MC4R) signalling research. Lyophilized peptide, ≥98% HPLC. RUO.
+
+purity: ≥97–98% HPLC
+form: Lyophilized peptide (acetate or free base)
+storage: -20°C lyophilized; -20°C reconstituted; protect from light
+molecular_weight: 1025.16 Da
+cas_number: 189691-06-3
+sequence: Ac-Nle-cyclo(Asp-His-D-Phe-Arg-Trp-Lys)-OH (cyclic heptapeptide)
+origin: Synthetic
+solubility: Water, dilute acetic acid
+research_category: Melanocortin agonist peptide
+
+faq_1_q: What class of peptide is PT-141?
+faq_1_a: PT-141 is a cyclic heptapeptide analog of α-MSH and is categorized as a melanocortin receptor agonist.[web:158][web:164]
+
+faq_2_q: Which melanocortin receptor subtypes are most commonly studied with PT-141?
+faq_2_a: It is frequently used to probe MC3R and MC4R pharmacology in cell-based receptor-binding and cAMP signalling assays.[web:164][web:153][web:146]
+
+faq_3_q: How is PT-141 typically supplied for research use?
+faq_3_a: Vendors offer PT-141 as a lyophilized peptide, often as the acetate salt, with high HPLC purity for reconstitution in aqueous media.[web:161][web:164]
+
+ref_1: PubChem CID 9941379. Bremelanotide – structure and identifiers.[web:158]
+ref_2: CymitQuimica technical entry for PT-141, CAS 189691-06-3.[web:164]
+---PRODUCT END---
+
+---PRODUCT START---
+product_name: Tesamorelin
+product_slug: tesamorelin
+alt_names: Tesamorelin acetate, TH9507, N-(trans-3-hexenoyl)-[Tyr1]hGHRH(1-44)NH2
+
+category: Growth Hormone Secretagogues
+product_type: Peptide
+
+description: Tesamorelin is a synthetic 44-amino-acid analog of human growth hormone–releasing hormone (GHRH) with an N-terminal trans-3-hexenoyl modification and a Tyr1 substitution, formally designated N-(trans-3-hexenoyl)-[Tyr1]hGHRH(1–44)NH2.[web:147][web:165][web:162] It closely mirrors endogenous GHRH sequence while incorporating modifications that enhance peptide stability and pharmacokinetic properties.[web:147][web:154] Tesamorelin has the molecular formula C221H366N72O67S and a molecular weight around 5135.9 Da.[web:162][web:165]
+
+Tesamorelin is a selective agonist of the GHRH receptor (GHRHR), a class B G protein–coupled receptor expressed on pituitary somatotrophs.[web:162][web:165] In vitro, it is used as a reference GHRH analog in binding, cAMP accumulation, and downstream signalling assays in GHRHR-expressing cell lines and pituitary cell models, enabling detailed characterization of GHRH receptor pharmacology.[web:147][web:154]
+
+Research-grade tesamorelin is supplied as a lyophilized acetate salt with high HPLC purity, intended for reconstitution in aqueous buffer or sterile water immediately before use.[web:165] Lyophilized vials are stored at −20°C protected from light and moisture; reconstituted solutions are kept refrigerated or frozen as appropriate for experimental timelines.[web:162] Reference standard for in-vitro research on GHRH receptor signalling and growth hormone axis regulation. For Research Use Only. Not for human consumption. Not intended for therapeutic, diagnostic, or clinical use.
+
+seo_title: Tesamorelin Reference Standard | GHRH Analog Peptide
+seo_description: 44-amino-acid GHRH analog (N-(trans-3-hexenoyl)-[Tyr1]hGHRH(1–44)NH2) for in-vitro GHRH receptor signalling research. Lyophilized. RUO.
+
+purity: ≥98–99% HPLC
+form: Lyophilized acetate salt
+storage: -20°C lyophilized; -20°C reconstituted; protect from light
+molecular_weight: 5135.9 Da
+cas_number: 218949-48-5
+sequence: Tyr-Ala-Asp-Ala-Ile-Phe-Thr-Asn-Ser-Tyr-Arg-Lys-Val-Leu-Gly-Gln-Leu-Ser-Ala-Arg-Lys-Leu-Leu-Gln-Asp-Ile-Met-Ser-Arg-Gln-Gln-Gly-Glu-Ser-Asn-Gln-Glu-Arg-Gly-Ala-Arg-Ala-Arg-Leu-NH2 (with N-terminal trans-3-hexenoyl)
+origin: Synthetic
+solubility: Water, aqueous buffers
+research_category: GHRH analog peptide
+
+faq_1_q: How does tesamorelin differ structurally from native GHRH?
+faq_1_a: Tesamorelin preserves the 44-residue GHRH backbone but adds an N-terminal trans-3-hexenoyl group and a Tyr1 substitution to improve stability while retaining GHRH receptor agonism.[web:147][web:162]
+
+faq_2_q: Which receptor is targeted in tesamorelin signalling studies?
+faq_2_a: Tesamorelin is a selective agonist at the GHRH receptor (GHRHR) and is used in in-vitro systems to characterize class B GHRH receptor pharmacology.[web:162][web:165]
+
+faq_3_q: In what forms is tesamorelin typically supplied for research?
+faq_3_a: It is commonly provided as tesamorelin acetate, a lyophilized powder of high HPLC purity for reconstitution in aqueous media.[web:165][web:162]
+
+ref_1: Paragon/Tide Labs technical monographs on tesamorelin structure and formula.[web:162][web:165]
+ref_2: Polaris/other peptide research overviews comparing tesamorelin with other GHRH analogs.[web:154][web:147]
+---PRODUCT END---
