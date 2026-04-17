@@ -494,9 +494,7 @@ function ScienceQualitySection() {
 // written permission are available. Renders nothing if `institutions`
 // is empty, so even if re-mounted without data it won't ship fake proof.
 
-// Exported so the module tsc / noUnusedLocals doesn't strip it while the
-// component is dormant (hidden from <Page> until real data lands).
-export function InstitutionLogosBar() {
+function InstitutionLogosBar() {
 	if (institutions.length === 0) return null;
 	return (
 		<section className="border-y border-border bg-card py-12">
@@ -643,9 +641,7 @@ async function TabbedProductsSection({ params }: { params: Promise<{ channel: st
 // returns null on an empty array so it is safe to re-mount at any
 // time without risking placeholder content shipping.
 
-// Exported so the module tsc / noUnusedLocals doesn't strip it while the
-// component is dormant (hidden from <Page> until real reviews land).
-export function TestimonialsSection() {
+function TestimonialsSection() {
 	if (testimonials.length === 0) return null;
 	const featured = testimonials[0];
 	const supporting = testimonials.slice(1);
@@ -816,6 +812,19 @@ function NewsletterSection() {
 }
 
 // ─── Skeletons ──────────────────────────────────────────────
+
+// ─── Dormant components kept in source for future re-enable ──
+//
+// `InstitutionLogosBar` and `TestimonialsSection` are deliberately not rendered
+// in `<Page>` — their data arrays (`institutions`, `testimonials`) are empty
+// until real, attributable social proof lands. The `void` references below
+// satisfy TypeScript's `noUnusedLocals` without turning them into named page
+// exports (which Next.js 16 rejects on route files).
+//
+// To re-enable: populate the `institutions` / `testimonials` arrays and mount
+// the components inside `<Page>`. Delete the matching `void` line here.
+void InstitutionLogosBar;
+void TestimonialsSection;
 
 // ─── Main Page ──────────────────────────────────────────────
 
