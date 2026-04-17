@@ -239,7 +239,7 @@ export function buildActiveFilters(filters: {
 	});
 
 	filters.sizes?.forEach((size) => {
-		active.push({ key: "size", label: "Size", value: size });
+		active.push({ key: "size", label: "Vial size", value: size });
 	});
 
 	if (filters.priceRange) {

@@ -6,7 +6,7 @@ import { Analytics } from "@vercel/analytics/react";
 import { DraftModeNotification } from "@/ui/components/draft-mode-notification";
 import { GoogleAnalytics } from "@/ui/components/google-analytics";
 import { ThemeProvider } from "@/ui/providers/theme-provider";
-import { AgeGate } from "@/ui/components/age-gate";
+import { ResearchGate } from "@/ui/components/research-gate";
 import { rootMetadata } from "@/lib/seo";
 import { localeConfig } from "@/config/locale";
 
@@ -28,7 +28,7 @@ export default function RootLayout(props: { children: ReactNode }) {
 			<body className="min-h-dvh font-sans" suppressHydrationWarning>
 				<ThemeProvider>
 					{children}
-					<AgeGate />
+					<ResearchGate />
 				</ThemeProvider>
 				<DraftModeNotification />
 				<GoogleAnalytics />

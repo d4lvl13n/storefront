@@ -1,5 +1,12 @@
 "use client";
 
+/**
+ * TODO(catalog): Add peptide-domain filters — Purity % (≥99 / 98 / 97), Research
+ * Category, CAS number search, Molecular Weight bucket. These require extending
+ * `ProductListItem.graphql` to include product-level attributes and adding
+ * server-side attribute filtering (Saleor `ProductFilterInput.attributes`).
+ * Not launch-blocking — generic Category/Vial-size/Price cover the v1 need.
+ */
 import { useState } from "react";
 import { ChevronDown, SlidersHorizontal, X } from "lucide-react";
 import { Button } from "@/ui/components/ui/button";
@@ -208,7 +215,7 @@ export function FilterBar({
 											{sizeOptions.length > 0 && onSizeToggle && (
 												<div className="px-4 py-6">
 													<h3 className="mb-4 text-xs font-semibold uppercase tracking-wider text-muted-foreground">
-														Size
+														Vial size
 													</h3>
 													<div className="flex flex-wrap gap-2">
 														{sizeOptions.map((size) => {
@@ -367,7 +374,7 @@ export function FilterBar({
 										size="sm"
 										className="hidden shrink-0 border-white/[0.08] bg-transparent text-foreground hover:border-white/[0.15] hover:text-foreground md:flex"
 									>
-										Size
+										Vial size
 										{selectedSizes.length > 0 && (
 											<Badge
 												variant="secondary"
@@ -380,7 +387,7 @@ export function FilterBar({
 									</Button>
 								</DropdownMenuTrigger>
 								<DropdownMenuContent align="start" className="w-48">
-									<DropdownMenuLabel>Size</DropdownMenuLabel>
+									<DropdownMenuLabel>Vial size</DropdownMenuLabel>
 									<DropdownMenuSeparator />
 									{sizeOptions.map((size) => (
 										<DropdownMenuCheckboxItem

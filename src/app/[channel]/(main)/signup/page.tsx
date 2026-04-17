@@ -1,9 +1,11 @@
 import { Suspense } from "react";
+import { AlertTriangle } from "lucide-react";
 import { SignUpForm } from "@/ui/components/sign-up-form";
 
 export const metadata = {
-	title: "Create Account",
-	description: "Create a new account to save your addresses and order history.",
+	title: "Create Research Account",
+	description:
+		"Register a research account to purchase reference compounds for in-vitro laboratory research. Accounts are for qualified research use only.",
 };
 
 export default function SignUpPage() {
@@ -14,11 +16,42 @@ export default function SignUpPage() {
 					<div className="absolute -left-40 top-1/4 h-80 w-80 rounded-full bg-emerald-500/[0.04] blur-[100px]" />
 					<div className="absolute -right-40 bottom-1/4 h-80 w-80 rounded-full bg-teal-500/[0.03] blur-[100px]" />
 				</div>
-				<div className="relative flex items-center justify-center px-6 py-16 sm:py-24">
+				<div className="relative mx-auto flex w-full max-w-md flex-col gap-6 px-6 py-16 sm:py-24">
+					<ResearchAccountNotice />
 					<SignUpForm />
 				</div>
 			</div>
 		</Suspense>
+	);
+}
+
+/**
+ * Compliance notice shown above the sign-up form.
+ *
+ * Mirrors the Frier Levitt memo guidance on Know-Your-Customer (Section III.B.b):
+ * accounts are intended for verified research personnel, not individual consumers.
+ * Copy should be tightened once stakeholders finalise the KYC policy and the
+ * form is extended with institutional fields.
+ */
+function ResearchAccountNotice() {
+	return (
+		<div className="flex items-start gap-3 rounded-2xl border border-amber-500/25 bg-amber-500/[0.06] px-5 py-4 text-left">
+			<AlertTriangle className="mt-0.5 h-5 w-5 shrink-0 text-amber-400" aria-hidden="true" />
+			<div className="space-y-2 text-sm leading-relaxed">
+				<p className="font-semibold text-foreground">Research accounts only</p>
+				<p className="text-muted-foreground">
+					Infinity BioLabs sells reference compounds strictly for{" "}
+					<strong className="text-foreground">in-vitro laboratory research</strong>. By creating an account
+					you confirm that you are acquiring products on behalf of a qualified research organisation or for
+					bona-fide laboratory research, and that products will not be used for human or animal consumption,
+					injection, or any therapeutic, diagnostic, or clinical purpose.
+				</p>
+				<p className="text-muted-foreground">
+					Accounts that appear to be for personal or clinical use may be declined or closed, and orders
+					reversed. An institutional email address is strongly preferred.
+				</p>
+			</div>
+		</div>
 	);
 }
 

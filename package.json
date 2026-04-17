@@ -10,7 +10,7 @@
 		"dev:turbopack": "next dev --turbopack",
 		"build": "next build --webpack",
 		"start": "next start",
-		"predev": "pnpm run generate:all",
+		"predev": "node scripts/generate-all-if-possible.mjs",
 		"prebuild": "node scripts/generate-all-if-possible.mjs",
 		"lint": "eslint",
 		"lint:fix": "eslint --fix",

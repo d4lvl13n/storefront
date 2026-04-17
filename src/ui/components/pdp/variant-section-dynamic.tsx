@@ -7,6 +7,7 @@ import { executeAuthenticatedGraphQL } from "@/lib/graphql";
 import * as Checkout from "@/lib/checkout";
 
 import { AddToCart } from "./add-to-cart";
+import { PdpTrustRow } from "./trust-row";
 import { VariantSelectionSection } from "./variant-selection";
 import { StickyBar } from "./sticky-bar";
 import { Badge } from "@/ui/components/ui/badge";
@@ -26,9 +27,27 @@ interface VariantSectionDynamicProps {
  * because it accesses searchParams (runtime data). The product data is
  * already cached in the static shell - this just adds the interactive parts.
  */
+// ── Trust row data extraction ──
+function extractPurity(product: Product): string | null {
+	const purityAttr = (product.attributes || []).find(
+		(a) => (a.attribute.name ?? "").toLowerCase() === "purity" || a.attribute.slug === "purity",
+	);
+	const value = purityAttr?.values[0]?.name;
+	return value ?? null;
+}
+
+function extractMeta(product: Product, key: string): string | null {
+	return (product.metadata || []).find((m) => m.key === key)?.value ?? null;
+}
+
 export async function VariantSectionDynamic({ product, channel, searchParams }: VariantSectionDynamicProps) {
 	const { variant: variantParam } = await searchParams;
 	const variants = product.variants || [];
+
+	// Trust-row data
+	const purity = extractPurity(product);
+	const coaUrl = extractMeta(product, "coa_url");
+	const lotNumber = extractMeta(product, "lot_number") ?? extractMeta(product, "batch_number");
 
 	// Auto-select variant: use URL param, or auto-select if only one variant exists
 	const selectedVariantID = variantParam || (variants.length === 1 ? variants[0].id : undefined);
@@ -69,13 +88,17 @@ export async function VariantSectionDynamic({ product, channel, searchParams }: 
 			: null;
 
 	// Server action for adding to cart
-	async function addToCart() {
+	async function addToCart(formData: FormData) {
 		"use server";
 
 		if (!selectedVariantID) {
 			// Silently return - button should be disabled if no variant selected
 			return;
 		}
+
+		// Parse quantity from the form (default 1, clamp 1-10)
+		const rawQty = Number.parseInt(String(formData.get("quantity") ?? "1"), 10);
+		const quantity = Number.isFinite(rawQty) ? Math.min(10, Math.max(1, rawQty)) : 1;
 
 		try {
 			const checkout = await Checkout.findOrCreate({
@@ -95,6 +118,7 @@ export async function VariantSectionDynamic({ product, channel, searchParams }: 
 				variables: {
 					id: checkout.id,
 					productVariantId: decodeURIComponent(selectedVariantID),
+					quantity,
 				},
 				cache: "no-cache",
 			});
@@ -138,6 +162,9 @@ export async function VariantSectionDynamic({ product, channel, searchParams }: 
 					productSlug={product.slug}
 					channel={channel}
 				/>
+
+				{/* Trust Row: purity, per-lot COA, shipping, reconstitution calculator */}
+				<PdpTrustRow purity={purity} coaUrl={coaUrl} lotNumber={lotNumber} channel={channel} />
 
 				{/* Add to Cart */}
 				<AddToCart

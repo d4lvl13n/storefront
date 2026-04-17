@@ -1,6 +1,7 @@
 export { ProductGallery } from "./product-gallery";
 export { ProductAttributes } from "./product-attributes";
 export { AddToCart } from "./add-to-cart";
+export { PdpTrustRow } from "./trust-row";
 export { StickyBar } from "./sticky-bar";
 
 // Variant Selection System

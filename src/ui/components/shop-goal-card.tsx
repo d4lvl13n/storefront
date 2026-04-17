@@ -1,8 +1,18 @@
 import Image from "next/image";
-import type { CollectionsListQuery } from "@/gql/graphql";
 import { LinkWithChannel } from "@/ui/atoms/link-with-channel";
 
-type CollectionNode = NonNullable<NonNullable<CollectionsListQuery["collections"]>["edges"][number]>["node"];
+/**
+ * Minimal node shape used by the card. Compatible with both `CollectionsListQuery`
+ * and `CategoriesListQuery` node types — either can be passed in.
+ */
+type GoalCardNode = {
+	id: string;
+	name: string;
+	slug: string;
+	backgroundImage?: { url: string; alt?: string | null } | null;
+};
+
+type CollectionNode = GoalCardNode;
 
 type HoverMediaOverride = {
 	src: string;
@@ -10,92 +20,106 @@ type HoverMediaOverride = {
 	objectPosition?: string;
 };
 
+// Media overrides keyed on current mechanism-class slugs. Images live under /public.
+// Reuses the existing artwork where the semantic fit is neutral (molecular glass-vial
+// hero shots). The abstract `GoalVisual` scenes render underneath regardless.
 const hoverMediaOverrides: Partial<Record<string, HoverMediaOverride>> = {
-	aesthetics: {
-		src: "/Aesthetics.webp",
-		alt: "Infinity BioLabs aesthetics research vial",
-		objectPosition: "center center",
-	},
-	"anti-aging-longevity": {
-		src: "/longevity.webp",
-		alt: "Longevity study vials with hourglass motif",
-		objectPosition: "center center",
-	},
-	"cognitive-mood": {
+	"glp-1-receptor-agonists": {
 		src: "/cognitive.webp",
-		alt: "Cognitive research vial with neural network backdrop",
+		alt: "GLP-1 receptor agonist reference vial",
 		objectPosition: "center center",
 	},
-	"fertility-hormonal": {
-		src: "/fertility.webp",
-		alt: "Fertility research vials with hormone chart display",
-		objectPosition: "center center",
-	},
-	"growth-recovery": {
+	"growth-hormone-secretagogues": {
 		src: "/growth.webp",
-		alt: "Tissue repair study vial with structural growth visualization",
+		alt: "Growth hormone secretagogue reference vial",
 		objectPosition: "center center",
 	},
-	"immune-support": {
+	"growth-hormone-derivatives": {
+		src: "/growth.webp",
+		alt: "Growth hormone derivative reference vial",
+		objectPosition: "center center",
+	},
+	"growth-factors": {
+		src: "/growth.webp",
+		alt: "Growth factor reference vial",
+		objectPosition: "center center",
+	},
+	"cytoprotective-peptides": {
+		src: "/growth.webp",
+		alt: "Cytoprotective peptide reference vial",
+		objectPosition: "center center",
+	},
+	"thymic-peptides": {
 		src: "/immune.webp",
-		alt: "Immune support vial with protective shield visualization",
+		alt: "Thymic peptide reference vial",
+		objectPosition: "center center",
+	},
+	"melanocortin-receptor-modulators": {
+		src: "/Aesthetics.webp",
+		alt: "Melanocortin receptor modulator reference vial",
+		objectPosition: "center center",
+	},
+	"copper-peptide-complexes": {
+		src: "/Aesthetics.webp",
+		alt: "Copper peptide complex reference vial",
+		objectPosition: "center center",
+	},
+	"nootropic-peptides": {
+		src: "/cognitive.webp",
+		alt: "Nootropic reference peptide vial",
+		objectPosition: "center center",
+	},
+	"mitochondrial-peptides": {
+		src: "/longevity.webp",
+		alt: "Mitochondrial peptide reference vial",
+		objectPosition: "center center",
+	},
+	"pineal-peptides": {
+		src: "/longevity.webp",
+		alt: "Pineal peptide reference vial",
+		objectPosition: "center center",
+	},
+	"reproductive-hormones": {
+		src: "/fertility.webp",
+		alt: "Reproductive hormone reference vial",
 		objectPosition: "center center",
 	},
 };
 
-function includesAny(slug: string, terms: string[]) {
-	return terms.some((term) => slug.includes(term));
-}
+/**
+ * Card eyebrow + tag metadata keyed on mechanism-class slugs.
+ *
+ * Labels describe chemical class or receptor target only. Do NOT re-introduce
+ * benefit-language tags ("Longevity", "Recovery", "Vitality", "Performance",
+ * "Dermal", "Immune", etc.) — those are the FDA "intended use" evidence pattern
+ * per the Frier Levitt memo (Warrior Labz, Summit Research).
+ */
+const mechanismMeta: Record<string, { eyebrow: string; tag: string }> = {
+	"glp-1-receptor-agonists": { eyebrow: "Incretin pathway", tag: "GLP-1" },
+	"growth-hormone-secretagogues": { eyebrow: "Somatotropic axis", tag: "GH-secretagogue" },
+	"growth-hormone-derivatives": { eyebrow: "GH fragment", tag: "GH derivative" },
+	"growth-factors": { eyebrow: "Growth factor", tag: "IGF-family" },
+	"cytoprotective-peptides": { eyebrow: "Cellular protection", tag: "Cytoprotective" },
+	"thymic-peptides": { eyebrow: "Thymic signalling", tag: "Thymic" },
+	"melanocortin-receptor-modulators": { eyebrow: "Melanocortin receptor", tag: "Melanocortin" },
+	"copper-peptide-complexes": { eyebrow: "Copper complex", tag: "GHK-Cu" },
+	"nootropic-peptides": { eyebrow: "Neurochemistry", tag: "Nootropic" },
+	"mitochondrial-peptides": { eyebrow: "Mitochondrial", tag: "Bioenergetics" },
+	"pineal-peptides": { eyebrow: "Pineal peptide", tag: "Chronobiology" },
+	"antimicrobial-peptides": { eyebrow: "Host defence", tag: "Antimicrobial" },
+	neuropeptides: { eyebrow: "Neuropeptide", tag: "Receptor research" },
+	"reproductive-hormones": { eyebrow: "Reproductive axis", tag: "Endocrine" },
+	"research-small-molecules": { eyebrow: "Small molecule", tag: "Non-peptide" },
+	"peptide-blends": { eyebrow: "Multi-peptide", tag: "Blend" },
+	"cosmetic-injectables": { eyebrow: "Cosmetic science", tag: "Injectable" },
+	"metabolic-injectables": { eyebrow: "Metabolic research", tag: "Injectable" },
+	"reference-peptides-miscellaneous": { eyebrow: "Reference peptides", tag: "Miscellaneous" },
+	supplies: { eyebrow: "Lab consumables", tag: "Supplies" },
+	"research-accessories": { eyebrow: "Lab consumables", tag: "Accessories" },
+};
 
 function getGoalMeta(slug: string) {
-	if (includesAny(slug, ["anti", "longevity"])) {
-		return { eyebrow: "Cellular protocol", tag: "Longevity" };
-	}
-
-	if (includesAny(slug, ["cognitive", "mood", "sleep"])) {
-		return {
-			eyebrow: slug.includes("sleep") ? "Circadian stack" : "Neuro assay",
-			tag: slug.includes("sleep") ? "Sleep" : "Cognition",
-		};
-	}
-
-	if (includesAny(slug, ["growth", "recovery", "healing"])) {
-		return { eyebrow: "Repair pathway", tag: slug.includes("healing") ? "Healing" : "Recovery" };
-	}
-
-	if (includesAny(slug, ["weight", "metabolic"])) {
-		return { eyebrow: "Metabolic track", tag: "Metabolism" };
-	}
-
-	if (includesAny(slug, ["performance"])) {
-		return { eyebrow: "Output stack", tag: "Performance" };
-	}
-
-	if (includesAny(slug, ["immune"])) {
-		return { eyebrow: "Defense matrix", tag: "Immune" };
-	}
-
-	if (includesAny(slug, ["sexual"])) {
-		return { eyebrow: "Hormonal track", tag: "Vitality" };
-	}
-
-	if (includesAny(slug, ["tanning", "skin"])) {
-		return { eyebrow: "Pigmentation lab", tag: "Dermal" };
-	}
-
-	if (includesAny(slug, ["aesthetic", "cosmetic"])) {
-		return { eyebrow: "Cosmetic pathway", tag: "Aesthetics" };
-	}
-
-	if (includesAny(slug, ["fertility", "hormonal", "endocrine"])) {
-		return { eyebrow: "Endocrine focus", tag: "Hormonal" };
-	}
-
-	if (includesAny(slug, ["vitamin", "supplement"])) {
-		return { eyebrow: "Foundation stack", tag: "Foundational" };
-	}
-
-	return { eyebrow: "Research collection", tag: "Protocol" };
+	return mechanismMeta[slug] ?? { eyebrow: "Research collection", tag: "Reference" };
 }
 
 function OrbitalScene() {
@@ -275,24 +299,48 @@ function FormulaScene() {
 	);
 }
 
+// Scene mapping keyed on mechanism-class slugs. Scenes are purely abstract
+// motion graphics (wave, orbit, trajectory, aura, formula) — none make a
+// bodily-effect claim on their own. The mapping is aesthetic pairing only.
+const mechanismSceneMap: Record<string, "orbital" | "wave" | "trajectory" | "aura" | "formula"> = {
+	"glp-1-receptor-agonists": "trajectory",
+	"growth-hormone-secretagogues": "trajectory",
+	"growth-hormone-derivatives": "trajectory",
+	"growth-factors": "trajectory",
+	"cytoprotective-peptides": "orbital",
+	"thymic-peptides": "orbital",
+	"antimicrobial-peptides": "orbital",
+	"melanocortin-receptor-modulators": "aura",
+	"copper-peptide-complexes": "aura",
+	"nootropic-peptides": "wave",
+	neuropeptides: "wave",
+	"mitochondrial-peptides": "orbital",
+	"pineal-peptides": "wave",
+	"reproductive-hormones": "wave",
+	"research-small-molecules": "formula",
+	"peptide-blends": "formula",
+	"cosmetic-injectables": "aura",
+	"metabolic-injectables": "formula",
+	"reference-peptides-miscellaneous": "formula",
+	supplies: "formula",
+	"research-accessories": "formula",
+};
+
 function GoalVisual({ slug }: { slug: string }) {
-	if (includesAny(slug, ["anti", "longevity", "immune", "healing"])) {
-		return <OrbitalScene />;
+	const scene = mechanismSceneMap[slug] ?? "formula";
+	switch (scene) {
+		case "orbital":
+			return <OrbitalScene />;
+		case "wave":
+			return <WaveScene />;
+		case "trajectory":
+			return <TrajectoryScene />;
+		case "aura":
+			return <AuraScene />;
+		case "formula":
+		default:
+			return <FormulaScene />;
 	}
-
-	if (includesAny(slug, ["cognitive", "mood", "sleep"])) {
-		return <WaveScene />;
-	}
-
-	if (includesAny(slug, ["growth", "recovery", "weight", "performance"])) {
-		return <TrajectoryScene />;
-	}
-
-	if (includesAny(slug, ["aesthetic", "cosmetic", "tanning", "skin", "sexual"])) {
-		return <AuraScene />;
-	}
-
-	return <FormulaScene />;
 }
 
 function resolveHoverMedia(collection: CollectionNode) {
@@ -306,54 +354,7 @@ function resolveHoverMedia(collection: CollectionNode) {
 		};
 	}
 
-	if (includesAny(collection.slug, ["anti", "longevity"])) {
-		return {
-			src: "/longevity.webp",
-			alt: "Longevity study vials with hourglass motif",
-			objectPosition: "center center",
-		};
-	}
-
-	if (includesAny(collection.slug, ["cognitive", "mood"])) {
-		return {
-			src: "/cognitive.webp",
-			alt: "Cognitive research vial with neural network backdrop",
-			objectPosition: "center center",
-		};
-	}
-
-	if (includesAny(collection.slug, ["growth", "recovery"])) {
-		return {
-			src: "/growth.webp",
-			alt: "Tissue repair study vial with structural growth visualization",
-			objectPosition: "center center",
-		};
-	}
-
-	if (includesAny(collection.slug, ["fertility", "hormonal", "endocrine"])) {
-		return {
-			src: "/fertility.webp",
-			alt: "Fertility research vials with hormone chart display",
-			objectPosition: "center center",
-		};
-	}
-
-	if (includesAny(collection.slug, ["immune"])) {
-		return {
-			src: "/immune.webp",
-			alt: "Immune support vial with protective shield visualization",
-			objectPosition: "center center",
-		};
-	}
-
-	if (includesAny(collection.slug, ["aesthetic", "cosmetic"])) {
-		return {
-			src: "/Aesthetics.webp",
-			alt: "Infinity BioLabs aesthetics research vial",
-			objectPosition: "center center",
-		};
-	}
-
+	// Fallback to Saleor-supplied collection background if mechanism override is absent.
 	if (collection.backgroundImage?.url) {
 		return {
 			src: collection.backgroundImage.url,
@@ -368,16 +369,19 @@ function resolveHoverMedia(collection: CollectionNode) {
 export function ShopGoalCard({
 	collection,
 	description,
+	hrefBase = "/collections",
 }: {
 	collection: CollectionNode;
 	description?: string;
+	/** Path prefix for the card link — use "/categories" when rendering Categories. */
+	hrefBase?: "/categories" | "/collections";
 }) {
 	const meta = getGoalMeta(collection.slug);
 	const hoverMedia = resolveHoverMedia(collection);
 
 	return (
 		<LinkWithChannel
-			href={`/collections/${collection.slug}`}
+			href={`${hrefBase}/${collection.slug}`}
 			className="shop-goal-card hover:border-emerald-500/22 group relative flex min-h-[368px] flex-col overflow-hidden rounded-[1.9rem] border border-border bg-background shadow-[0_22px_60px_-34px_rgba(0,0,0,0.18)] transition-[transform,border-color,box-shadow,background-color] duration-500 hover:-translate-y-1.5 hover:shadow-[0_34px_90px_-42px_rgba(16,185,129,0.22)] dark:shadow-[0_22px_60px_-34px_rgba(0,0,0,0.95)] dark:hover:shadow-[0_34px_90px_-42px_rgba(16,185,129,0.38)]"
 		>
 			<div className="absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-black/10 to-transparent dark:via-white/10" />

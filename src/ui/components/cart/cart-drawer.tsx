@@ -133,7 +133,7 @@ export function CartDrawer({ checkoutId, lines, totalPrice, channel }: CartDrawe
 		});
 	};
 
-	const freeShippingThreshold = 100;
+	const freeShippingThreshold = 150;
 	const progressToFreeShipping = Math.min((subtotal / freeShippingThreshold) * 100, 100);
 	const amountToFreeShipping = Math.max(freeShippingThreshold - subtotal, 0);
 

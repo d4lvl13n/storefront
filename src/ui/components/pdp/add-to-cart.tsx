@@ -1,7 +1,8 @@
 "use client";
 
+import { useState } from "react";
 import { useFormStatus } from "react-dom";
-import { ShoppingBag } from "lucide-react";
+import { Minus, Plus, ShoppingBag } from "lucide-react";
 import { Button } from "@/ui/components/ui/button";
 import { cn } from "@/lib/utils";
 
@@ -11,6 +12,44 @@ interface AddToCartProps {
 	discountPercent?: number | null;
 	disabled?: boolean;
 	disabledReason?: "no-selection" | "out-of-stock";
+}
+
+const MAX_QTY = 10;
+
+function QuantityStepper({ disabled }: { disabled?: boolean }) {
+	const [qty, setQty] = useState(1);
+	const dec = () => setQty((q) => Math.max(1, q - 1));
+	const inc = () => setQty((q) => Math.min(MAX_QTY, q + 1));
+
+	return (
+		<div className="flex items-center gap-3">
+			<span className="text-sm font-medium text-muted-foreground">Quantity</span>
+			<div className="inline-flex items-center rounded-full border border-border bg-background">
+				<button
+					type="button"
+					aria-label="Decrease quantity"
+					onClick={dec}
+					disabled={disabled || qty <= 1}
+					className="flex h-10 w-10 items-center justify-center rounded-l-full text-foreground transition-colors hover:bg-muted disabled:cursor-not-allowed disabled:opacity-40"
+				>
+					<Minus className="h-4 w-4" />
+				</button>
+				<span aria-live="polite" className="w-10 text-center text-sm font-semibold tabular-nums">
+					{qty}
+				</span>
+				<button
+					type="button"
+					aria-label="Increase quantity"
+					onClick={inc}
+					disabled={disabled || qty >= MAX_QTY}
+					className="flex h-10 w-10 items-center justify-center rounded-r-full text-foreground transition-colors hover:bg-muted disabled:cursor-not-allowed disabled:opacity-40"
+				>
+					<Plus className="h-4 w-4" />
+				</button>
+			</div>
+			<input type="hidden" name="quantity" value={qty} />
+		</div>
+	);
 }
 
 function AddToCartButton({
@@ -66,6 +105,9 @@ export function AddToCart({
 				)}
 			</div>
 
+			{/* Quantity Stepper */}
+			<QuantityStepper disabled={disabled} />
+
 			{/* Add to Cart Button */}
 			<AddToCartButton disabled={disabled} disabledReason={disabledReason} />
 
@@ -82,7 +124,7 @@ export function AddToCart({
 						<path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2V9z" />
 						<path d="M9 22V12h6v10" />
 					</svg>
-					Free delivery over €100
+					Free delivery over $150
 				</span>
 			</div>
 		</div>

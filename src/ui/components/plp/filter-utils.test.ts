@@ -353,8 +353,8 @@ describe("buildActiveFilters", () => {
 		const result = buildActiveFilters({ sizes: ["S", "M"] });
 
 		expect(result).toEqual([
-			{ key: "size", label: "Size", value: "S" },
-			{ key: "size", label: "Size", value: "M" },
+			{ key: "size", label: "Vial size", value: "S" },
+			{ key: "size", label: "Vial size", value: "M" },
 		]);
 	});
 

@@ -1,7 +1,7 @@
 import Image from "next/image";
 import {
 	ProductListByCollectionDocument,
-	CollectionsListDocument,
+	CategoriesListDocument,
 	ProductOrderField,
 	OrderDirection,
 } from "@/gql/graphql";
@@ -11,6 +11,8 @@ import { ProductTabs } from "./product-tabs";
 import { HowOrderingWorks } from "@/ui/components/how-ordering-works";
 import { VerifiedStoryCard } from "@/ui/components/verified-story-card";
 import { ShopGoalCard } from "@/ui/components/shop-goal-card";
+import { NewsletterForm } from "@/ui/components/newsletter-form";
+import { HeroScrollIndicator } from "@/ui/components/hero-scroll-indicator";
 
 export const metadata = {
 	title: "InfinityBio Labs — Pharmaceutical-Grade Research Peptides",
@@ -38,7 +40,7 @@ async function getFeaturedProducts(channel: string) {
 async function getBestSellers(channel: string) {
 	const result = await executePublicGraphQL(ProductListByCollectionDocument, {
 		variables: {
-			slug: "summer-picks",
+			slug: "best-sellers",
 			channel,
 			first: 8,
 			sortBy: { field: ProductOrderField.Collection, direction: OrderDirection.Asc },
@@ -50,14 +52,23 @@ async function getBestSellers(channel: string) {
 	return result.data.collection?.products?.edges.map(({ node }) => node) ?? [];
 }
 
-async function getCollections(channel: string) {
-	const result = await executePublicGraphQL(CollectionsListDocument, {
-		variables: { channel, first: 20 },
+/**
+ * Top-level mechanism Categories for the homepage "Browse by Mechanism" grid.
+ *
+ * Note: we deliberately query Categories (taxonomy — "what the compound is")
+ * rather than Collections (merchandising — "what it's for"). Category-based
+ * navigation carries zero structure/function-claim signal and matches how
+ * research-reagent suppliers (Sigma, Bachem, Cayman) organise their catalogs.
+ * See Frier Levitt Peptide Guidance Memorandum, Section III.B.a.
+ */
+async function getTopCategories() {
+	const result = await executePublicGraphQL(CategoriesListDocument, {
+		variables: { first: 30 },
 		revalidate: 3600,
 	});
 
 	if (!result.ok) return [];
-	return result.data.collections?.edges.map(({ node }) => node) ?? [];
+	return result.data.categories?.edges.map(({ node }) => node) ?? [];
 }
 
 // ─── Icon Components (inline SVG for zero bundle cost) ──────
@@ -133,75 +144,61 @@ function IconLock({ className }: { className?: string }) {
 	);
 }
 
-const collectionDescriptions: Record<string, string> = {
-	"anti-aging-longevity": "Peptides targeting cellular repair, telomere support, and age-related pathways.",
-	"cognitive-mood": "Nootropic compounds for memory, focus, and neurotransmitter research.",
-	"growth-recovery": "Growth factor peptides for tissue repair and musculoskeletal studies.",
-	"weight-management": "Metabolic peptides for fat oxidation and appetite regulation research.",
-	performance: "Endurance and strength-related compounds for sports science protocols.",
-	"immune-support": "Thymic peptides and immunomodulators for immune system research.",
-	"sleep-recovery": "Peptides targeting circadian rhythm, deep sleep, and recovery cycles.",
-	"sexual-health": "Compounds for reproductive health and sexual function research.",
-	"tanning-skin": "Melanocortin peptides for dermatological and pigmentation studies.",
-	aesthetics: "Cosmetic peptides for skin elasticity, collagen synthesis, and tissue repair.",
-	"fertility-hormonal": "Hormonal peptides for reproductive and endocrine research.",
-	"vitamins-supplements": "Essential compounds supporting foundational health research.",
-	"recovery-healing": "Restorative peptides for wound healing and tissue regeneration.",
+/**
+ * Mechanism-class descriptions for research-catalog Categories.
+ *
+ * Descriptions intentionally avoid structure/function language (per Frier Levitt
+ * Peptide Guidance Memorandum, April 2026). All copy describes the chemical class
+ * or receptor target and ends in a research-framed phrase. Do NOT re-introduce
+ * benefit language ("supports", "enhances", "promotes", "recovery", "longevity",
+ * "weight", "growth", "healing", "immunity", "libido", etc.) — that is the FDA
+ * "intended use" evidence pattern cited in Warrior Labz and Summit Research.
+ *
+ * If a category slug is returned by Saleor but not mapped here, render the
+ * category's own Saleor description (falls through in the component) rather
+ * than guessing via keyword heuristics.
+ */
+const categoryDescriptions: Record<string, string> = {
+	"glp-1-receptor-agonists":
+		"Glucagon-like peptide-1 receptor agonist reference compounds for in-vitro research on incretin signalling.",
+	"growth-hormone-secretagogues":
+		"Research-grade ghrelin receptor agonists and GHRH analogues for in-vitro studies of somatotropic axis signalling.",
+	"growth-hormone-derivatives":
+		"Growth hormone fragment and derivative reference standards for in-vitro research on somatotropic signalling.",
+	"growth-factors":
+		"IGF-family and related growth-factor reference peptides for in-vitro cell-culture research.",
+	"cytoprotective-peptides":
+		"Synthetic peptide reference standards used in in-vitro studies of cellular protection and tissue-culture models.",
+	"thymic-peptides": "Thymus-derived peptide reference standards for in-vitro immunology research.",
+	"melanocortin-receptor-modulators":
+		"Reference peptides targeting melanocortin MC1R / MC3R / MC4R receptors for in-vitro pharmacology research.",
+	"copper-peptide-complexes":
+		"Glycyl-L-histidyl-L-lysine copper complexes. Reference standards for non-injectable in-vitro research applications only.",
+	"mitochondrial-peptides":
+		"Mitochondrial-encoded peptide reference standards (MOTS-c family, humanin family) for in-vitro bioenergetics research.",
+	"pineal-peptides":
+		"Pineal-derived peptide reference compounds for in-vitro chronobiology and cellular-pathway research.",
+	"nootropic-peptides":
+		"Short-chain neuropeptide reference standards used in in-vitro neurochemistry research.",
+	"antimicrobial-peptides":
+		"Cathelicidin, defensin and related host-defence peptide reference standards for in-vitro microbiology research.",
+	neuropeptides:
+		"Neuropeptide reference standards for in-vitro neurochemistry and receptor-pharmacology research.",
+	"reproductive-hormones":
+		"Reproductive and gonadotropic peptide reference standards for in-vitro endocrinology research.",
+	"research-small-molecules":
+		"Non-peptide reference compounds (small molecules, cofactors, glycosaminoglycans) used in in-vitro biochemistry research.",
+	"reference-peptides-miscellaneous":
+		"Reference research peptides of heterogeneous mechanism. Individual product descriptions specify each compound's biochemical target.",
+	"peptide-blends": "Multi-peptide reference preparations used in in-vitro comparative research protocols.",
+	"cosmetic-injectables": "Injectable-form reference compounds used in in-vitro cosmetic-science research.",
+	"metabolic-injectables":
+		"Injectable-form reference compounds used in in-vitro metabolism and nutritional-biochemistry research.",
+	supplies: "Laboratory consumables and reconstitution solvents for in-vitro protocols.",
 };
 
-function getCollectionDescription(slug: string) {
-	const exact = collectionDescriptions[slug];
-	if (exact) return exact;
-
-	if (slug.includes("anti") || slug.includes("longevity")) {
-		return "Peptides targeting cellular repair, telomere support, and age-related pathways.";
-	}
-
-	if (slug.includes("cognitive") || slug.includes("mood")) {
-		return "Nootropic compounds for memory, focus, and neurotransmitter research.";
-	}
-
-	if (slug.includes("growth") || slug.includes("recovery")) {
-		return "Growth factor peptides for tissue repair and musculoskeletal studies.";
-	}
-
-	if (slug.includes("weight") || slug.includes("metabolic")) {
-		return "Metabolic peptides for fat oxidation and appetite regulation research.";
-	}
-
-	if (slug.includes("immune")) {
-		return "Thymic peptides and immunomodulators for immune system research.";
-	}
-
-	if (slug.includes("sleep")) {
-		return "Peptides targeting circadian rhythm, deep sleep, and recovery cycles.";
-	}
-
-	if (slug.includes("sexual")) {
-		return "Compounds for reproductive health and sexual function research.";
-	}
-
-	if (slug.includes("skin") || slug.includes("tanning")) {
-		return "Melanocortin peptides for dermatological and pigmentation studies.";
-	}
-
-	if (slug.includes("aesthetic") || slug.includes("cosmetic")) {
-		return "Cosmetic peptides for skin elasticity, collagen synthesis, and tissue repair.";
-	}
-
-	if (slug.includes("fertility") || slug.includes("hormonal") || slug.includes("endocrine")) {
-		return "Hormonal peptides for reproductive and endocrine research.";
-	}
-
-	if (slug.includes("vitamin") || slug.includes("supplement")) {
-		return "Essential compounds supporting foundational health research.";
-	}
-
-	if (slug.includes("healing")) {
-		return "Restorative peptides for wound healing and tissue regeneration.";
-	}
-
-	return undefined;
+function getCategoryDescription(slug: string) {
+	return categoryDescriptions[slug];
 }
 
 // ─── Trust Items ────────────────────────────────────────────
@@ -251,42 +248,21 @@ const statsData = [
 	{ value: "100%", label: "Batch Tested" },
 ];
 
-// ─── Testimonials ───────────────────────────────────────────
+// ─── Testimonials ────────────────────────────────────────────
+// TODO: Replace with real, attributable reviews before enabling
+// TestimonialsSection in <Page>. Do NOT ship placeholder quotes as
+// real social proof — see launch review notes.
+const testimonials: {
+	quote: string;
+	author: string;
+	role: string;
+	rating: number;
+}[] = [];
 
-const testimonials = [
-	{
-		quote:
-			"The purity consistency across batches is exceptional. We've been running comparative assays for 6 months and InfinityBio's peptides deliver reproducible results every time.",
-		author: "Dr. Sarah M.",
-		role: "Principal Investigator, Molecular Biology",
-		rating: 5,
-	},
-	{
-		quote:
-			"Finally found a supplier that provides actual HPLC chromatograms with every order. The COA documentation is thorough and their support team understands the science.",
-		author: "Dr. James R.",
-		role: "Research Director, Pharmacology Lab",
-		rating: 5,
-	},
-	{
-		quote:
-			"Switched from our previous supplier after purity issues. InfinityBio's cold-chain shipping and consistent ≥98% purity has been a game changer for our research protocols.",
-		author: "Dr. Elena K.",
-		role: "Postdoctoral Fellow, Biochemistry",
-		rating: 5,
-	},
-];
-
-// ─── Institution names (placeholder — replace with logos) ───
-
-const institutions = [
-	"Stanford Research",
-	"MIT BioLab",
-	"Johns Hopkins",
-	"Cambridge Pharma",
-	"Max Planck Institute",
-	"Karolinska Institute",
-];
+// ─── Institution Logos ───────────────────────────────────────
+// TODO: Replace with logos for institutions that have given written
+// permission to be listed. Do NOT ship unverified university names.
+const institutions: string[] = [];
 
 // ════════════════════════════════════════════════════════════
 // SECTIONS
@@ -365,10 +341,10 @@ function HeroSection() {
 							</svg>
 						</LinkWithChannel>
 						<a
-							href="#shop-by-goal"
+							href="#browse-by-mechanism"
 							className="inline-flex h-12 items-center justify-center rounded-full border border-border bg-background px-6 text-sm font-semibold text-foreground transition-colors hover:border-muted-foreground hover:text-foreground sm:px-8"
 						>
-							Shop by Goal
+							Browse by Mechanism
 						</a>
 					</div>
 
@@ -388,12 +364,8 @@ function HeroSection() {
 				</div>
 			</div>
 
-			{/* Scroll indicator */}
-			<div className="absolute bottom-8 left-1/2 -translate-x-1/2 animate-bounce">
-				<div className="flex h-10 w-6 justify-center rounded-full border-2 border-muted-foreground pt-2">
-					<div className="h-2 w-1 rounded-full bg-muted-foreground" />
-				</div>
-			</div>
+			{/* Scroll indicator (fades out on first scroll) */}
+			<HeroScrollIndicator />
 		</section>
 	);
 }
@@ -518,8 +490,12 @@ function ScienceQualitySection() {
 }
 
 // ─── 4. Institution Logos Bar ────────────────────────────────
+// Currently hidden from <Page>. Re-enable only after real logos with
+// written permission are available. Renders nothing if `institutions`
+// is empty, so even if re-mounted without data it won't ship fake proof.
 
 function InstitutionLogosBar() {
+	if (institutions.length === 0) return null;
 	return (
 		<section className="border-y border-border bg-card py-12">
 			<div className="mx-auto max-w-7xl px-6">
@@ -541,22 +517,54 @@ function InstitutionLogosBar() {
 	);
 }
 
-// ─── 5. Shop by Goal (top 6, larger cards) ──────────────────
+// ─── 5. Browse by Mechanism (top 6, larger cards) ───────────
 
-async function ShopByGoalSection({ params }: { params: Promise<{ channel: string }> }) {
-	const { channel } = await params;
-	const collections = await getCollections(channel);
+/**
+ * Categories intentionally hidden from the homepage mechanism grid.
+ *
+ * Reasons:
+ *  - `supplies` — accessories (BAC water, acetic acid), surfaced elsewhere
+ *  - `peptide-blends` — pre-mixed preparations. Legitimate mechanism grouping
+ *    exists upstream; blending on the homepage grid telegraphs non-research
+ *    intended use (see memo Section III.A — Warrior Labz case).
+ *  - `cosmetic-injectables`, `metabolic-injectables` — injectable form cohorts
+ *    flagged for stakeholder review; keep off the hero browse grid until the
+ *    catalog composition decision is finalised.
+ *  - `reference-peptides-miscellaneous` — heterogeneous catch-all; uninviting
+ *    on the hero grid. Still reachable via /products and via direct URL.
+ *  - `neuropeptides`, `antimicrobial-peptides` — single-product categories
+ *    today; promote once the catalog grows.
+ *  - `growth-hormone-derivatives` — 3-product category, overlaps conceptually
+ *    with secretagogues for the hero grid audience.
+ *  - `pineal-peptides` — single product.
+ *  - `copper-peptide-complexes` — single product with route-of-admin caveat;
+ *    surface once the description is nailed.
+ */
+const HOMEPAGE_CATEGORY_HIDE_LIST = new Set<string>([
+	"supplies",
+	"peptide-blends",
+	"cosmetic-injectables",
+	"metabolic-injectables",
+	"reference-peptides-miscellaneous",
+	"neuropeptides",
+	"antimicrobial-peptides",
+	"growth-hormone-derivatives",
+	"pineal-peptides",
+	"copper-peptide-complexes",
+]);
 
-	const excludeSlugs = ["accessories"];
-	const displayCollections = collections.filter((c) => !excludeSlugs.includes(c.slug)).slice(0, 6);
+async function BrowseByMechanismSection(_: { params: Promise<{ channel: string }> }) {
+	const categories = await getTopCategories();
 
-	if (displayCollections.length === 0) return null;
+	const displayCategories = categories.filter((c) => !HOMEPAGE_CATEGORY_HIDE_LIST.has(c.slug)).slice(0, 6);
+
+	if (displayCategories.length === 0) return null;
 
 	return (
 		<section
-			id="shop-by-goal"
+			id="browse-by-mechanism"
 			className="noise-overlay relative overflow-hidden bg-background text-foreground"
-			aria-label="Shop by Goal"
+			aria-label="Browse by Mechanism"
 		>
 			{/* Background */}
 			<div className="pointer-events-none absolute inset-0">
@@ -570,9 +578,11 @@ async function ShopByGoalSection({ params }: { params: Promise<{ channel: string
 					<div className="flex items-end justify-between">
 						<div>
 							<p className="mb-4 text-sm font-medium uppercase tracking-[0.25em] text-emerald-400">
-								Research Goals
+								Research Catalog
 							</p>
-							<h2 className="text-3xl font-bold tracking-tight sm:text-4xl lg:text-5xl">Shop by Goal</h2>
+							<h2 className="text-3xl font-bold tracking-tight sm:text-4xl lg:text-5xl">
+								Browse by Mechanism
+							</h2>
 						</div>
 						<LinkWithChannel
 							href="/products"
@@ -586,11 +596,18 @@ async function ShopByGoalSection({ params }: { params: Promise<{ channel: string
 					</div>
 				</div>
 
-				{/* Top 6 collections */}
+				{/* Top mechanism categories */}
 				<div className="grid grid-cols-1 gap-5 sm:grid-cols-2 sm:gap-6 lg:grid-cols-3">
-					{displayCollections.map((collection) => {
-						const description = getCollectionDescription(collection.slug);
-						return <ShopGoalCard key={collection.id} collection={collection} description={description} />;
+					{displayCategories.map((category) => {
+						const description = getCategoryDescription(category.slug);
+						return (
+							<ShopGoalCard
+								key={category.id}
+								collection={category}
+								description={description}
+								hrefBase="/categories"
+							/>
+						);
 					})}
 				</div>
 			</div>
@@ -619,8 +636,13 @@ async function TabbedProductsSection({ params }: { params: Promise<{ channel: st
 }
 
 // ─── 7. Testimonials (single featured) ──────────────────────
+// Currently hidden from <Page>. Re-enable once the `testimonials`
+// array is populated with real, attributable reviews. The component
+// returns null on an empty array so it is safe to re-mount at any
+// time without risking placeholder content shipping.
 
 function TestimonialsSection() {
+	if (testimonials.length === 0) return null;
 	const featured = testimonials[0];
 	const supporting = testimonials.slice(1);
 
@@ -634,19 +656,15 @@ function TestimonialsSection() {
 					<h2 className="text-3xl font-bold tracking-tight sm:text-4xl lg:text-5xl">
 						Trusted by Researchers Worldwide
 					</h2>
-					<p className="mt-3 text-sm text-muted-foreground">
-						4.9/5 average rating across 1,200+ research orders.
-					</p>
+					{/* TODO: Re-add an aggregate rating line here only once backed by a real review dataset */}
 				</div>
 
 				{/* Featured testimonial */}
 				<article className="relative mx-auto max-w-4xl overflow-hidden rounded-2xl border border-border bg-card p-6 text-center sm:rounded-3xl sm:p-12 lg:p-16">
-					{/* Decorative quote */}
 					<div className="pointer-events-none absolute -top-6 left-1/2 -translate-x-1/2 font-serif text-[200px] leading-none text-emerald-500/[0.06]">
 						&ldquo;
 					</div>
 
-					{/* Stars */}
 					<div className="relative mb-8 flex justify-center gap-1">
 						{Array.from({ length: featured.rating }).map((_, s) => (
 							<svg key={s} className="h-6 w-6 text-emerald-500" viewBox="0 0 20 20" fill="currentColor">
@@ -684,70 +702,49 @@ function TestimonialsSection() {
 				</article>
 
 				{/* Supporting quotes */}
-				<div className="mt-6 grid gap-4 sm:mt-8 sm:gap-6 md:grid-cols-2">
-					{supporting.map((t, i) => (
-						<article
-							key={i}
-							className="relative flex flex-col overflow-hidden rounded-2xl border border-border bg-card p-5 sm:p-8"
-						>
-							<div className="mb-4 flex gap-1">
-								{Array.from({ length: t.rating }).map((_, s) => (
-									<svg key={s} className="h-4 w-4 text-emerald-500" viewBox="0 0 20 20" fill="currentColor">
-										<path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
-									</svg>
-								))}
-							</div>
-							<blockquote className="flex-1 text-base leading-relaxed text-muted-foreground">
-								&ldquo;{t.quote}&rdquo;
-							</blockquote>
-							<div className="mt-6 flex items-center gap-3 border-t border-border pt-6">
-								<div className="flex h-10 w-10 items-center justify-center rounded-full bg-emerald-500/10 text-sm font-bold text-emerald-400">
-									{t.author
-										.split(" ")
-										.map((n) => n[0])
-										.join("")}
+				{supporting.length > 0 && (
+					<div className="mt-6 grid gap-4 sm:mt-8 sm:gap-6 md:grid-cols-2">
+						{supporting.map((t, i) => (
+							<article
+								key={i}
+								className="relative flex flex-col overflow-hidden rounded-2xl border border-border bg-card p-5 sm:p-8"
+							>
+								<div className="mb-4 flex gap-1">
+									{Array.from({ length: t.rating }).map((_, s) => (
+										<svg key={s} className="h-4 w-4 text-emerald-500" viewBox="0 0 20 20" fill="currentColor">
+											<path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
+										</svg>
+									))}
 								</div>
-								<div className="flex-1">
-									<p className="text-sm font-semibold text-foreground">{t.author}</p>
-									<p className="text-xs text-muted-foreground">{t.role}</p>
+								<blockquote className="flex-1 text-base leading-relaxed text-muted-foreground">
+									&ldquo;{t.quote}&rdquo;
+								</blockquote>
+								<div className="mt-6 flex items-center gap-3 border-t border-border pt-6">
+									<div className="flex h-10 w-10 items-center justify-center rounded-full bg-emerald-500/10 text-sm font-bold text-emerald-400">
+										{t.author
+											.split(" ")
+											.map((n) => n[0])
+											.join("")}
+									</div>
+									<div className="flex-1">
+										<p className="text-sm font-semibold text-foreground">{t.author}</p>
+										<p className="text-xs text-muted-foreground">{t.role}</p>
+									</div>
+									<span className="inline-flex items-center gap-1 rounded-full bg-emerald-500/10 px-2.5 py-0.5 text-[10px] font-medium text-emerald-400">
+										<svg className="h-3 w-3" viewBox="0 0 20 20" fill="currentColor">
+											<path
+												fillRule="evenodd"
+												d="M16.704 4.153a.75.75 0 01.143 1.052l-8 10.5a.75.75 0 01-1.127.075l-4.5-4.5a.75.75 0 011.06-1.06l3.894 3.893 7.48-9.817a.75.75 0 011.05-.143z"
+												clipRule="evenodd"
+											/>
+										</svg>
+										Verified
+									</span>
 								</div>
-								<span className="inline-flex items-center gap-1 rounded-full bg-emerald-500/10 px-2.5 py-0.5 text-[10px] font-medium text-emerald-400">
-									<svg className="h-3 w-3" viewBox="0 0 20 20" fill="currentColor">
-										<path
-											fillRule="evenodd"
-											d="M16.704 4.153a.75.75 0 01.143 1.052l-8 10.5a.75.75 0 01-1.127.075l-4.5-4.5a.75.75 0 011.06-1.06l3.894 3.893 7.48-9.817a.75.75 0 011.05-.143z"
-											clipRule="evenodd"
-										/>
-									</svg>
-									Verified
-								</span>
-							</div>
-						</article>
-					))}
-				</div>
-
-				{/* Review links */}
-				<div className="mt-10 flex flex-col items-center gap-3 sm:flex-row sm:justify-center sm:gap-8">
-					<LinkWithChannel
-						href="/reviews"
-						className="inline-flex items-center gap-2 text-sm font-medium text-emerald-400 transition-colors hover:text-emerald-300"
-					>
-						Read all reviews
-						<svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-							<path strokeLinecap="round" strokeLinejoin="round" d="M13 7l5 5m0 0l-5 5m5-5H6" />
-						</svg>
-					</LinkWithChannel>
-					<span className="hidden text-border sm:inline">·</span>
-					<LinkWithChannel
-						href="/partners"
-						className="inline-flex items-center gap-2 text-sm font-medium text-muted-foreground transition-colors hover:text-foreground"
-					>
-						See our RUO partners and case studies
-						<svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-							<path strokeLinecap="round" strokeLinejoin="round" d="M13 7l5 5m0 0l-5 5m5-5H6" />
-						</svg>
-					</LinkWithChannel>
-				</div>
+							</article>
+						))}
+					</div>
+				)}
 			</div>
 		</section>
 	);
@@ -802,23 +799,10 @@ function NewsletterSection() {
 							))}
 						</ul>
 
-						<div className="mx-auto mt-10 flex max-w-md flex-col gap-3 sm:flex-row">
-							<input
-								type="email"
-								placeholder="Enter your email"
-								className="h-13 flex-1 rounded-full border border-white/[0.08] bg-white/[0.04] px-6 text-sm text-foreground placeholder-muted-foreground outline-none transition-all focus:border-emerald-500/60 focus:bg-white/[0.06] focus:ring-1 focus:ring-emerald-500/40"
-							/>
-							<button
-								type="button"
-								className="h-13 rounded-full bg-emerald-500 px-8 text-sm font-semibold text-foreground shadow-lg shadow-emerald-500/20 transition-all hover:bg-emerald-400 hover:shadow-xl hover:shadow-emerald-500/30"
-							>
-								Get the Free Guide
-							</button>
-						</div>
+						<NewsletterForm />
 
 						<p className="mt-5 text-xs leading-relaxed text-muted-foreground">
-							Used by lab managers and principal investigators in over 18 countries. No spam. Unsubscribe
-							anytime.
+							No spam. Unsubscribe anytime.
 						</p>
 					</div>
 				</div>
@@ -837,7 +821,7 @@ export default async function Page(props: { params: Promise<{ channel: string }>
 			<HeroSection />
 			<TrustBar />
 
-			<ShopByGoalSection params={props.params} />
+			<BrowseByMechanismSection params={props.params} />
 
 			<TabbedProductsSection params={props.params} />
 
@@ -845,9 +829,15 @@ export default async function Page(props: { params: Promise<{ channel: string }>
 
 			<ScienceQualitySection />
 
-			<InstitutionLogosBar />
-
-			<TestimonialsSection />
+			{/*
+			 * ── Social proof sections — hidden until real data lands ──
+			 * Both components render null on empty data arrays, so re-enable
+			 * by populating `institutions` and `testimonials` above, then
+			 * un-commenting the renders below.
+			 *
+			 * <InstitutionLogosBar />
+			 * <TestimonialsSection />
+			 */}
 
 			<NewsletterSection />
 		</>

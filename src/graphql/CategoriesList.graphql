@@ -5,6 +5,10 @@ query CategoriesList($first: Int!) {
 				id
 				name
 				slug
+				backgroundImage {
+					url
+					alt
+				}
 			}
 		}
 	}

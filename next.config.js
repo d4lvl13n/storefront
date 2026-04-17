@@ -92,6 +92,92 @@ const config = {
 		];
 	},
 
+	/**
+	 * 301 redirects for the April 2026 compliance taxonomy refactor.
+	 *
+	 * Context: "Shop by Goal" benefit-labeled Collections were deleted from Saleor
+	 * and replaced with mechanism-class Categories. Old URLs (bookmarks, indexed
+	 * pages, inbound links) 301 to the closest new Category. Retired benefit
+	 * buckets with no clean mechanism equivalent redirect to the catalog index.
+	 *
+	 * Deleted product URLs (Tesamorelin, Retatrutide, PT-141) also redirect to
+	 * the catalog index rather than returning a bare 404 — clearer UX and
+	 * preserves any residual inbound link equity.
+	 *
+	 * All redirects are keyed against `/:channel/...` patterns because the
+	 * storefront is channel-scoped. `:channel` is captured per Next.js syntax
+	 * and reinserted into the destination.
+	 */
+	async redirects() {
+		// Collection slug → Category slug (closest mechanism match)
+		const collectionToCategory = [
+			{ from: "weight-management", to: "glp-1-receptor-agonists" },
+			{ from: "antiaging-longevity", to: "pineal-peptides" },
+			{ from: "cognitive-mood", to: "nootropic-peptides" },
+			{ from: "growth-recovery", to: "growth-hormone-secretagogues" },
+			{ from: "recovery-healing", to: "cytoprotective-peptides" },
+			{ from: "immune-support", to: "thymic-peptides" },
+			{ from: "tanning-skin", to: "melanocortin-receptor-modulators" },
+			{ from: "aesthetics", to: "copper-peptide-complexes" },
+		];
+
+		// Retired Collections without a clean mechanism home → catalog index
+		const retiredCollections = [
+			"sexual-health",
+			"fertility-hormonal",
+			"performance",
+			"sleep-recovery",
+			"vitamins-supplements",
+		];
+
+		// Category slug renames
+		const categoryRenames = [
+			{ from: "glp1-receptor-agonists", to: "glp-1-receptor-agonists" },
+			{ from: "growth-hormone", to: "growth-hormone-derivatives" },
+			{ from: "hormones", to: "reproductive-hormones" },
+			{ from: "peptides", to: "reference-peptides-miscellaneous" },
+			// `injectables` was split into cosmetic-injectables + metabolic-injectables;
+			// send the legacy URL to the catalog index since we can't know which split
+			// the inbound link intended. `null` destination = redirect to products root.
+			{ from: "injectables", to: null },
+		];
+
+		// Deleted products — redirect slug to catalog index (410 Gone would be
+		// more correct semantically; Next.js `redirects` only supports 30x. The
+		// `gone` flag requires middleware.)
+		const deletedProducts = [
+			"pt-141-bremelanotide",
+			"pt-141",
+			"bremelanotide",
+			"retatrutide",
+			"retratutide",
+			"tesamorelin",
+		];
+
+		return [
+			...collectionToCategory.map(({ from, to }) => ({
+				source: `/:channel/collections/${from}`,
+				destination: `/:channel/categories/${to}`,
+				permanent: true,
+			})),
+			...retiredCollections.map((slug) => ({
+				source: `/:channel/collections/${slug}`,
+				destination: `/:channel/products`,
+				permanent: true,
+			})),
+			...categoryRenames.map(({ from, to }) => ({
+				source: `/:channel/categories/${from}`,
+				destination: to ? `/:channel/categories/${to}` : `/:channel/products`,
+				permanent: true,
+			})),
+			...deletedProducts.map((slug) => ({
+				source: `/:channel/products/${slug}`,
+				destination: `/:channel/products`,
+				permanent: true,
+			})),
+		];
+	},
+
 	// Logging configuration
 	logging: {
 		fetches: {
