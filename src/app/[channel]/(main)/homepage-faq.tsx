@@ -6,7 +6,7 @@ import { cn } from "@/lib/utils";
 const faqItems = [
 	{
 		q: "What purity standards do your peptides meet?",
-		a: "All peptides are verified at ≥98% purity via High-Performance Liquid Chromatography (HPLC). Select compounds are available at ≥99%. Each batch is independently tested by accredited third-party laboratories, and Certificates of Analysis documenting purity, identity, and endotoxin levels are provided with every order.",
+		a: "All peptides are verified at ≥98% purity via High-Performance Liquid Chromatography (HPLC). Select compounds are available at ≥99%. Every batch is independently tested at accredited US laboratories, and Certificates of Analysis documenting purity, identity, and endotoxin levels are provided with every order.",
 	},
 	{
 		q: "How are your products shipped and stored?",

@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { AlertTriangle } from "lucide-react";
 import { buildPageMetadata, buildFaqJsonLd, buildBreadcrumbJsonLd, buildHowToJsonLd } from "@/lib/seo";
 import { CalculatorPageClient } from "@/ui/components/reconstitution/calculator-page-client";
 import { CALCULATOR_FAQ_ITEMS, RECONSTITUTION_STEPS } from "@/ui/components/reconstitution/data";
@@ -24,9 +25,9 @@ export default async function ReconstitutionCalculatorPage(props: { params: Prom
 		{ label: "Reconstitution Calculator", href: `/${channel}/peptide-calculator` },
 	]);
 	const howToJsonLd = buildHowToJsonLd({
-		name: "How to Reconstitute a Peptide Vial",
+		name: "How to Reconstitute a Peptide Vial for In-Vitro Research",
 		description:
-			"Step-by-step guide to reconstituting lyophilized peptides with bacteriostatic water and calculating the correct injection dose using a U-100 insulin syringe.",
+			"Step-by-step guide to reconstituting lyophilized peptides with bacteriostatic water and calculating the correct draw volume using a U-100 syringe for in-vitro research protocols.",
 		totalTime: "PT10M",
 		steps: RECONSTITUTION_STEPS,
 	});
@@ -52,7 +53,7 @@ export default async function ReconstitutionCalculatorPage(props: { params: Prom
 
 			<div className="mx-auto max-w-5xl px-4 py-16 sm:px-6 sm:py-24 lg:px-8">
 				{/* Header */}
-				<div className="mb-10 text-center">
+				<div className="mb-8 text-center">
 					<span className="text-sm font-medium uppercase tracking-[0.25em] text-emerald-400">
 						Research Tool
 					</span>
@@ -60,19 +61,30 @@ export default async function ReconstitutionCalculatorPage(props: { params: Prom
 						Peptide Reconstitution Calculator
 					</h1>
 					<p className="mx-auto mt-4 max-w-2xl text-muted-foreground">
-						Enter your vial size, diluent volume, and desired dose to instantly calculate the exact draw
-						volume and syringe units. No manual unit conversion needed.
+						Enter vial mass, diluent volume, and target dose to calculate the exact draw volume and syringe
+						units for in-vitro reconstitution protocols.
+					</p>
+				</div>
+
+				{/* Research Use Only notice — rendered above the calculator so the
+				    attestation is visible before the tool is used. Visual pattern
+				    matches the PDP RUO banner (product-attributes.tsx) for a
+				    consistent compliance signal across the storefront. */}
+				<div
+					role="note"
+					aria-label="Research use only notice"
+					className="mx-auto mb-10 flex max-w-3xl items-start gap-3 rounded-xl border border-amber-500/20 bg-amber-500/5 px-5 py-4 text-sm leading-relaxed text-amber-700 dark:text-amber-400"
+				>
+					<AlertTriangle className="mt-0.5 h-5 w-5 shrink-0 text-amber-500" aria-hidden="true" />
+					<p>
+						<span className="font-semibold">For Research Use Only.</span> This calculator supports in-vitro
+						reconstitution protocols for research-grade reference compounds. It is not medical advice and must
+						not be used to prepare material for human or animal administration. Always follow applicable laws
+						and institutional research protocols.
 					</p>
 				</div>
 
 				<CalculatorPageClient />
-
-				{/* Disclaimer */}
-				<div className="mt-16 rounded-xl border border-border bg-card px-5 py-4 text-center text-xs leading-relaxed text-muted-foreground">
-					This tool is provided for educational and calculation-support purposes only. It is not intended as
-					individualized medical advice. Always consult qualified professionals and follow applicable
-					regulations for your research application.
-				</div>
 			</div>
 		</section>
 	);

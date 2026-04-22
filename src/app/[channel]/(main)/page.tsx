@@ -320,7 +320,7 @@ function HeroSection() {
 					</h1>
 					<p className="mt-6 max-w-xl animate-fade-in-up-delay-1 text-base leading-relaxed text-foreground opacity-0 sm:mt-8 sm:text-lg">
 						HPLC-verified, 99%+ purity research peptides and biotech compounds. Every batch independently
-						tested. Every order documented with a Certificate of Analysis.
+						tested at accredited US laboratories. Every order documented with a Certificate of Analysis.
 					</p>
 
 					{/* CTAs */}
