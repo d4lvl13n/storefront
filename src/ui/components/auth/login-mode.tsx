@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import Link from "next/link";
-import { useParams, useRouter } from "next/navigation";
+import { useParams, useRouter, useSearchParams } from "next/navigation";
 import { Mail, Lock, Eye, EyeOff } from "lucide-react";
 import { useSaleorAuthContext } from "@saleor/auth-sdk/react";
 import { Input } from "@/ui/components/ui/input";
@@ -10,10 +10,29 @@ import { Label } from "@/ui/components/ui/label";
 
 const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
+/**
+ * Accept only same-origin relative paths in the `?next=` redirect param.
+ * Rejects protocol-relative (`//evil.com/...`), absolute URLs, and anything
+ * that doesn't start with a single `/`. Prevents open-redirect attacks.
+ */
+function isSafeNextPath(value: string | null): value is string {
+	if (!value) return false;
+	if (!value.startsWith("/")) return false;
+	if (value.startsWith("//")) return false;
+	return true;
+}
+
 export function LoginMode() {
 	const router = useRouter();
 	const params = useParams<{ channel: string }>();
+	const searchParams = useSearchParams();
 	const { signIn } = useSaleorAuthContext();
+
+	// Post-login destination: if middleware or a page sent us here with
+	// `?next=/checkout?checkout=...`, land the user back on that URL.
+	// Otherwise fall back to the channel home page.
+	const nextParam = searchParams.get("next");
+	const postLoginDestination = isSafeNextPath(nextParam) ? nextParam : `/${params.channel}`;
 
 	const [email, setEmail] = useState("");
 	const [password, setPassword] = useState("");
@@ -56,7 +75,7 @@ export function LoginMode() {
 			}
 
 			if (result.data?.tokenCreate?.token) {
-				router.push(`/${params.channel}`);
+				router.push(postLoginDestination);
 				router.refresh();
 			}
 		} catch {
@@ -125,7 +144,11 @@ export function LoginMode() {
 						<p className="mt-3 text-sm leading-relaxed text-muted-foreground">
 							Access order history, saved lab addresses, and reorder details.{" "}
 							<Link
-								href={`/${params.channel}/signup`}
+								href={
+									isSafeNextPath(nextParam)
+										? `/${params.channel}/signup?next=${encodeURIComponent(nextParam)}`
+										: `/${params.channel}/signup`
+								}
 								className="font-medium text-foreground underline underline-offset-2 transition-colors hover:text-emerald-400 hover:no-underline"
 							>
 								Create an account

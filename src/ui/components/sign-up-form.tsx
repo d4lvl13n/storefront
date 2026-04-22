@@ -2,14 +2,31 @@
 
 import { useState } from "react";
 import Link from "next/link";
-import { useParams } from "next/navigation";
+import { useParams, useSearchParams } from "next/navigation";
 import { Mail, Lock, Eye, EyeOff, User } from "lucide-react";
 import { Input } from "@/ui/components/ui/input";
 import { Label } from "@/ui/components/ui/label";
 import { cn } from "@/lib/utils";
 
+/** Only accept same-origin relative paths as a post-auth return target. */
+function isSafeNextPath(value: string | null): value is string {
+	if (!value) return false;
+	if (!value.startsWith("/")) return false;
+	if (value.startsWith("//")) return false;
+	return true;
+}
+
 export function SignUpForm() {
 	const params = useParams<{ channel: string }>();
+	const searchParams = useSearchParams();
+
+	// Preserve the `?next=` param across the signup → email verification → login
+	// flow, so a user who arrived at signup via the checkout-auth redirect ends
+	// up back at checkout after signing in for the first time.
+	const nextParam = searchParams.get("next");
+	const loginHref = isSafeNextPath(nextParam)
+		? `/${params.channel}/login?next=${encodeURIComponent(nextParam)}`
+		: `/${params.channel}/login`;
 
 	const [firstName, setFirstName] = useState("");
 	const [lastName, setLastName] = useState("");
@@ -106,7 +123,7 @@ export function SignUpForm() {
 							Please check your email to verify your account before signing in.
 						</p>
 						<Link
-							href={`/${params.channel}/login`}
+							href={loginHref}
 							className="mt-8 inline-flex h-12 items-center justify-center rounded-xl bg-emerald-500 px-8 text-sm font-semibold text-white shadow-lg shadow-emerald-500/20 transition-all hover:bg-emerald-400 hover:shadow-xl hover:shadow-emerald-500/30"
 						>
 							Go to Sign In
@@ -131,7 +148,7 @@ export function SignUpForm() {
 						<p className="mt-3 text-sm leading-relaxed text-muted-foreground">
 							Already have an account?{" "}
 							<Link
-								href={`/${params.channel}/login`}
+								href={loginHref}
 								className="font-medium text-foreground underline underline-offset-2 transition-colors hover:text-emerald-400 hover:no-underline"
 							>
 								Sign in

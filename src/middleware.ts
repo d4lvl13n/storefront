@@ -32,6 +32,37 @@ function requiresResearchGate(pathname: string): boolean {
 	return false;
 }
 
+/**
+ * Authenticated-only checkout guard.
+ *
+ * Frier Levitt memo (April 2026), Section III.B.b — Know-Your-Customer Screening (p. 18):
+ *   "Individuals should be prohibited from opening an account"
+ *
+ * Saleor does not expose a channel-level toggle for guest checkout. The enforcement
+ * happens in the storefront, here. Any request for /checkout without a Saleor
+ * refresh token cookie is redirected to the login page. We deliberately check
+ * cookie PRESENCE only (not validity) — stale cookies are a small edge case and
+ * the frontend will surface the real auth error on the login/checkout pages.
+ *
+ * Refresh-token cookie name is produced by @saleor/auth-sdk using the pattern:
+ *   `{saleorApiUrl}+saleor_auth_module_refresh_token`  →  non-alphanumeric → `_`
+ * (matches `encodeCookieName()` in src/lib/auth/constants.ts).
+ */
+const SALEOR_API_URL = process.env.NEXT_PUBLIC_SALEOR_API_URL ?? "";
+const DEFAULT_CHANNEL = process.env.NEXT_PUBLIC_DEFAULT_CHANNEL ?? "default-channel";
+
+function encodeCookieName(key: string): string {
+	return key.replace(/[^a-zA-Z0-9_-]/g, "_");
+}
+
+const REFRESH_TOKEN_COOKIE = SALEOR_API_URL
+	? encodeCookieName(`${SALEOR_API_URL}+saleor_auth_module_refresh_token`)
+	: null;
+
+function requiresAuth(pathname: string): boolean {
+	return pathname === "/checkout" || pathname.startsWith("/checkout/");
+}
+
 export function middleware(request: NextRequest) {
 	const url = request.nextUrl;
 
@@ -47,7 +78,26 @@ export function middleware(request: NextRequest) {
 		return NextResponse.redirect(redirectUrl);
 	}
 
-	// ── 2. Affiliate referral capture ──
+	// ── 2. Authenticated-only checkout: block guest purchase ──
+	//
+	// Redirects unauthenticated visitors hitting /checkout to the login page
+	// with a ?next=<original-path> so they return to the same checkout after
+	// signing in. Crawlers skip this check (the checkout route is noindex
+	// anyway, and redirecting crawlers to login creates a redirect loop on
+	// the login page for bots that follow).
+	if (REFRESH_TOKEN_COOKIE && !isCrawler && requiresAuth(url.pathname)) {
+		const hasRefreshToken = request.cookies.has(REFRESH_TOKEN_COOKIE);
+		if (!hasRefreshToken) {
+			const next = url.pathname + url.search;
+			const loginUrl = url.clone();
+			loginUrl.pathname = `/${DEFAULT_CHANNEL}/login`;
+			loginUrl.search = "";
+			loginUrl.searchParams.set("next", next);
+			return NextResponse.redirect(loginUrl);
+		}
+	}
+
+	// ── 3. Affiliate referral capture ──
 	const ref = url.searchParams.get("ref");
 	if (!ref) return NextResponse.next();
 
