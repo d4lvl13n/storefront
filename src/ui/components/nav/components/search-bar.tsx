@@ -11,7 +11,7 @@ export const SearchBar = ({ channel }: { channel: string }) => {
 	}
 
 	return (
-		<form action={onSubmit} className="group relative w-full max-w-md">
+		<form action={onSubmit} className="group relative w-full max-w-[25rem]">
 			<label className="relative block">
 				<span className="sr-only">Search for products</span>
 				{/* Search icon */}

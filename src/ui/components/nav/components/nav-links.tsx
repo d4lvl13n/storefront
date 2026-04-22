@@ -13,12 +13,11 @@ export const NavLinks = async ({ channel }: { channel: string }) => {
 		// During build, if the API is unreachable, render minimal nav.
 		// The page will re-fetch when a user visits.
 		console.warn(`[NavLinks] Failed to fetch navigation for ${channel}:`, result.error.message);
-		return <NavLink href="/products">All</NavLink>;
+		return null;
 	}
 
 	return (
 		<>
-			<NavLink href="/products">All</NavLink>
 			{result.data.menu?.items?.map((item) => {
 				if (item.category) {
 					return (

@@ -28,9 +28,11 @@ const ESFlag = () => (
 	</svg>
 );
 
-const LOCALES: Locale[] = [
+type LocaleWithState = Locale & { disabled?: boolean; hint?: string };
+
+const LOCALES: LocaleWithState[] = [
 	{ code: "en-US", label: "English (US)", flag: <USFlag /> },
-	{ code: "es", label: "Español", flag: <ESFlag /> },
+	{ code: "es", label: "Español", flag: <ESFlag />, disabled: true, hint: "Coming soon" },
 ];
 
 const COOKIE_NAME = "preferred_locale";
@@ -83,6 +85,8 @@ export function LanguageSwitcher() {
 	const active = LOCALES.find((l) => l.code === current) ?? LOCALES[0];
 
 	function selectLocale(code: string) {
+		const target = LOCALES.find((l) => l.code === code);
+		if (target?.disabled) return;
 		setCurrent(code);
 		setCookie(COOKIE_NAME, code);
 		setOpen(false);
@@ -119,24 +123,33 @@ export function LanguageSwitcher() {
 			{open && (
 				<ul
 					role="listbox"
-					className="absolute right-0 z-50 mt-2 min-w-[180px] overflow-hidden rounded-lg border border-border bg-popover py-1 shadow-lg"
+					className="absolute right-0 z-50 mt-2 min-w-[220px] overflow-hidden rounded-lg border border-border bg-popover py-1 shadow-lg"
 				>
 					{LOCALES.map((locale) => {
 						const isActive = locale.code === current;
+						const isDisabled = Boolean(locale.disabled);
 						return (
-							<li key={locale.code} role="option" aria-selected={isActive}>
+							<li key={locale.code} role="option" aria-selected={isActive} aria-disabled={isDisabled}>
 								<button
 									type="button"
 									onClick={() => selectLocale(locale.code)}
+									disabled={isDisabled}
 									className={`flex w-full items-center gap-2.5 px-3 py-2 text-left text-sm transition-colors ${
-										isActive
-											? "bg-accent text-foreground"
-											: "text-muted-foreground hover:bg-accent hover:text-foreground"
+										isDisabled
+											? "text-muted-foreground/60 cursor-not-allowed"
+											: isActive
+												? "bg-accent text-foreground"
+												: "text-muted-foreground hover:bg-accent hover:text-foreground"
 									}`}
 								>
 									{locale.flag}
 									<span>{locale.label}</span>
-									{isActive && (
+									{locale.hint && (
+										<span className="ml-1 rounded-full bg-amber-500/10 px-2 py-0.5 text-[10px] font-medium uppercase tracking-wide text-amber-400">
+											{locale.hint}
+										</span>
+									)}
+									{isActive && !isDisabled && (
 										<svg
 											className="ml-auto h-4 w-4 text-emerald-400"
 											viewBox="0 0 20 20"

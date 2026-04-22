@@ -8,6 +8,7 @@ import { SearchBar } from "./nav/components/search-bar";
 import { ScrollHeader } from "./scroll-header";
 import { ThemeToggle } from "./theme-toggle";
 import { LanguageSwitcher } from "./language-switcher";
+import { LinkWithChannel } from "@/ui/atoms/link-with-channel";
 
 function SearchBarSkeleton() {
 	return <div className="h-10 w-full max-w-md animate-pulse rounded-lg bg-secondary" />;
@@ -37,11 +38,17 @@ export async function Header({ channel }: { channel: string }) {
 					{/* Logo - no Suspense needed (simple server component) */}
 					<Logo className="-my-2 h-14 w-auto sm:-my-1 sm:h-16 lg:-my-2 lg:h-20" />
 
-					{/* Search bar - Suspense for server action */}
-					<div className="hidden flex-1 justify-center md:flex">
+					{/* Search bar + All shortcut - Suspense for server action */}
+					<div className="hidden flex-1 items-center justify-center gap-3 md:flex">
 						<Suspense fallback={<SearchBarSkeleton />}>
 							<SearchBar channel={channel} />
 						</Suspense>
+						<LinkWithChannel
+							href="/products"
+							className="hover:bg-secondary/80 inline-flex h-10 shrink-0 items-center justify-center rounded-lg border border-border bg-secondary px-3 text-sm font-medium text-foreground transition-colors hover:border-emerald-500/40"
+						>
+							All
+						</LinkWithChannel>
 					</div>
 
 					{/* Navigation - Suspense for cached data + client active state */}
