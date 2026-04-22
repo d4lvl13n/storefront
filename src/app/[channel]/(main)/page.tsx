@@ -319,9 +319,9 @@ function HeroSection() {
 						</span>
 					</h1>
 					<p className="mt-6 max-w-xl animate-fade-in-up-delay-1 text-base leading-relaxed text-foreground opacity-0 sm:mt-8 sm:text-lg">
-						HPLC-verified, 99%+ purity research peptides and biotech compounds. Every batch independently
-						tested at accredited US laboratories. Every order documented with a Certificate of Analysis. Every
-						order is fully traceable and ships with its original Certificate of Analysis, issued in the USA.
+						HPLC-verified research peptides and biotech compounds with 99%+ purity. Every batch is
+						independently tested by accredited U.S. laboratories. Every order is fully traceable and ships
+						with its original U.S.-issued Certificate of Analysis.
 					</p>
 
 					{/* CTAs */}

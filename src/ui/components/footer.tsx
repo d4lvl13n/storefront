@@ -65,7 +65,9 @@ export async function Footer({ channel }: { channel: string }) {
 							<Logo className="h-10 w-auto sm:h-14" />
 						</Link>
 						<p className="mt-4 max-w-xs text-sm leading-relaxed text-muted-foreground">
-							Premium research peptides and biotech compounds. Lab-verified purity you can trust.
+							USA premium research peptides and biotech compounds. Every product is tested and verified by
+							trusted US labs — purity (HPLC and MS), endotoxins, heavy metals, microbial safety, and spectral
+							analysis — to guarantee the integrity of your research results.
 						</p>
 					</div>
 
