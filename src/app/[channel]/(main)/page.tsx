@@ -320,7 +320,8 @@ function HeroSection() {
 					</h1>
 					<p className="mt-6 max-w-xl animate-fade-in-up-delay-1 text-base leading-relaxed text-foreground opacity-0 sm:mt-8 sm:text-lg">
 						HPLC-verified, 99%+ purity research peptides and biotech compounds. Every batch independently
-						tested at accredited US laboratories. Every order documented with a Certificate of Analysis.
+						tested at accredited US laboratories. Every order documented with a Certificate of Analysis. Every
+						order is fully traceable and ships with its original Certificate of Analysis, issued in the USA.
 					</p>
 
 					{/* CTAs */}
@@ -432,6 +433,11 @@ function ScienceQualitySection() {
 					</h2>
 					<p className="mx-auto mt-6 max-w-xl text-lg leading-relaxed text-muted-foreground">
 						From synthesis to your lab bench, every compound undergoes rigorous multi-stage verification.
+					</p>
+					<p className="mx-auto mt-4 max-w-2xl text-base leading-relaxed text-muted-foreground">
+						USA premium research peptides and biotech compounds. Every product is tested and verified by
+						trusted US labs — purity (HPLC and MS), endotoxins, heavy metals, microbial safety, and spectral
+						analysis — to guarantee the integrity of your research results.
 					</p>
 				</div>
 

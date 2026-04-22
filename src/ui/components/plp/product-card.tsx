@@ -14,6 +14,8 @@ export interface ProductCardData {
 	slug: string;
 	brand?: string | null;
 	price: number;
+	/** Maximum price in the variant range (used for "from X – Y" display) */
+	maxPrice?: number | null;
 	compareAtPrice?: number | null;
 	currency: string;
 	image: string;
@@ -24,6 +26,10 @@ export interface ProductCardData {
 	colors?: { name: string; hex: string }[];
 	/** Available sizes for filtering (e.g., ["S", "M", "L"]) */
 	sizes?: string[];
+	/** Available concentrations / doses (e.g., ["5mg", "10mg"]) */
+	concentrations?: string[];
+	/** True when the product offers bulk / qty-based pricing (variant spread or metadata flag) */
+	hasQtyDiscount?: boolean;
 	/** Category for filtering */
 	category?: { id: string; name: string; slug: string } | null;
 	/** ISO date string for "newest" sorting */
@@ -135,7 +141,33 @@ export function ProductCard({ product, priority = false }: ProductCardProps) {
 							</div>
 						)}
 
-						<div className="mt-2 flex items-center gap-2">
+						{product.concentrations && product.concentrations.length > 0 && (
+							<div
+								className="mt-2 flex flex-wrap items-center gap-1"
+								aria-label={`Available concentrations: ${product.concentrations.join(", ")}`}
+							>
+								{product.concentrations.slice(0, 4).map((dose) => (
+									<span
+										key={dose}
+										className="rounded-full border border-emerald-500/20 bg-emerald-500/10 px-2 py-0.5 font-mono text-[11px] font-medium text-emerald-400"
+									>
+										{dose}
+									</span>
+								))}
+								{product.concentrations.length > 4 && (
+									<span className="text-[11px] text-muted-foreground">
+										+{product.concentrations.length - 4}
+									</span>
+								)}
+							</div>
+						)}
+
+						<div className="mt-2 flex items-baseline gap-2">
+							{product.maxPrice && product.maxPrice > product.price ? (
+								<span className="text-xs font-medium uppercase tracking-wide text-muted-foreground">
+									From
+								</span>
+							) : null}
 							<span className="font-semibold text-foreground">
 								{formatPrice(product.price, product.currency)}
 							</span>
@@ -145,6 +177,19 @@ export function ProductCard({ product, priority = false }: ProductCardProps) {
 								</span>
 							)}
 						</div>
+
+						{product.hasQtyDiscount && (
+							<p className="mt-1.5 inline-flex items-center gap-1 text-[11px] font-medium text-emerald-400">
+								<svg className="h-3 w-3" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
+									<path
+										fillRule="evenodd"
+										d="M10 18a8 8 0 100-16 8 8 0 000 16zm.707-11.707a1 1 0 00-1.414 0L7.586 8H6a1 1 0 100 2h1.586l-.293.293a1 1 0 101.414 1.414l2-2a1 1 0 000-1.414l-2-2z"
+										clipRule="evenodd"
+									/>
+								</svg>
+								Bulk pricing available
+							</p>
+						)}
 					</div>
 				</div>
 			</Link>

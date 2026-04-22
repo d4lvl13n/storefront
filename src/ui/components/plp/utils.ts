@@ -52,11 +52,56 @@ function extractSizesFromVariants(variants: ProductListItemFragment["variants"])
 	return sortSizes(Array.from(sizeSet));
 }
 
+const CONCENTRATION_SLUGS = new Set([
+	"concentration",
+	"strength",
+	"dose",
+	"dosage",
+	"potency",
+	"amount",
+	"mg",
+]);
+
+function isConcentrationAttribute(slug: string): boolean {
+	return CONCENTRATION_SLUGS.has(slug.toLowerCase());
+}
+
+// Matches values like "5mg", "10 mg", "250mcg", "1000 IU", "2.5 mg"
+const DOSE_LIKE = /^\s*\d+(?:[.,]\d+)?\s*(mg|mcg|µg|ug|g|iu|ml)\s*$/i;
+
+function extractConcentrationsFromVariants(variants: ProductListItemFragment["variants"]): string[] {
+	const doses = new Set<string>();
+
+	variants?.forEach((variant) => {
+		variant.selectionAttributes?.forEach((attr) => {
+			const slug = attr.attribute?.slug ?? "";
+			const isExplicit = isConcentrationAttribute(slug);
+
+			attr.values?.forEach((value) => {
+				const name = value.name?.trim();
+				if (!name) return;
+				if (isExplicit || DOSE_LIKE.test(name)) {
+					doses.add(name);
+				}
+			});
+		});
+	});
+
+	// Sort numerically by leading number when possible
+	return Array.from(doses).sort((a, b) => {
+		const numA = parseFloat(a.replace(",", "."));
+		const numB = parseFloat(b.replace(",", "."));
+		if (Number.isFinite(numA) && Number.isFinite(numB)) return numA - numB;
+		return a.localeCompare(b);
+	});
+}
+
 /**
  * Transform Saleor product data to ProductCard format
  */
 export function transformToProductCard(product: ProductListItemFragment, channel: string): ProductCardData {
 	const startPrice = product.pricing?.priceRange?.start?.gross;
+	const stopPrice = product.pricing?.priceRange?.stop?.gross;
 	const undiscountedStartPrice = product.pricing?.priceRangeUndiscounted?.start?.gross;
 
 	// Use centralized pricing logic to detect if ANY variant is on sale
@@ -68,13 +113,21 @@ export function transformToProductCard(product: ProductListItemFragment, channel
 	// Extract colors and sizes from variants
 	const colors = extractColorsFromVariants(product.variants);
 	const sizes = extractSizesFromVariants(product.variants);
+	const concentrations = extractConcentrationsFromVariants(product.variants);
+
+	const minAmount = startPrice?.amount ?? 0;
+	const maxAmount = stopPrice?.amount ?? null;
+	// Bulk / qty-based pricing is surfaced whenever variants span a price range
+	// (typical for peptides: 5mg / 10mg / 20mg at descending $/mg).
+	const hasQtyDiscount = maxAmount != null && maxAmount > minAmount;
 
 	return {
 		id: product.id,
 		name: product.name,
 		slug: product.slug,
 		brand: product.category?.name ?? null,
-		price: startPrice?.amount ?? 0,
+		price: minAmount,
+		maxPrice: maxAmount,
 		compareAtPrice: isSale ? undiscountedStartPrice?.amount : null,
 		currency: startPrice?.currency ?? localeConfig.fallbackCurrency,
 		image: product.thumbnail?.url ?? "/placeholder.svg",
@@ -84,6 +137,8 @@ export function transformToProductCard(product: ProductListItemFragment, channel
 		badge: isSale ? "Sale" : null,
 		colors,
 		sizes,
+		concentrations,
+		hasQtyDiscount,
 		category: product.category
 			? { id: product.category.id, name: product.category.name, slug: product.category.slug }
 			: null,
