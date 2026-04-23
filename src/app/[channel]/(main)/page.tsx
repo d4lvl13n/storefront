@@ -371,7 +371,55 @@ function HeroSection() {
 	);
 }
 
-// ─── 2. Trust Bar ───────────────────────────────────────────
+// ─── 2. Guarantee Strip (static, 3-up, high-visibility) ─────
+
+function GuaranteeStrip() {
+	const guarantees = [
+		{
+			icon: IconTruck,
+			title: "Ships in 24h",
+			subtitle: "Same-day dispatch, Mon–Fri",
+		},
+		{
+			icon: IconShield,
+			title: "Free shipping $150+",
+			subtitle: "Insured, tracked U.S. delivery",
+		},
+		{
+			icon: IconCertificate,
+			title: "99% purity guaranteed",
+			subtitle: "Or your money back",
+		},
+	];
+
+	return (
+		<section aria-label="Shipping and guarantee" className="border-b border-border bg-card">
+			<div className="mx-auto grid max-w-7xl grid-cols-1 gap-0 px-6 sm:grid-cols-3">
+				{guarantees.map((g, i) => {
+					const Icon = g.icon;
+					return (
+						<div
+							key={g.title}
+							className={`flex items-center gap-4 py-5 sm:justify-center sm:py-6 ${
+								i < guarantees.length - 1 ? "border-b border-border sm:border-b-0 sm:border-r" : ""
+							}`}
+						>
+							<span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-emerald-500/10 text-emerald-400">
+								<Icon className="h-5 w-5" />
+							</span>
+							<div className="text-left">
+								<p className="text-sm font-semibold text-foreground">{g.title}</p>
+								<p className="text-xs text-muted-foreground">{g.subtitle}</p>
+							</div>
+						</div>
+					);
+				})}
+			</div>
+		</section>
+	);
+}
+
+// ─── 2b. Trust Bar (scrolling marquee) ──────────────────────
 
 function TrustBar() {
 	const items = [...trustItems, ...trustItems];
@@ -778,15 +826,20 @@ function NewsletterSection() {
 
 				<div className="noise-overlay relative px-6 py-14 text-center sm:px-10 sm:py-20 lg:px-20 lg:py-24">
 					<div className="relative">
-						<p className="mb-5 text-xs font-semibold uppercase tracking-[0.25em] text-emerald-400">
-							Free Resource
+						<p className="mb-5 inline-flex items-center gap-2 rounded-full border border-emerald-500/30 bg-emerald-500/10 px-3 py-1 text-xs font-semibold uppercase tracking-[0.2em] text-emerald-400">
+							<span>Welcome offer</span>
+							<span className="h-1 w-1 rounded-full bg-emerald-400/60" aria-hidden="true" />
+							<span>15% off + free guide</span>
 						</p>
 						<h2 className="text-3xl font-bold tracking-tight text-foreground sm:text-4xl lg:text-5xl">
-							Free Peptide Stability &amp; Storage Guide
+							Get 15% off your first order —
+							<br className="hidden sm:inline" /> plus our Peptide Stability &amp; Storage Guide.
 						</h2>
 						<p className="mx-auto mt-5 max-w-lg text-base leading-relaxed text-muted-foreground">
-							Get our 20‑page reference guide on peptide reconstitution, storage protocols and stability data
-							— plus early access to new compound launches.
+							Subscribe and instantly unlock a{" "}
+							<span className="font-semibold text-foreground">15% welcome code</span> plus our 20-page
+							reference on reconstitution, storage protocols and stability data — and early access to new
+							compound launches.
 						</p>
 
 						{/* Checklist */}
@@ -838,11 +891,12 @@ export default async function Page(props: { params: Promise<{ channel: string }>
 	return (
 		<>
 			<HeroSection />
+			<GuaranteeStrip />
 			<TrustBar />
 
-			<BrowseByMechanismSection params={props.params} />
-
 			<TabbedProductsSection params={props.params} />
+
+			<BrowseByMechanismSection params={props.params} />
 
 			<HowOrderingWorks />
 
