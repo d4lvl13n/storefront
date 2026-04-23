@@ -12,9 +12,11 @@ const defaultFooterLinks = {
 		{ label: "Contact Us", href: "/contact" },
 		{ label: "FAQs", href: "/faq" },
 		{ label: "About", href: "/about" },
-		{ label: "Affiliate Program", href: "/affiliate" },
 	],
-	tools: [{ label: "Peptide Calculator", href: "/peptide-calculator" }],
+	tools: [
+		{ label: "Peptide Calculator", href: "/peptide-calculator" },
+		{ label: "Partner Program", href: "/affiliate" },
+	],
 	legal: [
 		{ label: "Privacy Policy", href: "/privacy" },
 		{ label: "Terms of Service", href: "/terms" },
@@ -169,7 +171,9 @@ export async function Footer({ channel }: { channel: string }) {
 										</li>
 									))}
 								</ul>
-								<h4 className="mb-4 mt-8 text-sm font-medium text-foreground">Legal</h4>
+							</div>
+							<div>
+								<h4 className="mb-4 text-sm font-medium text-foreground">Legal</h4>
 								<ul className="space-y-3">
 									{defaultFooterLinks.legal.map((link) => (
 										<li key={link.href}>
@@ -257,7 +261,7 @@ export async function Footer({ channel }: { channel: string }) {
 								prefetch={false}
 								className="text-xs text-muted-foreground transition-colors hover:text-foreground"
 							>
-								Affiliate Program
+								Partner Program
 							</LinkWithChannel>
 							<LinkWithChannel
 								href="/privacy"
