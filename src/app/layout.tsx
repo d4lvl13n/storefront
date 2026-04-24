@@ -5,6 +5,7 @@ import { type ReactNode } from "react";
 import { Analytics } from "@vercel/analytics/react";
 import { DraftModeNotification } from "@/ui/components/draft-mode-notification";
 import { GoogleAnalytics } from "@/ui/components/google-analytics";
+import { Klaviyo } from "@/ui/components/klaviyo";
 import { ThemeProvider } from "@/ui/providers/theme-provider";
 import { ResearchGate } from "@/ui/components/research-gate";
 import { rootMetadata } from "@/lib/seo";
@@ -32,6 +33,7 @@ export default function RootLayout(props: { children: ReactNode }) {
 				</ThemeProvider>
 				<DraftModeNotification />
 				<GoogleAnalytics />
+				<Klaviyo />
 				<Analytics />
 			</body>
 		</html>
