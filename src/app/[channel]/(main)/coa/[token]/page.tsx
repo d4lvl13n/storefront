@@ -214,10 +214,13 @@ function PdfEmbed({ coa }: { coa: PublicCoa }) {
 				/>
 			</div>
 
-			{/* Integrity panel */}
+			{/* Integrity panel — optional, for users who want to confirm the
+			    downloaded file is byte-identical to what the lab issued. Copy
+			    written to be intelligible without a tech background; the actual
+			    command is reserved for users who'll know what to do with it. */}
 			<details className="bg-card/30 group rounded-xl border border-border p-4">
 				<summary className="flex cursor-pointer items-center justify-between text-xs font-medium uppercase tracking-[0.18em] text-muted-foreground transition-colors hover:text-foreground">
-					<span>Verify PDF integrity (advanced)</span>
+					<span>Confirm this PDF is the original</span>
 					<svg
 						className="h-3 w-3 transition-transform group-open:rotate-180"
 						viewBox="0 0 12 12"
@@ -233,14 +236,33 @@ function PdfEmbed({ coa }: { coa: PublicCoa }) {
 						/>
 					</svg>
 				</summary>
-				<div className="mt-3 space-y-2 text-xs leading-relaxed text-muted-foreground">
+				<div className="mt-3 space-y-3 text-xs leading-relaxed text-muted-foreground">
 					<p>
-						The lab issued this COA with the SHA-256 fingerprint below. After downloading the PDF you can hash
-						it locally and confirm it matches.
+						Each COA has a unique &ldquo;digital fingerprint&rdquo; — like a tamper-evident seal. If even one
+						character of the PDF changes, the fingerprint changes too. We published this fingerprint the day
+						the batch was tested:
 					</p>
-					<p className="select-all break-all font-mono text-foreground">{coa.pdfSha256}</p>
-					<p className="text-[11px]">
-						On macOS / Linux: <code className="font-mono">shasum -a 256 your-coa.pdf</code>
+					<p className="bg-secondary/60 select-all break-all rounded-md px-3 py-2 font-mono text-foreground">
+						{coa.pdfSha256}
+					</p>
+					<p>
+						If you&rsquo;re archiving the document or auditing your supply chain, you can check that the file
+						you downloaded matches:
+					</p>
+					<ul className="space-y-1.5 pl-4">
+						<li>
+							<span className="text-foreground">Mac or Linux:</span> open Terminal, run{" "}
+							<code className="font-mono text-foreground">shasum -a 256 your-coa.pdf</code>
+						</li>
+						<li>
+							<span className="text-foreground">Windows:</span> open PowerShell, run{" "}
+							<code className="font-mono text-foreground">Get-FileHash your-coa.pdf -Algorithm SHA256</code>
+						</li>
+					</ul>
+					<p>
+						The output should be the same string as above. If it isn&rsquo;t,{" "}
+						<span className="text-foreground">stop using the file and contact us</span> — the copy you have
+						isn&rsquo;t the one we issued.
 					</p>
 				</div>
 			</details>
