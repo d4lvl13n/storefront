@@ -211,11 +211,6 @@ function PdfEmbed({ coa }: { coa: PublicCoa }) {
 					// a preview which still renders fine. The Download PDF link above is
 					// the reliable fallback.
 					referrerPolicy="no-referrer"
-					// Defence in depth: if the registry ever served HTML at this URL
-					// (misconfig or compromise), the sandbox prevents arbitrary script
-					// execution, popups, and form submissions. Browsers' built-in PDF
-					// viewers still work under sandbox.
-					sandbox=""
 				/>
 			</div>
 

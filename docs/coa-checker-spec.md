@@ -254,7 +254,7 @@ COA tokens must stay online even after newer audits are uploaded.
      PDF route. The storefront and Saleor backend are different origins
      (`infinitybiolabs.com` vs `api.infinitybiolabs.com`), so `SAMEORIGIN`
      would block the inline PDF. If using CSP, set:
-     `Content-Security-Policy: frame-ancestors https://infinitybiolabs.com`.
+     `Content-Security-Policy: frame-ancestors https://infinitybiolabs.com https://www.infinitybiolabs.com`.
    - **Indexing:** send `X-Robots-Tag: noindex, nofollow, noarchive` for COA
      PDFs and JSON records.
    - **Backups:** include the COA directory in the existing Postgres backup
