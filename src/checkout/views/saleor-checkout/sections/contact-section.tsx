@@ -3,7 +3,12 @@
 import { type FC } from "react";
 import { Label } from "@/ui/components/ui/label";
 import { Checkbox } from "@/ui/components/ui/checkbox";
-import { SignedInUser, GuestContact } from "@/checkout/components/contact";
+import {
+	SignedInUser,
+	GuestContact,
+	BuyerTypeSelect,
+	type BuyerTypeValue,
+} from "@/checkout/components/contact";
 
 // User type matching what useUser() returns
 type User = {
@@ -40,6 +45,10 @@ interface ContactSectionProps {
 	// Subscribe state (guests)
 	subscribeNews: boolean;
 	onSubscribeChange: (value: boolean) => void;
+
+	// Buyer type (optional, all users)
+	buyerType: BuyerTypeValue;
+	onBuyerTypeChange: (value: BuyerTypeValue) => void;
 }
 
 // =============================================================================
@@ -62,6 +71,8 @@ export const ContactSection: FC<ContactSectionProps> = ({
 	passwordError,
 	subscribeNews,
 	onSubscribeChange,
+	buyerType,
+	onBuyerTypeChange,
 }) => {
 	return (
 		<section className="space-y-4">
@@ -69,6 +80,7 @@ export const ContactSection: FC<ContactSectionProps> = ({
 				<>
 					<h2 className="text-xl font-semibold">Contact</h2>
 					<SignedInUser user={user} onSignOut={onSignOut} />
+					<BuyerTypeSelect value={buyerType} onChange={onBuyerTypeChange} />
 				</>
 			) : (
 				<>
@@ -84,6 +96,8 @@ export const ContactSection: FC<ContactSectionProps> = ({
 						onPasswordChange={onPasswordChange}
 						passwordError={passwordError}
 					/>
+
+					<BuyerTypeSelect value={buyerType} onChange={onBuyerTypeChange} />
 
 					{/* Subscribe checkbox (only for guests not creating account) */}
 					{!createAccount && (

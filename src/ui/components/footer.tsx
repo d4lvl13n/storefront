@@ -11,11 +11,13 @@ import { PaymentBadges } from "./payment-badges";
 const defaultFooterLinks = {
 	support: [
 		{ label: "Contact Us", href: "/contact" },
+		{ label: "Track Order", href: "/track-order" },
 		{ label: "FAQs", href: "/faq" },
 		{ label: "About", href: "/about" },
 	],
 	tools: [
 		{ label: "Peptide Calculator", href: "/peptide-calculator" },
+		{ label: "Research Library", href: "/research-library" },
 		{ label: "Partner Program", href: "/affiliate" },
 	],
 	legal: [

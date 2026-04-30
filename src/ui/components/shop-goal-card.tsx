@@ -125,16 +125,16 @@ function getGoalMeta(slug: string) {
 function OrbitalScene() {
 	return (
 		<div className="absolute inset-0 overflow-hidden">
-			<div className="absolute left-8 top-7 h-16 w-16 rounded-full border border-emerald-500/20 [animation:ib-goal-pulse_5.8s_ease-in-out_infinite]" />
-			<div className="absolute left-[2.15rem] top-[2.05rem] h-12 w-12 rounded-full border border-border" />
-			<div className="absolute left-8 top-7 h-16 w-16 [animation:ib-goal-orbit_14s_linear_infinite]">
+			<div className="absolute left-8 top-8 h-16 w-16 rounded-full border border-emerald-500/20 [animation:ib-goal-pulse_5.8s_ease-in-out_infinite]" />
+			<div className="absolute left-10 top-10 h-12 w-12 rounded-full border border-border" />
+			<div className="absolute left-8 top-8 h-16 w-16 [animation:ib-goal-orbit_14s_linear_infinite]">
 				<span className="absolute -right-1 top-6 h-2.5 w-2.5 rounded-full bg-emerald-400/80 shadow-[0_0_18px_rgba(52,211,153,0.45)]" />
 			</div>
-			<div className="absolute right-10 top-8 flex items-center gap-2 font-mono text-[10px] uppercase tracking-[0.18em] text-muted-foreground">
+			<div className="absolute right-8 top-8 flex items-center gap-2 font-mono text-[10px] uppercase tracking-[0.18em] text-muted-foreground">
 				<span className="h-1.5 w-1.5 rounded-full bg-emerald-400/70" />
 				Multi-stage verified
 			</div>
-			<div className="absolute inset-x-8 bottom-8 h-px bg-gradient-to-r from-transparent via-emerald-400/30 to-transparent" />
+			<div className="absolute inset-x-8 bottom-10 h-px bg-gradient-to-r from-transparent via-emerald-400/30 to-transparent" />
 			<div className="absolute bottom-8 left-8 right-8 flex items-end gap-2">
 				{[44, 76, 58, 90, 64, 82].map((height, index) => (
 					<span
@@ -259,7 +259,7 @@ function AuraScene() {
 					</span>
 				))}
 			</div>
-			<div className="absolute inset-x-8 bottom-10 flex items-center justify-between">
+			<div className="absolute inset-x-8 bottom-8 flex items-center justify-between">
 				{[0, 1, 2, 3].map((index) => (
 					<span
 						key={index}
@@ -404,11 +404,9 @@ export function ShopGoalCard({
 					</span>
 				</div>
 
-				{description ? (
-					<p className="mt-4 min-h-[72px] max-w-[34ch] text-sm leading-6 text-muted-foreground transition-colors duration-500 group-hover:text-muted-foreground">
-						{description}
-					</p>
-				) : null}
+				<p className="mt-4 min-h-[72px] max-w-[34ch] text-sm leading-6 text-muted-foreground transition-colors duration-500 group-hover:text-muted-foreground">
+					{description ?? ""}
+				</p>
 
 				<div className="relative mt-6 h-[152px] shrink-0 overflow-hidden rounded-[1.5rem] border border-white/5 bg-black/25 sm:h-[164px]">
 					<div className="absolute inset-0 transition-all duration-700 group-hover:scale-[1.02] group-hover:opacity-80">

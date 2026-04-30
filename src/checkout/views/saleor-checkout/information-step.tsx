@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useEffect, useCallback, type FC } from "react";
+import { useMutation, gql } from "urql";
 import { useRouter, useSearchParams } from "next/navigation";
 import { Button } from "@/ui/components/ui/button";
 import { ExpressCheckout } from "@/checkout/components/express-checkout";
@@ -11,6 +12,22 @@ import {
 	useCheckoutShippingAddressUpdateMutation,
 	useUserRegisterMutation,
 } from "@/checkout/graphql";
+import { BUYER_TYPE_METADATA_KEY, type BuyerTypeValue } from "@/checkout/components/contact";
+
+// Inline metadata mutation. The typed hook (useCheckoutMetadataUpdateMutation)
+// will be generated from src/checkout/graphql/checkout.graphql on the next
+// codegen run; until then we call updateMetadata directly.
+const CHECKOUT_METADATA_UPDATE = gql`
+	mutation checkoutMetadataUpdate($checkoutId: ID!, $input: [MetadataInput!]!) {
+		updateMetadata(id: $checkoutId, input: $input) {
+			errors {
+				field
+				message
+				code
+			}
+		}
+	}
+`;
 import { useAvailableShippingCountries } from "@/checkout/hooks/use-available-shipping-countries";
 import { useAddressFormUtils } from "@/checkout/components/address-form/use-address-form-utils";
 import {
@@ -58,6 +75,10 @@ export const InformationStep: FC<InformationStepProps> = ({ checkout, onNext }) 
 	const [, updateEmail] = useCheckoutEmailUpdateMutation();
 	const [, updateShippingAddress] = useCheckoutShippingAddressUpdateMutation();
 	const [, userRegister] = useUserRegisterMutation();
+	const [, updateCheckoutMetadata] = useMutation<
+		unknown,
+		{ checkoutId: string; input: { key: string; value: string }[] }
+	>(CHECKOUT_METADATA_UPDATE);
 
 	// View state - what sub-view are we showing?
 	const [contactView, setContactView] = useState<ContactView>(() => {
@@ -71,6 +92,13 @@ export const InformationStep: FC<InformationStepProps> = ({ checkout, onNext }) 
 	const [createAccount, setCreateAccount] = useState(false);
 	const [accountPassword, setAccountPassword] = useState("");
 	const [subscribeNews, setSubscribeNews] = useState(false);
+	const [buyerType, setBuyerType] = useState<BuyerTypeValue>(() => {
+		// Hydrate from checkout metadata if previously set on this checkout
+		const existing = (checkout as { metadata?: { key: string; value: string }[] }).metadata?.find(
+			(m) => m.key === BUYER_TYPE_METADATA_KEY,
+		);
+		return (existing?.value as BuyerTypeValue) || "";
+	});
 
 	// ----- Address form state (for guests/new address) -----
 	const [countryCode, setCountryCode] = useState<CountryCode>(defaultCountry);
@@ -323,6 +351,19 @@ export const InformationStep: FC<InformationStepProps> = ({ checkout, onNext }) 
 					}
 				}
 
+				// Persist buyer type to checkout metadata (best-effort, non-blocking)
+				if (buyerType) {
+					try {
+						await updateCheckoutMetadata({
+							checkoutId: checkout.id,
+							input: [{ key: BUYER_TYPE_METADATA_KEY, value: buyerType }],
+						});
+					} catch (err) {
+						// Don't block checkout on metadata write failure — log and continue
+						console.warn("Failed to persist buyer_type metadata:", err);
+					}
+				}
+
 				// Update shipping address
 				if (checkout.isShippingRequired) {
 					let addressInput;
@@ -380,9 +421,11 @@ export const InformationStep: FC<InformationStepProps> = ({ checkout, onNext }) 
 			getFieldLabel,
 			formData,
 			countryCode,
+			buyerType,
 			updateEmail,
 			userRegister,
 			updateShippingAddress,
+			updateCheckoutMetadata,
 			onNext,
 		],
 	);
@@ -449,6 +492,8 @@ export const InformationStep: FC<InformationStepProps> = ({ checkout, onNext }) 
 				passwordError={errors.password}
 				subscribeNews={subscribeNews}
 				onSubscribeChange={setSubscribeNews}
+				buyerType={buyerType}
+				onBuyerTypeChange={setBuyerType}
 			/>
 
 			{checkout.isShippingRequired && (

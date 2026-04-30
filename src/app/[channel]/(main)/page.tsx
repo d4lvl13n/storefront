@@ -650,20 +650,35 @@ async function BrowseByMechanismSection(_: { params: Promise<{ channel: string }
 					</div>
 				</div>
 
-				{/* Top mechanism categories */}
-				<div className="grid grid-cols-1 gap-5 sm:grid-cols-2 sm:gap-6 lg:grid-cols-3">
+				{/* Top mechanism categories — mobile: horizontal scroll-snap carousel; tablet+: grid */}
+				<div
+					className="-mx-6 flex snap-x snap-mandatory gap-4 overflow-x-auto px-6 pb-4 [-ms-overflow-style:none] [scrollbar-width:none] sm:mx-0 sm:grid sm:snap-none sm:grid-cols-2 sm:gap-6 sm:overflow-visible sm:px-0 sm:pb-0 lg:grid-cols-3 [&::-webkit-scrollbar]:hidden"
+					aria-label="Mechanism category carousel"
+				>
 					{displayCategories.map((category) => {
 						const description = getCategoryDescription(category.slug);
 						return (
-							<ShopGoalCard
-								key={category.id}
-								collection={category}
-								description={description}
-								hrefBase="/categories"
-							/>
+							<div key={category.id} className="w-[88%] shrink-0 snap-center sm:w-auto sm:shrink">
+								<ShopGoalCard collection={category} description={description} hrefBase="/categories" />
+							</div>
 						);
 					})}
 				</div>
+
+				{/* Mobile-only swipe hint */}
+				<p className="mt-3 flex items-center justify-center gap-2 text-xs text-muted-foreground sm:hidden">
+					<svg
+						className="h-3 w-3"
+						viewBox="0 0 24 24"
+						fill="none"
+						stroke="currentColor"
+						strokeWidth={2}
+						aria-hidden="true"
+					>
+						<path strokeLinecap="round" strokeLinejoin="round" d="M9 5l7 7-7 7" />
+					</svg>
+					Swipe to explore
+				</p>
 			</div>
 		</section>
 	);
