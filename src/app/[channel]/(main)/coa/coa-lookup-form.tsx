@@ -23,7 +23,7 @@ export function CoaLookupForm({ channel }: CoaLookupFormProps) {
 		const canonical = normalizeToken(token);
 		if (!canonical) {
 			setStatus("error");
-			setErrorMessage("That doesn't look like a valid COA token. Check the label on your vial.");
+			setErrorMessage("That code doesn't look right. Check the label on your vial.");
 			return;
 		}
 		setStatus("loading");
@@ -42,7 +42,7 @@ export function CoaLookupForm({ channel }: CoaLookupFormProps) {
 
 			<div>
 				<label htmlFor="coa-token" className="mb-2 block text-sm font-medium text-foreground">
-					COA token <span className="text-red-400">*</span>
+					Code from your label <span className="text-red-400">*</span>
 				</label>
 				<input
 					id="coa-token"
@@ -66,7 +66,7 @@ export function CoaLookupForm({ channel }: CoaLookupFormProps) {
 					className="placeholder:text-muted-foreground/60 flex h-12 w-full rounded-md border border-border bg-secondary px-4 font-mono text-base uppercase tracking-[0.18em] text-foreground placeholder:tracking-[0.15em] focus:border-emerald-500 focus:outline-none focus:ring-1 focus:ring-emerald-500 disabled:cursor-not-allowed disabled:opacity-70"
 				/>
 				<p className="mt-2 text-xs text-muted-foreground">
-					12 letters and digits, dashes optional. The token is on the label of your vial, near the QR code.
+					12 characters, printed next to the QR code on your vial.
 				</p>
 			</div>
 
