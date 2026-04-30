@@ -12,6 +12,7 @@ const defaultFooterLinks = {
 	support: [
 		{ label: "Contact Us", href: "/contact" },
 		{ label: "Track Order", href: "/track-order" },
+		{ label: "Verify a COA", href: "/coa" },
 		{ label: "FAQs", href: "/faq" },
 		{ label: "About", href: "/about" },
 	],
