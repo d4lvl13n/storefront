@@ -1,11 +1,11 @@
 "use client";
 
 import { type FC, useState } from "react";
-import { CreditCard, Lock } from "lucide-react";
+import { CreditCard, ExternalLink, Lock } from "lucide-react";
 import { Input } from "@/ui/components/ui/input";
 import { cn } from "@/lib/utils";
 
-export type PaymentMethodType = "card" | "paypal" | "ideal";
+export type PaymentMethodType = "digiteal" | "card" | "paypal" | "ideal";
 
 export interface CardData {
 	cardNumber: string;
@@ -27,6 +27,8 @@ export interface PaymentMethodSelectorProps {
 	isTestMode?: boolean;
 	/** Available payment methods to show */
 	availableMethods?: PaymentMethodType[];
+	/** Hosted gateway display name */
+	hostedPaymentName?: string;
 }
 
 /**
@@ -55,6 +57,7 @@ export const PaymentMethodSelector: FC<PaymentMethodSelectorProps> = ({
 	onChange,
 	cardData,
 	onCardDataChange,
+	hostedPaymentName = "Digiteal",
 	availableMethods = ["card", "paypal", "ideal"],
 }) => {
 	// Local card state if not controlled
@@ -97,6 +100,35 @@ export const PaymentMethodSelector: FC<PaymentMethodSelectorProps> = ({
 			<p className="text-sm text-muted-foreground">All transactions are secure and encrypted.</p>
 
 			<div className="space-y-3">
+				{/* Hosted Digiteal payment */}
+				{availableMethods.includes("digiteal") && (
+					<label
+						className={cn(
+							"flex cursor-pointer items-center gap-4 rounded-lg border p-4 transition-colors",
+							"focus-within:ring-2 focus-within:ring-foreground focus-within:ring-offset-2",
+							value === "digiteal" ? "border-foreground" : "border-border",
+						)}
+					>
+						<input
+							type="radio"
+							name="payment"
+							value="digiteal"
+							checked={value === "digiteal"}
+							onChange={() => onChange("digiteal")}
+							className="sr-only"
+						/>
+						<RadioIndicator selected={value === "digiteal"} />
+						<CreditCard className="h-5 w-5 text-muted-foreground" />
+						<div className="min-w-0 flex-1">
+							<span className="block font-medium">{hostedPaymentName}</span>
+							<span className="block text-sm text-muted-foreground">
+								Card payment on the secure payment page
+							</span>
+						</div>
+						<ExternalLink className="h-4 w-4 shrink-0 text-muted-foreground" />
+					</label>
+				)}
+
 				{/* Credit Card */}
 				{availableMethods.includes("card") && (
 					<div

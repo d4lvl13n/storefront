@@ -42,6 +42,26 @@ interface PaymentStepProps {
 	onGoToInformation?: () => void;
 }
 
+type PaymentGateway = NonNullable<CheckoutFragment["availablePaymentGateways"]>[number];
+
+const isDigitealGateway = (gateway: PaymentGateway) => {
+	const id = gateway.id.toLowerCase();
+	const name = gateway.name.toLowerCase();
+
+	return id.includes("digiteal") || name.includes("digiteal");
+};
+
+const extractHostedPaymentUrl = (data: unknown): string | null => {
+	if (!data || typeof data !== "object") {
+		return null;
+	}
+
+	const payload = data as Record<string, unknown>;
+	const paymentUrl = payload.paymentUrl ?? payload.externalUrl;
+
+	return typeof paymentUrl === "string" && paymentUrl.length > 0 ? paymentUrl : null;
+};
+
 export const PaymentStep: FC<PaymentStepProps> = ({
 	checkout: initialCheckout,
 	onBack,
@@ -122,8 +142,20 @@ export const PaymentStep: FC<PaymentStepProps> = ({
 
 	// Check for available payment gateways
 	const availableGateways = checkout.availablePaymentGateways || [];
+	const digitealGateway = availableGateways.find(isDigitealGateway);
+	const hasDigitealGateway = Boolean(digitealGateway);
 	const hasDummyGateway = availableGateways.some((g) => g.id === dummyGatewayId);
-	const hasRealGateway = availableGateways.some((g) => g.id !== dummyGatewayId);
+	const hasSupportedGateway = hasDigitealGateway || hasDummyGateway;
+
+	useEffect(() => {
+		if (hasDigitealGateway && paymentMethod !== "digiteal") {
+			setPaymentMethod("digiteal");
+		}
+
+		if (!hasDigitealGateway && paymentMethod === "digiteal") {
+			setPaymentMethod("card");
+		}
+	}, [hasDigitealGateway, paymentMethod]);
 
 	const shippingAddress = checkout.shippingAddress;
 
@@ -234,7 +266,51 @@ export const PaymentStep: FC<PaymentStepProps> = ({
 					});
 				}
 
-				// Process payment using available gateway
+				// Hosted Digiteal payments are completed by Digiteal and confirmed asynchronously by Saleor/app webhooks.
+				if (paymentMethod === "digiteal" && digitealGateway) {
+					const checkoutId = checkout.id;
+					const amount = checkout.totalPrice?.gross.amount;
+
+					if (!amount) {
+						setErrors({ payment: "Checkout total is missing. Please refresh and try again." });
+						return;
+					}
+
+					const initResult = await transactionInitialize({
+						checkoutId,
+						action: "CHARGE",
+						amount,
+						paymentGateway: {
+							id: digitealGateway.id,
+							data: {},
+						},
+					});
+
+					if (initResult.error) {
+						console.error("Digiteal initialization error:", initResult.error);
+						setErrors({ payment: "Payment initialization failed. Please try again." });
+						return;
+					}
+
+					const transactionErrors = initResult.data?.transactionInitialize?.errors;
+					if (transactionErrors?.length) {
+						console.error("Digiteal transaction errors:", transactionErrors);
+						setErrors({ payment: transactionErrors[0].message || "Payment initialization failed" });
+						return;
+					}
+
+					const paymentUrl = extractHostedPaymentUrl(initResult.data?.transactionInitialize?.data);
+					if (!paymentUrl) {
+						console.error("Digiteal transaction initialized without a hosted payment URL", initResult.data);
+						setErrors({ payment: "Payment page is unavailable. Please try again." });
+						return;
+					}
+
+					window.location.assign(paymentUrl);
+					return;
+				}
+
+				// Process test payment using Saleor Dummy Payment app.
 				if (hasDummyGateway) {
 					const checkoutId = checkout.id;
 
@@ -293,19 +369,10 @@ export const PaymentStep: FC<PaymentStepProps> = ({
 						router.replace(`?${newQuery}`, { scroll: false });
 						return;
 					}
-				} else if (!hasRealGateway) {
+				} else if (!hasSupportedGateway) {
 					// No payment gateway configured
 					setErrors({
-						streetAddress1:
-							"No payment gateway configured. Please contact support or configure a payment app in Saleor.",
-					});
-					return;
-				} else {
-					// Real payment gateway - this UI doesn't support it yet
-					// For now, show an error
-					setErrors({
-						streetAddress1:
-							"This checkout UI currently only supports test payments. Please use the standard checkout for real payments.",
+						payment: "No payment gateway configured. Please contact support.",
 					});
 					return;
 				}
@@ -322,8 +389,11 @@ export const PaymentStep: FC<PaymentStepProps> = ({
 			user?.addresses,
 			shippingAddress,
 			checkout.id,
+			checkout.totalPrice?.gross.amount,
+			digitealGateway,
 			hasDummyGateway,
-			hasRealGateway,
+			hasSupportedGateway,
+			paymentMethod,
 			updateBillingAddress,
 			transactionInitialize,
 			checkoutComplete,
@@ -342,12 +412,12 @@ export const PaymentStep: FC<PaymentStepProps> = ({
 		? completeState.fetching
 			? "Creating order..."
 			: "Processing payment..."
-		: `Pay ${totalStr}`;
+		: paymentMethod === "digiteal"
+			? "Continue to secure payment"
+			: `Pay ${totalStr}`;
 
 	const isDisabled =
-		isLoading ||
-		(!hasDummyGateway && !hasRealGateway) ||
-		(paymentMethod === "card" && !hasDummyGateway && !isCardValid);
+		isLoading || !hasSupportedGateway || (paymentMethod === "card" && !hasDummyGateway && !isCardValid);
 
 	return (
 		<form className="space-y-8" onSubmit={handleSubmit}>
@@ -355,7 +425,7 @@ export const PaymentStep: FC<PaymentStepProps> = ({
 			<CheckoutSummaryContext checkout={checkout} rows={summaryRows} onGoToStep={handleGoToStep} />
 
 			{/* No Payment Gateway Warning */}
-			{!hasDummyGateway && !hasRealGateway && (
+			{!hasSupportedGateway && (
 				<div className="flex items-start gap-3 rounded-lg border border-amber-200 bg-amber-50 p-4">
 					<AlertCircle className="mt-0.5 h-5 w-5 shrink-0 text-amber-600" />
 					<div>
@@ -369,7 +439,7 @@ export const PaymentStep: FC<PaymentStepProps> = ({
 			)}
 
 			{/* Test Mode Indicator */}
-			{hasDummyGateway && !hasRealGateway && (
+			{hasDummyGateway && !hasDigitealGateway && (
 				<div className="flex items-start gap-3 rounded-lg border border-blue-200 bg-blue-50 p-4">
 					<AlertCircle className="mt-0.5 h-5 w-5 shrink-0 text-blue-600" />
 					<div>
@@ -387,6 +457,8 @@ export const PaymentStep: FC<PaymentStepProps> = ({
 				onChange={setPaymentMethod}
 				cardData={cardData}
 				onCardDataChange={setCardData}
+				availableMethods={hasDigitealGateway ? ["digiteal"] : ["card"]}
+				hostedPaymentName={digitealGateway?.name || "Digiteal"}
 			/>
 
 			{/* Billing Address */}
