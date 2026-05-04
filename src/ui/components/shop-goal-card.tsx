@@ -395,7 +395,17 @@ export function ShopGoalCard({
 						<p className="text-[11px] font-medium uppercase tracking-[0.22em] text-muted-foreground">
 							{meta.eyebrow}
 						</p>
-						<h3 className="mt-3 text-xl font-semibold tracking-tight text-foreground sm:text-[1.35rem]">
+						{/*
+						 * `min-h` keeps the title row at 2 lines tall even when the
+						 * category name fits on a single line. Without this, 1-line
+						 * titles like "Growth Factors" pull the description block up,
+						 * de-aligning their card against neighbours with 2-line titles
+						 * like "Growth Hormone Secretagogues".
+						 *
+						 * Calculation: 2 × line-height (1.25) × font-size — for the
+						 * sm:text-[1.35rem] breakpoint this is roughly 3.4rem.
+						 */}
+						<h3 className="mt-3 min-h-[3rem] text-xl font-semibold leading-tight tracking-tight text-foreground sm:min-h-[3.4rem] sm:text-[1.35rem]">
 							{collection.name}
 						</h3>
 					</div>
