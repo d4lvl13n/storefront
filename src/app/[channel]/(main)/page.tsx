@@ -166,11 +166,11 @@ const categoryDescriptions: Record<string, string> = {
 	"growth-hormone-derivatives":
 		"Growth hormone fragment and derivative reference standards for in-vitro research on somatotropic signalling.",
 	"growth-factors":
-		"IGF-family, EGF-family and related growth-factor reference peptides for in-vitro cell-culture research and receptor-binding studies.",
+		"IGF-family, EGF-family and related growth-factor reference peptides for in-vitro cell-culture research.",
 	"cytoprotective-peptides":
 		"Synthetic peptide reference standards used in in-vitro studies of cellular protection and tissue-culture models.",
 	"thymic-peptides":
-		"Thymus-derived peptide reference standards (thymulin, thymosin α-1, thymopoietin) for in-vitro immunology and cell-signalling research.",
+		"Thymus-derived peptide standards (thymulin, thymosin α-1, thymopoietin) for in-vitro immunology research.",
 	"melanocortin-receptor-modulators":
 		"Reference peptides targeting melanocortin MC1R / MC3R / MC4R receptors for in-vitro pharmacology research.",
 	"copper-peptide-complexes":
@@ -180,13 +180,13 @@ const categoryDescriptions: Record<string, string> = {
 	"pineal-peptides":
 		"Pineal-derived peptide reference compounds for in-vitro chronobiology and cellular-pathway research.",
 	"nootropic-peptides":
-		"Short-chain neuropeptide reference standards (Semax, Selank, cerebrolysin fragments) for in-vitro neurochemistry and receptor-pharmacology research.",
+		"Short-chain neuropeptide standards (Semax, Selank, cerebrolysin fragments) for in-vitro neurochemistry research.",
 	"antimicrobial-peptides":
 		"Cathelicidin, defensin and related host-defence peptide reference standards for in-vitro microbiology research.",
 	neuropeptides:
 		"Neuropeptide reference standards for in-vitro neurochemistry and receptor-pharmacology research.",
 	"reproductive-hormones":
-		"Reproductive and gonadotropic peptide reference standards (kisspeptin, GnRH analogues, gonadotropins) for in-vitro endocrinology research.",
+		"Gonadotropic and reproductive peptide standards (kisspeptin, GnRH analogues) for in-vitro endocrinology research.",
 	"research-small-molecules":
 		"Non-peptide reference compounds (small molecules, cofactors, glycosaminoglycans) used in in-vitro biochemistry research.",
 	"reference-peptides-miscellaneous":

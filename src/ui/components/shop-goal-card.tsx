@@ -414,7 +414,17 @@ export function ShopGoalCard({
 					</span>
 				</div>
 
-				<p className="mt-4 min-h-[72px] max-w-[34ch] text-sm leading-6 text-muted-foreground transition-colors duration-500 group-hover:text-muted-foreground">
+				{/*
+				 * Description height is locked top AND bottom so all six homepage
+				 * cards align perfectly:
+				 *   - `min-h-[72px]` (= 3 lines × 24px line-height) keeps short
+				 *     descriptions from collapsing
+				 *   - `line-clamp-3` truncates anything longer than 3 lines with
+				 *     an ellipsis instead of pushing the card taller
+				 * If a future Saleor description is too long to fit, edit it down;
+				 * never bump the clamp without bumping `min-h` to match.
+				 */}
+				<p className="mt-4 line-clamp-3 min-h-[72px] max-w-[34ch] text-sm leading-6 text-muted-foreground transition-colors duration-500 group-hover:text-muted-foreground">
 					{description ?? ""}
 				</p>
 
