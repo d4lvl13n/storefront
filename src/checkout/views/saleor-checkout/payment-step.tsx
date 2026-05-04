@@ -278,7 +278,6 @@ export const PaymentStep: FC<PaymentStepProps> = ({
 
 					const initResult = await transactionInitialize({
 						checkoutId,
-						action: "CHARGE",
 						amount,
 						paymentGateway: {
 							id: digitealGateway.id,
