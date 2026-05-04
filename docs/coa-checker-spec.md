@@ -97,14 +97,14 @@ What "private" means in this design:
 
 ### Files to create
 
-| File                                            | Responsibility                                                                                                                                                                                                                            |
-| ----------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `src/app/[channel]/(main)/coa/[token]/page.tsx` | Server component. Fetches the COA bundle. Renders the page with the PDF embedded. Returns `notFound()` on miss.                                                                                                                           |
-| `src/app/[channel]/(main)/coa/page.tsx`         | Manual entry form. User pastes a token, form 302s to `/[channel]/coa/<token>`.                                                                                                                                                            |
-| `src/app/coa/[token]/page.tsx`                  | Root canonical QR handler. Redirects `/coa/<token>` to `/<default-channel>/coa/<token>` so printed QR codes do not depend on a channel slug.                                                                                              |
-| `src/app/api/coa/[token]/route.ts`              | GET endpoint. Rate-limited (10 req / 15 min / IP). Fetches the token's COA JSON record from the backend COA registry. Validates with the Zod schema before returning sanitized `{ pdfUrl, pdfSha256, peptide, batch, issuedAt, status }`. |
-| `src/lib/coa/token.ts`                          | Token format helpers — normalise, validate, format with dashes for display.                                                                                                                                                               |
-| `src/lib/coa/schema.ts`                         | **Zod schema** for the COA JSON record. Single source of truth shared between the API route (runtime validation) and the page (TypeScript type via `z.infer<>`). API route returns 502 if validation fails.                               |
+| File                                            | Responsibility                                                                                                                                                                                                                                                                                       |
+| ----------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `src/app/[channel]/(main)/coa/[token]/page.tsx` | Server component. Fetches the COA bundle. Renders the page with the PDF embedded. Returns `notFound()` on miss.                                                                                                                                                                                      |
+| `src/app/[channel]/(main)/coa/page.tsx`         | Manual entry form. User pastes a token, form 302s to `/[channel]/coa/<token>`.                                                                                                                                                                                                                       |
+| `src/app/coa/[token]/page.tsx`                  | Root canonical QR handler. Redirects `/coa/<token>` to `/<default-channel>/coa/<token>` so printed QR codes do not depend on a channel slug.                                                                                                                                                         |
+| `src/app/api/coa/[token]/route.ts`              | GET endpoint. Rate-limited (10 req / 15 min / IP). Fetches the token's COA JSON record from the backend COA registry. Validates with the Zod schema before returning sanitized `{ pdfUrl, pdfSha256, peptide, batch, issuedAt, status }` for published COAs, or a pending record without PDF fields. |
+| `src/lib/coa/token.ts`                          | Token format helpers — normalise, validate, format with dashes for display.                                                                                                                                                                                                                          |
+| `src/lib/coa/schema.ts`                         | **Zod schema** for the COA JSON record. Single source of truth shared between the API route (runtime validation) and the page (TypeScript type via `z.infer<>`). API route returns 502 if validation fails.                                                                                          |
 
 ### Page layout
 
@@ -125,7 +125,8 @@ page if something looks wrong.
 
 ### Behaviour
 
-- **Status normalisation.** API returns `status: "active" | "superseded" | "recalled"`.
+- **Status normalisation.** API returns `status: "pending" | "active" | "superseded" | "recalled"`.
+  - `pending` → render a "COA pending" page. Do not show `Authentic COA` and do not embed a PDF.
   - `active` → render normally.
   - `superseded` → amber banner above the PDF: `A newer COA exists for this batch. View latest →` linking to the new token if available.
   - `recalled` → red full-width banner replacing the PDF: `This batch was recalled.` + recall reason + contact CTA. **Do not 404** — the customer needs to learn the truth.
@@ -181,12 +182,12 @@ COA tokens must stay online even after newer audits are uploaded.
    | Field               | Required                          | Type          | Example                                                        | Notes                                                                           |
    | ------------------- | --------------------------------- | ------------- | -------------------------------------------------------------- | ------------------------------------------------------------------------------- |
    | `token`             | ✅                                | string        | `A8K2-9F4R-X2P7`                                               | The lookup primary key. Globally unique.                                        |
-   | `pdfUrl`            | ✅                                | string (URL)  | `https://api.infinitybiolabs.com/media/coa/A8K2-9F4R-X2P7.pdf` | HTTPS URL on the same Hetzner server as Saleor.                                 |
-   | `pdfSha256`         | ✅                                | string        | `9e107d9d372bb6826bd81d3542a419d6...`                          | Integrity fingerprint captured at upload time.                                  |
-   | `batchNumber`       | ✅                                | string        | `IBL-2026-04-A`                                                | Customer reads this on the vial label. Used for the side-by-side eyeball check. |
+   | `pdfUrl`            | required unless `pending`         | string (URL)  | `https://api.infinitybiolabs.com/media/coa/A8K2-9F4R-X2P7.pdf` | HTTPS URL on the same Hetzner server as Saleor.                                 |
+   | `pdfSha256`         | required unless `pending`         | string        | `9e107d9d372bb6826bd81d3542a419d6...`                          | Integrity fingerprint captured at upload time.                                  |
+   | `batchNumber`       | required unless `pending`         | string        | `IBL-2026-04-A`                                                | Customer reads this on the vial label. Used for the side-by-side eyeball check. |
    | `peptideName`       | ✅                                | string        | `Semaglutide 5mg`                                              | Customer reads this on the vial label.                                          |
-   | `issuedAt`          | ✅                                | ISO 8601 date | `2026-04-15`                                                   | When the lab issued the COA.                                                    |
-   | `status`            | ✅                                | enum          | `active` / `superseded` / `recalled`                           | Defaults to `active`.                                                           |
+   | `issuedAt`          | required unless `pending`         | ISO 8601 date | `2026-04-15`                                                   | When the lab issued the COA.                                                    |
+   | `status`            | ✅                                | enum          | `pending` / `active` / `superseded` / `recalled`               | Defaults to `active` for real COAs.                                             |
    | `labName`           | optional                          | string        | `Janoski Analytical`                                           | Displayed in the page footer for trust signaling.                               |
    | `recallReason`      | required if `status = recalled`   | string        | `Heavy metal limit exceeded — see notice`                      | Shown to the customer in the red banner.                                        |
    | `supersededByToken` | required if `status = superseded` | string        | `B6K4-8M2P-Q9R3`                                               | Storefront uses this to link to the latest COA.                                 |
@@ -345,11 +346,11 @@ type CoaLookupSuccess = {
 	coa: {
 		token: string; // echoed back
 		peptideName: string; // from JSON record peptideName
-		batchNumber: string; // from JSON record batchNumber
-		issuedAt: string; // ISO date from JSON record issuedAt
-		pdfUrl: string; // from JSON record pdfUrl
-		pdfSha256: string; // from JSON record pdfSha256
-		status: "active" | "superseded" | "recalled";
+		batchNumber?: string; // optional for pending records
+		issuedAt?: string; // required once published
+		pdfUrl?: string; // required once published
+		pdfSha256?: string; // required once published
+		status: "pending" | "active" | "superseded" | "recalled";
 		labName?: string; // from JSON record labName
 		recallReason?: string; // from JSON record recallReason (only if recalled)
 		supersededByToken?: string; // from JSON record supersededByToken (only if superseded)

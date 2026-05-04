@@ -11,6 +11,8 @@ import { CopyTokenButton } from "./copy-token-button";
 export const dynamic = "force-dynamic"; // never cache the rendered HTML — status flips matter
 
 type Params = { channel: string; token: string };
+type PendingCoa = Extract<PublicCoa, { status: "pending" }>;
+type PublishedCoa = Exclude<PublicCoa, PendingCoa>;
 
 export async function generateMetadata(props: { params: Promise<Params> }): Promise<Metadata> {
 	const { channel, token } = await props.params;
@@ -70,6 +72,9 @@ export default async function CoaVerificationPage(props: { params: Promise<Param
 	}
 
 	const coa: PublicCoa = toPublicCoa(result.record);
+	if (coa.status === "pending") {
+		return <PendingCoaPage coa={coa} />;
+	}
 
 	return (
 		<section className="relative overflow-hidden bg-background text-foreground">
@@ -100,9 +105,77 @@ export default async function CoaVerificationPage(props: { params: Promise<Param
 	);
 }
 
+function PendingCoaPage({ coa }: { coa: PendingCoa }) {
+	return (
+		<section className="relative overflow-hidden bg-background text-foreground">
+			<div className="pointer-events-none absolute inset-0">
+				<div className="bg-amber-500/8 absolute left-1/4 top-0 h-[500px] w-[500px] rounded-full blur-[150px]" />
+				<div className="bg-emerald-500/6 absolute bottom-0 right-1/4 h-[500px] w-[500px] rounded-full blur-[150px]" />
+			</div>
+
+			<div className="relative mx-auto max-w-3xl px-6 py-16 sm:py-20">
+				<div className="mb-8">
+					<span className="inline-flex items-center gap-2 rounded-full border border-amber-500/30 bg-amber-500/10 px-3 py-1 text-xs font-semibold uppercase tracking-[0.2em] text-amber-300">
+						<svg className="h-3.5 w-3.5" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
+							<path
+								fillRule="evenodd"
+								d="M10 1a9 9 0 100 18 9 9 0 000-18zm1 5a1 1 0 10-2 0v4a1 1 0 00.553.894l3 1.5a1 1 0 00.894-1.788L11 9.382V6z"
+								clipRule="evenodd"
+							/>
+						</svg>
+						COA pending
+					</span>
+
+					<h1 className="mt-4 text-3xl font-bold leading-tight tracking-tight sm:text-4xl lg:text-5xl">
+						Certificate of Analysis Pending
+					</h1>
+
+					<p className="mt-4 text-sm leading-relaxed text-muted-foreground">
+						This QR code is valid, but the lab-issued COA has not been published yet. Please check back before
+						using this product for research.
+					</p>
+				</div>
+
+				<div className="bg-card/40 grid gap-6 rounded-2xl border border-border p-5 sm:grid-cols-2 sm:p-6">
+					<MetaCell label="Peptide" value={coa.peptideName} />
+					{coa.batchNumber && <MetaCell label="Batch" value={coa.batchNumber} mono />}
+					<div className="sm:col-span-2">
+						<p className="text-[11px] font-medium uppercase tracking-[0.2em] text-amber-300">Token</p>
+						<div className="mt-1 flex flex-wrap items-center gap-3">
+							<p className="select-all break-all font-mono text-sm text-foreground">{coa.token}</p>
+							<CopyTokenButton token={coa.token} />
+						</div>
+					</div>
+				</div>
+
+				<div className="mt-6 rounded-2xl border border-amber-500/30 bg-amber-500/10 p-5">
+					<p className="text-sm font-semibold text-amber-200">The COA is not ready yet.</p>
+					<p className="mt-2 text-sm leading-relaxed text-amber-100/90">
+						Once our team publishes the lab document, this same QR code will show the final Certificate of
+						Analysis. The printed label does not need to change.
+					</p>
+				</div>
+
+				<div className="mt-10 space-y-3 border-t border-border pt-6 text-xs leading-relaxed text-muted-foreground">
+					<p>
+						Something doesn&rsquo;t look right?{" "}
+						<LinkWithChannel
+							href="/contact"
+							className="text-emerald-400 underline underline-offset-2 hover:text-emerald-300"
+						>
+							Contact our team
+						</LinkWithChannel>
+						.
+					</p>
+				</div>
+			</div>
+		</section>
+	);
+}
+
 // ─── Header ────────────────────────────────────────────────────
 
-function CoaHeader({ coa }: { coa: PublicCoa }) {
+function CoaHeader({ coa }: { coa: PublishedCoa }) {
 	const issuedAtLabel = formatIssuedAt(coa.issuedAt);
 
 	return (
@@ -182,7 +255,7 @@ function MetaCell({ label, value, mono = false }: { label: string; value: string
 
 // ─── PDF embed ─────────────────────────────────────────────────
 
-function PdfEmbed({ coa }: { coa: PublicCoa }) {
+function PdfEmbed({ coa }: { coa: PublishedCoa }) {
 	return (
 		<div className="space-y-3">
 			<div className="flex items-center justify-between gap-3">
@@ -272,7 +345,7 @@ function PdfEmbed({ coa }: { coa: PublicCoa }) {
 
 // ─── Banners ───────────────────────────────────────────────────
 
-function RecallBanner({ coa }: { coa: PublicCoa }) {
+function RecallBanner({ coa }: { coa: Extract<PublishedCoa, { status: "recalled" }> }) {
 	return (
 		<div className="rounded-2xl border border-red-500/40 bg-red-500/10 p-6 sm:p-8">
 			<div className="flex items-start gap-4">
@@ -306,7 +379,7 @@ function RecallBanner({ coa }: { coa: PublicCoa }) {
 	);
 }
 
-function SupersededBanner({ coa }: { coa: PublicCoa }) {
+function SupersededBanner({ coa }: { coa: Extract<PublishedCoa, { status: "superseded" }> }) {
 	return (
 		<div className="mb-4 rounded-2xl border border-amber-500/30 bg-amber-500/10 p-5">
 			<div className="flex items-start gap-3">
@@ -343,7 +416,7 @@ function SupersededBanner({ coa }: { coa: PublicCoa }) {
 
 // ─── Footer ────────────────────────────────────────────────────
 
-function CoaFooter({ coa }: { coa: PublicCoa }) {
+function CoaFooter({ coa }: { coa: PublishedCoa }) {
 	return (
 		<div className="mt-10 space-y-3 border-t border-border pt-6 text-xs leading-relaxed text-muted-foreground">
 			<p>

@@ -2,7 +2,7 @@
  * Zod schema for a COA registry record.
  *
  * Single source of truth for the JSON record shape published by the backend
- * COA registry to `https://saleor.infinitybiolabs.com/media/coa/<token>.json`,
+ * COA registry to `https://api.infinitybiolabs.com/media/coa/<token>.json`,
  * shared between the API route (runtime validation) and the page (TypeScript
  * type via `z.infer<>`).
  *
@@ -65,8 +65,24 @@ const pdfUrlSchema = z.string().refine(
 	{ message: "pdfUrl must be HTTPS and within the configured COA registry origin" },
 );
 
-export const CoaStatusSchema = z.enum(["active", "superseded", "recalled"]);
+export const CoaStatusSchema = z.enum(["pending", "active", "superseded", "recalled"]);
 export type CoaStatus = z.infer<typeof CoaStatusSchema>;
+
+const CoaTraceabilityFields = {
+	labName: z.string().min(1).max(200).optional(),
+	// Backend-only field — never returned to the storefront page.
+	saleorVariantId: z.string().min(1).max(500).optional(),
+};
+
+const PublishedCoaFields = {
+	token: z.string().regex(COA_TOKEN_REGEX, "Token must match XXXX-XXXX-XXXX format"),
+	pdfUrl: pdfUrlSchema,
+	pdfSha256: z.string().regex(SHA256_HEX_REGEX, "pdfSha256 must be a 64-char hex digest"),
+	batchNumber: z.string().min(1).max(200),
+	peptideName: z.string().min(1).max(200),
+	issuedAt: z.string().regex(ISO_DATE_LOOSE, "issuedAt must be ISO 8601 (date or datetime)"),
+	...CoaTraceabilityFields,
+};
 
 /**
  * Raw COA JSON record as published by the backend registry.
@@ -74,37 +90,40 @@ export type CoaStatus = z.infer<typeof CoaStatusSchema>;
  * Includes the optional `saleorVariantId` field for backend traceability.
  * The API route strips this before returning data to the page.
  */
-export const CoaRecordSchema = z
-	.object({
+export const CoaRecordSchema = z.discriminatedUnion("status", [
+	z.object({
 		token: z.string().regex(COA_TOKEN_REGEX, "Token must match XXXX-XXXX-XXXX format"),
-		pdfUrl: pdfUrlSchema,
-		pdfSha256: z.string().regex(SHA256_HEX_REGEX, "pdfSha256 must be a 64-char hex digest"),
-		batchNumber: z.string().min(1).max(200),
+		status: z.literal("pending"),
 		peptideName: z.string().min(1).max(200),
-		issuedAt: z.string().regex(ISO_DATE_LOOSE, "issuedAt must be ISO 8601 (date or datetime)"),
-		status: CoaStatusSchema,
-		labName: z.string().min(1).max(200).optional(),
-		recallReason: z.string().min(1).max(2000).optional(),
-		supersededByToken: z.string().regex(COA_TOKEN_REGEX).optional(),
-		// Backend-only field — never returned to the storefront page.
-		saleorVariantId: z.string().min(1).max(500).optional(),
-	})
-	.superRefine((data, ctx) => {
-		if (data.status === "recalled" && !data.recallReason) {
-			ctx.addIssue({
-				code: z.ZodIssueCode.custom,
-				path: ["recallReason"],
-				message: "recallReason is required when status is 'recalled'",
-			});
-		}
-		if (data.status === "superseded" && !data.supersededByToken) {
-			ctx.addIssue({
-				code: z.ZodIssueCode.custom,
-				path: ["supersededByToken"],
-				message: "supersededByToken is required when status is 'superseded'",
-			});
-		}
-	});
+		batchNumber: z.string().min(1).max(200).optional(),
+		issuedAt: z.string().regex(ISO_DATE_LOOSE, "issuedAt must be ISO 8601 (date or datetime)").optional(),
+		...CoaTraceabilityFields,
+	}),
+	z.object({
+		status: z.literal("active"),
+		...PublishedCoaFields,
+	}),
+	z.object({
+		status: z.literal("superseded"),
+		...PublishedCoaFields,
+		supersededByToken: z.string().regex(COA_TOKEN_REGEX),
+	}),
+	z
+		.object({
+			status: z.literal("recalled"),
+			...PublishedCoaFields,
+			recallReason: z.string().min(1).max(2000).optional(),
+		})
+		.superRefine((data, ctx) => {
+			if (!data.recallReason) {
+				ctx.addIssue({
+					code: z.ZodIssueCode.custom,
+					path: ["recallReason"],
+					message: "recallReason is required when status is 'recalled'",
+				});
+			}
+		}),
+]);
 
 export type CoaRecord = z.infer<typeof CoaRecordSchema>;
 
@@ -113,7 +132,8 @@ export type CoaRecord = z.infer<typeof CoaRecordSchema>;
  *
  * Strips `saleorVariantId` (internal traceability only).
  */
-export type PublicCoa = Omit<CoaRecord, "saleorVariantId">;
+type StripInternal<T> = T extends unknown ? Omit<T, "saleorVariantId"> : never;
+export type PublicCoa = StripInternal<CoaRecord>;
 
 /**
  * Sanitize a validated registry record into the public response shape.
@@ -122,7 +142,7 @@ export function toPublicCoa(record: CoaRecord): PublicCoa {
 	// Destructure away saleorVariantId without referencing the unused binding.
 	const { saleorVariantId: _internalOnly, ...publicFields } = record;
 	void _internalOnly;
-	return publicFields;
+	return publicFields as PublicCoa;
 }
 
 /** API success/failure response envelope. Mirrors docs/coa-checker-spec.md. */
