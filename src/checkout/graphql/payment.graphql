@@ -29,6 +29,7 @@ mutation transactionInitialize(
 			actions
 		}
 		transactionEvent {
+			externalUrl
 			message
 			type
 		}
@@ -48,6 +49,7 @@ mutation transactionProcess($id: ID!, $data: JSON) {
 			actions
 		}
 		transactionEvent {
+			externalUrl
 			message
 			type
 		}

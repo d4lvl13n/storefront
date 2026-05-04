@@ -51,15 +51,48 @@ const isDigitealGateway = (gateway: PaymentGateway) => {
 	return id.includes("digiteal") || name.includes("digiteal");
 };
 
-const extractHostedPaymentUrl = (data: unknown): string | null => {
+const parsePaymentData = (data: unknown): Record<string, unknown> | null => {
+	if (typeof data === "string") {
+		try {
+			const parsed = JSON.parse(data) as unknown;
+			return parsePaymentData(parsed);
+		} catch {
+			return null;
+		}
+	}
+
 	if (!data || typeof data !== "object") {
 		return null;
 	}
 
-	const payload = data as Record<string, unknown>;
+	return data as Record<string, unknown>;
+};
+
+const extractHostedPaymentUrl = (data: unknown, externalUrl?: string | null): string | null => {
+	if (externalUrl) {
+		return externalUrl;
+	}
+
+	const payload = parsePaymentData(data);
+
+	if (!payload) {
+		return null;
+	}
+
 	const paymentUrl = payload.paymentUrl ?? payload.externalUrl;
 
 	return typeof paymentUrl === "string" && paymentUrl.length > 0 ? paymentUrl : null;
+};
+
+const extractPaymentMessage = (data: unknown, eventMessage?: string | null): string | null => {
+	const payload = parsePaymentData(data);
+	const dataMessage = payload?.message;
+
+	if (typeof dataMessage === "string" && dataMessage.length > 0) {
+		return dataMessage;
+	}
+
+	return eventMessage || null;
 };
 
 export const PaymentStep: FC<PaymentStepProps> = ({
@@ -298,10 +331,19 @@ export const PaymentStep: FC<PaymentStepProps> = ({
 						return;
 					}
 
-					const paymentUrl = extractHostedPaymentUrl(initResult.data?.transactionInitialize?.data);
+					const paymentUrl = extractHostedPaymentUrl(
+						initResult.data?.transactionInitialize?.data,
+						initResult.data?.transactionInitialize?.transactionEvent?.externalUrl,
+					);
 					if (!paymentUrl) {
 						console.error("Digiteal transaction initialized without a hosted payment URL", initResult.data);
-						setErrors({ payment: "Payment page is unavailable. Please try again." });
+						setErrors({
+							payment:
+								extractPaymentMessage(
+									initResult.data?.transactionInitialize?.data,
+									initResult.data?.transactionInitialize?.transactionEvent?.message,
+								) || "Payment page is unavailable. Please try again.",
+						});
 						return;
 					}
 

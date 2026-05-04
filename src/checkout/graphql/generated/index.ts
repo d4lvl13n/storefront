@@ -269,6 +269,7 @@ export type AccountErrorCode =
 	| "DELETE_STAFF_ACCOUNT"
 	| "DELETE_SUPERUSER_ACCOUNT"
 	| "DUPLICATED_INPUT_ITEM"
+	| "FILE_SIZE_LIMIT_EXCEEDED"
 	| "GRAPHQL_ERROR"
 	| "INACTIVE"
 	| "INVALID"
@@ -5808,6 +5809,7 @@ export type CollectionError = {
 export type CollectionErrorCode =
 	| "CANNOT_MANAGE_PRODUCT_WITHOUT_VARIANT"
 	| "DUPLICATED_INPUT_ITEM"
+	| "FILE_SIZE_LIMIT_EXCEEDED"
 	| "GRAPHQL_ERROR"
 	| "INVALID"
 	| "NOT_FOUND"
@@ -19346,7 +19348,10 @@ export type Payment = Node &
 		modified: Scalars["DateTime"]["output"];
 		/** Order associated with a payment. */
 		order?: Maybe<Order>;
-		/** Informs whether this is a partial payment. */
+		/**
+		 * Informs whether this is a partial payment.
+		 * @deprecated This field is reserved for the Adyen Gateway plugin. For other gateways, its value is always `false`. This field will be removed in 3.23 along with the plugin.
+		 */
 		partial: Scalars["Boolean"]["output"];
 		/** Type of method used for payment. */
 		paymentMethodType: Scalars["String"]["output"];
@@ -20782,6 +20787,7 @@ export type ProductBulkCreateErrorCode =
 	| "ATTRIBUTE_VARIANTS_DISABLED"
 	| "BLANK"
 	| "DUPLICATED_INPUT_ITEM"
+	| "FILE_SIZE_LIMIT_EXCEEDED"
 	| "GRAPHQL_ERROR"
 	| "INVALID"
 	| "INVALID_PRICE"
@@ -21215,6 +21221,7 @@ export type ProductErrorCode =
 	| "ATTRIBUTE_VARIANTS_DISABLED"
 	| "CANNOT_MANAGE_PRODUCT_WITHOUT_VARIANT"
 	| "DUPLICATED_INPUT_ITEM"
+	| "FILE_SIZE_LIMIT_EXCEEDED"
 	| "GRAPHQL_ERROR"
 	| "INVALID"
 	| "INVALID_FILE_TYPE"
@@ -22718,6 +22725,31 @@ export type ProductVariantDeleted = Event & {
 /** Event sent when product variant is deleted. */
 export type ProductVariantDeletedProductVariantArgs = {
 	channel?: InputMaybe<Scalars["String"]["input"]>;
+};
+
+/**
+ * Event sent when product variant discounted price is recalculated.
+ *
+ * Added in Saleor 3.22.
+ */
+export type ProductVariantDiscountedPriceUpdated = Event & {
+	__typename?: "ProductVariantDiscountedPriceUpdated";
+	/** The channel where the price changed. */
+	channel: Channel;
+	/** Time of the event. */
+	issuedAt?: Maybe<Scalars["DateTime"]["output"]>;
+	/** The user or application that triggered the event. */
+	issuingPrincipal?: Maybe<IssuingPrincipal>;
+	/** The new discounted price. */
+	newPrice: Money;
+	/** The previous discounted price. */
+	previousPrice: Money;
+	/** The product variant the event relates to. */
+	productVariant: ProductVariant;
+	/** The application receiving the webhook. */
+	recipient?: Maybe<App>;
+	/** Saleor version that triggered the event. */
+	version?: Maybe<Scalars["String"]["output"]>;
 };
 
 export type ProductVariantFilterInput = {
@@ -27863,6 +27895,14 @@ export type Subscription = {
 	 * Note: this API is currently in Feature Preview and can be subject to changes at later point.
 	 */
 	orderUpdated?: Maybe<OrderUpdated>;
+	/**
+	 * Event sent when product variant discounted price is recalculated.
+	 *
+	 * Added in Saleor 3.22.
+	 *
+	 * Note: this API is currently in Feature Preview and can be subject to changes at later point.
+	 */
+	productVariantDiscountedPriceUpdated?: Maybe<ProductVariantDiscountedPriceUpdated>;
 };
 
 export type SubscriptionCheckoutCreatedArgs = {
@@ -27942,6 +27982,10 @@ export type SubscriptionOrderRefundedArgs = {
 };
 
 export type SubscriptionOrderUpdatedArgs = {
+	channels?: InputMaybe<Array<Scalars["String"]["input"]>>;
+};
+
+export type SubscriptionProductVariantDiscountedPriceUpdatedArgs = {
 	channels?: InputMaybe<Array<Scalars["String"]["input"]>>;
 };
 
@@ -31319,6 +31363,7 @@ export type WebhookEventTypeAsyncEnum =
 	| "PRODUCT_VARIANT_CREATED"
 	/** A product variant is deleted. Warning: this event will not be executed when parent product has been deleted. Check PRODUCT_DELETED. */
 	| "PRODUCT_VARIANT_DELETED"
+	| "PRODUCT_VARIANT_DISCOUNTED_PRICE_UPDATED"
 	/** A product variant metadata is updated. */
 	| "PRODUCT_VARIANT_METADATA_UPDATED"
 	/** A product variant is out of stock. */
@@ -31644,6 +31689,7 @@ export type WebhookEventTypeEnum =
 	| "PRODUCT_VARIANT_CREATED"
 	/** A product variant is deleted. Warning: this event will not be executed when parent product has been deleted. Check PRODUCT_DELETED. */
 	| "PRODUCT_VARIANT_DELETED"
+	| "PRODUCT_VARIANT_DISCOUNTED_PRICE_UPDATED"
 	/** A product variant metadata is updated. */
 	| "PRODUCT_VARIANT_METADATA_UPDATED"
 	/** A product variant is out of stock. */
@@ -31885,6 +31931,7 @@ export type WebhookSampleEventTypeEnum =
 	| "PRODUCT_VARIANT_BACK_IN_STOCK"
 	| "PRODUCT_VARIANT_CREATED"
 	| "PRODUCT_VARIANT_DELETED"
+	| "PRODUCT_VARIANT_DISCOUNTED_PRICE_UPDATED"
 	| "PRODUCT_VARIANT_METADATA_UPDATED"
 	| "PRODUCT_VARIANT_OUT_OF_STOCK"
 	| "PRODUCT_VARIANT_STOCK_UPDATED"
@@ -32873,6 +32920,24 @@ export type CheckoutEmailUpdateMutation = {
 				};
 			}>;
 		} | null;
+	} | null;
+};
+
+export type CheckoutMetadataUpdateMutationVariables = Exact<{
+	checkoutId: Scalars["ID"]["input"];
+	input: Array<MetadataInput> | MetadataInput;
+}>;
+
+export type CheckoutMetadataUpdateMutation = {
+	__typename?: "Mutation";
+	updateMetadata?: {
+		__typename?: "UpdateMetadata";
+		errors: Array<{
+			__typename?: "MetadataError";
+			field?: string | null;
+			message?: string | null;
+			code: MetadataErrorCode;
+		}>;
 	} | null;
 };
 
@@ -34132,6 +34197,7 @@ export type TransactionInitializeMutation = {
 		} | null;
 		transactionEvent?: {
 			__typename?: "TransactionEvent";
+			externalUrl: string;
 			message: string;
 			type?: TransactionEventTypeEnum | null;
 		} | null;
@@ -34161,6 +34227,7 @@ export type TransactionProcessMutation = {
 		} | null;
 		transactionEvent?: {
 			__typename?: "TransactionEvent";
+			externalUrl: string;
 			message: string;
 			type?: TransactionEventTypeEnum | null;
 		} | null;
@@ -35061,6 +35128,23 @@ export function useCheckoutEmailUpdateMutation() {
 		CheckoutEmailUpdateDocument,
 	);
 }
+export const CheckoutMetadataUpdateDocument = gql`
+	mutation checkoutMetadataUpdate($checkoutId: ID!, $input: [MetadataInput!]!) {
+		updateMetadata(id: $checkoutId, input: $input) {
+			errors {
+				field
+				message
+				code
+			}
+		}
+	}
+`;
+
+export function useCheckoutMetadataUpdateMutation() {
+	return Urql.useMutation<CheckoutMetadataUpdateMutation, CheckoutMetadataUpdateMutationVariables>(
+		CheckoutMetadataUpdateDocument,
+	);
+}
 export const CheckoutCustomerAttachDocument = gql`
 	mutation checkoutCustomerAttach($checkoutId: ID!, $languageCode: LanguageCodeEnum!) {
 		checkoutCustomerAttach(id: $checkoutId) {
@@ -35303,6 +35387,7 @@ export const TransactionInitializeDocument = gql`
 				actions
 			}
 			transactionEvent {
+				externalUrl
 				message
 				type
 			}
@@ -35329,6 +35414,7 @@ export const TransactionProcessDocument = gql`
 				actions
 			}
 			transactionEvent {
+				externalUrl
 				message
 				type
 			}
