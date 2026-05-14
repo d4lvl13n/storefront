@@ -230,14 +230,41 @@ export function getCatalogFeedOptions(): CatalogFeedOptions {
 	};
 }
 
+const FEED_GRAPHQL_TIMEOUT_MS_DEFAULT = 15_000;
+const FEED_MAX_PAGES_DEFAULT = 200;
+const FEED_CACHE_TTL_MS_DEFAULT = 15 * 60 * 1000;
+const FEED_STALE_TTL_MS_DEFAULT = 60 * 60 * 1000;
+const FEED_LOG_BODY_MAX_LEN = 500;
+
+interface FeedCacheEntry {
+	items: NormalizedCatalogItem[];
+	expiresAt: number;
+}
+
+const feedCache = new Map<string, FeedCacheEntry>();
+const feedInflight = new Map<string, Promise<NormalizedCatalogItem[]>>();
+
+function readPositiveIntEnv(name: string, fallback: number): number {
+	const raw = process.env[name];
+	if (!raw) return fallback;
+	const parsed = Number.parseInt(raw, 10);
+	return Number.isFinite(parsed) && parsed > 0 ? parsed : fallback;
+}
+
 export async function fetchNormalizedCatalogItems(
 	options: CatalogFeedOptions = getCatalogFeedOptions(),
 ): Promise<NormalizedCatalogItem[]> {
 	const pageSize = options.pageSize ?? 100;
+	const maxPages = readPositiveIntEnv("FEED_MAX_PAGES", FEED_MAX_PAGES_DEFAULT);
 	let after: string | null = null;
 	const variants: SaleorFeedVariant[] = [];
+	let pagesFetched = 0;
 
 	do {
+		if (pagesFetched >= maxPages) {
+			throw new Error(`Feed pagination exceeded the limit of ${maxPages} pages (pageSize=${pageSize}).`);
+		}
+
 		const result: FeedGraphQLResult<SaleorFeedResponse> = await executeFeedGraphQL<SaleorFeedResponse>({
 			query: FEED_PRODUCT_VARIANTS_QUERY,
 			variables: {
@@ -262,9 +289,57 @@ export async function fetchNormalizedCatalogItems(
 			throw new Error("Saleor feed pagination returned hasNextPage=true without an endCursor.");
 		}
 		after = connection.pageInfo.hasNextPage ? connection.pageInfo.endCursor : null;
+		pagesFetched += 1;
 	} while (after);
 
 	return normalizeSaleorVariants(variants, options);
+}
+
+export async function getCachedNormalizedCatalogItems(
+	options: CatalogFeedOptions = getCatalogFeedOptions(),
+): Promise<NormalizedCatalogItem[]> {
+	const ttl = readPositiveIntEnv("FEED_CACHE_TTL_MS", FEED_CACHE_TTL_MS_DEFAULT);
+	const staleTtl = readPositiveIntEnv("FEED_STALE_TTL_MS", FEED_STALE_TTL_MS_DEFAULT);
+	const key = JSON.stringify(options);
+	const now = Date.now();
+	const cached = feedCache.get(key);
+
+	if (cached && cached.expiresAt > now) {
+		return cached.items;
+	}
+
+	const existing = feedInflight.get(key);
+	if (existing) {
+		return existing;
+	}
+
+	const fetchPromise = (async () => {
+		try {
+			const items = await fetchNormalizedCatalogItems(options);
+			feedCache.set(key, { items, expiresAt: Date.now() + ttl });
+			return items;
+		} catch (error) {
+			const stale = feedCache.get(key);
+			if (stale && stale.expiresAt + staleTtl > Date.now()) {
+				console.warn(
+					`[feeds] Serving stale catalog (${stale.items.length} items) after refresh failure:`,
+					error instanceof Error ? error.message : String(error),
+				);
+				return stale.items;
+			}
+			throw error;
+		} finally {
+			feedInflight.delete(key);
+		}
+	})();
+
+	feedInflight.set(key, fetchPromise);
+	return fetchPromise;
+}
+
+export function __resetFeedCacheForTests(): void {
+	feedCache.clear();
+	feedInflight.clear();
 }
 
 async function executeFeedGraphQL<T>(input: {
@@ -277,17 +352,25 @@ async function executeFeedGraphQL<T>(input: {
 		return { ok: false, error: "Missing SALEOR_API_URL or NEXT_PUBLIC_SALEOR_API_URL env variable" };
 	}
 
+	const timeoutMs = readPositiveIntEnv("FEED_GRAPHQL_TIMEOUT_MS", FEED_GRAPHQL_TIMEOUT_MS_DEFAULT);
+	const controller = new AbortController();
+	const timer = setTimeout(() => controller.abort(), timeoutMs);
+
 	try {
 		const response = await fetch(url, {
 			method: "POST",
 			headers: { "Content-Type": "application/json" },
 			body: JSON.stringify(input),
 			cache: "no-store",
+			signal: controller.signal,
 		});
 
 		if (!response.ok) {
 			const body = await response.text().catch(() => "");
-			return { ok: false, error: `HTTP ${response.status}: ${response.statusText}\n${body}` };
+			return {
+				ok: false,
+				error: `HTTP ${response.status}: ${response.statusText}\n${truncateForLog(body)}`,
+			};
 		}
 
 		const body = (await response.json()) as { data?: T; errors?: Array<{ message: string }> };
@@ -302,9 +385,23 @@ async function executeFeedGraphQL<T>(input: {
 
 		return { ok: true, data: body.data };
 	} catch (error) {
+		if (error instanceof Error && (error.name === "AbortError" || error.name === "TimeoutError")) {
+			return { ok: false, error: `Saleor feed request timed out after ${timeoutMs}ms` };
+		}
 		const message = error instanceof Error ? error.message : String(error);
-		return { ok: false, error: message };
+		return { ok: false, error: truncateForLog(message) };
+	} finally {
+		clearTimeout(timer);
 	}
+}
+
+function truncateForLog(value: string): string {
+	if (value.length <= FEED_LOG_BODY_MAX_LEN) {
+		return value;
+	}
+	return `${value.slice(0, FEED_LOG_BODY_MAX_LEN)}...[truncated ${
+		value.length - FEED_LOG_BODY_MAX_LEN
+	} chars]`;
 }
 
 export function normalizeSaleorVariants(
@@ -554,8 +651,11 @@ function getGoogleExclusion(item: NormalizedCatalogItem): { reason: string; deta
 		return { reason: "invalid_link", detail: "The product landing page URL must be http or https." };
 	}
 
-	if (!item.imageLink || !isHttpUrl(item.imageLink)) {
-		return { reason: "invalid_image_link", detail: "The item needs a public http or https image URL." };
+	if (!item.imageLink || !isSafePublicMediaUrl(item.imageLink)) {
+		return {
+			reason: "invalid_image_link",
+			detail: "The item needs a public HTTPS image URL on a non-private host.",
+		};
 	}
 
 	if (!item.price || !Number.isFinite(item.price.amount) || !item.price.currency) {
@@ -582,8 +682,11 @@ function getKlaviyoExclusion(item: NormalizedCatalogItem): { reason: string; det
 		return { reason: "invalid_link", detail: "Klaviyo catalog items require a public product URL." };
 	}
 
-	if (!item.imageLink || !isHttpsUrl(item.imageLink)) {
-		return { reason: "invalid_image_link", detail: "Klaviyo catalog image_link must be an HTTPS URL." };
+	if (!item.imageLink || !isSafePublicMediaUrl(item.imageLink)) {
+		return {
+			reason: "invalid_image_link",
+			detail: "Klaviyo catalog image_link must be a public HTTPS URL on a non-private host.",
+		};
 	}
 
 	return null;
@@ -617,12 +720,47 @@ function isHttpUrl(value: string): boolean {
 	}
 }
 
-function isHttpsUrl(value: string): boolean {
+export function isSafePublicMediaUrl(value: string | null | undefined): boolean {
+	if (!value) return false;
+
+	let parsed: URL;
 	try {
-		return new URL(value).protocol === "https:";
+		parsed = new URL(value);
 	} catch {
 		return false;
 	}
+
+	if (parsed.protocol !== "https:") return false;
+
+	const host = parsed.hostname.toLowerCase();
+	if (!host) return false;
+	if (host === "localhost" || host.endsWith(".localhost")) return false;
+
+	// IPv6 literal or any host containing a colon (e.g. bare IPv6) — refuse for simplicity.
+	if (host.startsWith("[") || host.includes(":")) return false;
+
+	if (isPrivateIpv4(host)) return false;
+
+	return true;
+}
+
+function isPrivateIpv4(host: string): boolean {
+	if (!/^\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}$/.test(host)) return false;
+	const parts = host.split(".").map((p) => Number.parseInt(p, 10));
+	if (parts.some((p) => !Number.isFinite(p) || p < 0 || p > 255)) return true;
+	const [a, b] = parts;
+	if (a === 0) return true; // 0.0.0.0/8
+	if (a === 10) return true; // 10.0.0.0/8
+	if (a === 127) return true; // loopback
+	if (a === 169 && b === 254) return true; // link-local
+	if (a === 172 && b >= 16 && b <= 31) return true; // 172.16.0.0/12
+	if (a === 192 && b === 168) return true; // 192.168.0.0/16
+	if (a === 192 && b === 0 && parts[2] === 2) return true; // TEST-NET-1
+	if (a === 198 && (b === 18 || b === 19)) return true; // benchmark
+	if (a === 198 && b === 51 && parts[2] === 100) return true; // TEST-NET-2
+	if (a === 203 && b === 0 && parts[2] === 113) return true; // TEST-NET-3
+	if (a >= 224) return true; // multicast/reserved
+	return false;
 }
 
 class MetadataScope {

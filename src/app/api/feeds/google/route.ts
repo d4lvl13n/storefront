@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
-import { fetchNormalizedCatalogItems, getCatalogFeedOptions } from "@/lib/feeds/catalog";
+import { getCachedNormalizedCatalogItems, getCatalogFeedOptions } from "@/lib/feeds/catalog";
 import { buildGoogleMerchantFeed } from "@/lib/feeds/google";
 
 export const dynamic = "force-dynamic";
@@ -9,7 +9,7 @@ const FEED_CACHE_CONTROL = "public, max-age=900, s-maxage=900, stale-while-reval
 export async function GET(request: NextRequest) {
 	try {
 		const options = getCatalogFeedOptions();
-		const catalogItems = await fetchNormalizedCatalogItems(options);
+		const catalogItems = await getCachedNormalizedCatalogItems(options);
 		const feedUrl = buildPublicFeedUrl(options.storefrontUrl, request.url);
 		const feed = buildGoogleMerchantFeed(catalogItems, feedUrl);
 

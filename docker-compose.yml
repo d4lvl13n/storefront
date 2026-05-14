@@ -21,6 +21,12 @@ services:
       - FEED_CHANNEL=${FEED_CHANNEL:-}
       - FEED_ITEM_ID_SOURCE=${FEED_ITEM_ID_SOURCE:-variant_id}
       - FEED_BRAND_NAME=${FEED_BRAND_NAME:-InfinityBio}
+      # Runtime-only secret — never bake into the image. /api/feeds/diagnostics 404s when empty.
+      - FEED_DIAGNOSTICS_TOKEN=${FEED_DIAGNOSTICS_TOKEN:-}
+      - FEED_CACHE_TTL_MS=${FEED_CACHE_TTL_MS:-}
+      - FEED_STALE_TTL_MS=${FEED_STALE_TTL_MS:-}
+      - FEED_GRAPHQL_TIMEOUT_MS=${FEED_GRAPHQL_TIMEOUT_MS:-}
+      - FEED_MAX_PAGES=${FEED_MAX_PAGES:-}
     restart: always
     ports:
       - 3000:3000

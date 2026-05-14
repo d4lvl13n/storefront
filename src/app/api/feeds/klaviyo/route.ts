@@ -1,5 +1,5 @@
 import { NextResponse } from "next/server";
-import { fetchNormalizedCatalogItems } from "@/lib/feeds/catalog";
+import { getCachedNormalizedCatalogItems } from "@/lib/feeds/catalog";
 import { buildKlaviyoCatalogFeed } from "@/lib/feeds/klaviyo";
 
 export const dynamic = "force-dynamic";
@@ -8,7 +8,7 @@ const FEED_CACHE_CONTROL = "public, max-age=900, s-maxage=900, stale-while-reval
 
 export async function GET() {
 	try {
-		const catalogItems = await fetchNormalizedCatalogItems();
+		const catalogItems = await getCachedNormalizedCatalogItems();
 		const feed = buildKlaviyoCatalogFeed(catalogItems);
 
 		return NextResponse.json(feed.items, {

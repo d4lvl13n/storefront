@@ -1,12 +1,17 @@
-import { describe, expect, it } from "vitest";
+import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
+import { isDiagnosticsAuthorized } from "@/lib/feeds/auth";
 import {
 	FEED_METADATA_KEYS,
 	type CatalogFeedOptions,
+	__resetFeedCacheForTests,
+	fetchNormalizedCatalogItems,
+	getCachedNormalizedCatalogItems,
+	isSafePublicMediaUrl,
 	normalizeSaleorVariants,
 	validateGoogleCatalogItems,
 	validateKlaviyoCatalogItems,
 } from "@/lib/feeds/catalog";
-import { buildGoogleMerchantFeed } from "@/lib/feeds/google";
+import { buildGoogleMerchantFeed, escapeXml } from "@/lib/feeds/google";
 import { buildKlaviyoCatalogFeed } from "@/lib/feeds/klaviyo";
 
 type SaleorVariantFixture = Parameters<typeof normalizeSaleorVariants>[0][number];
@@ -153,5 +158,270 @@ describe("feed builders", () => {
 			inventory_quantity: 12,
 			inventory_policy: 1,
 		});
+	});
+});
+
+describe("isSafePublicMediaUrl", () => {
+	it.each(["https://media.example.com/x.webp", "https://cdn.infinitybiolabs.com/p/123.jpg"])(
+		"accepts public HTTPS URL %s",
+		(url) => {
+			expect(isSafePublicMediaUrl(url)).toBe(true);
+		},
+	);
+
+	it.each([
+		["http://media.example.com/x.webp", "plain http"],
+		["https://localhost/x.webp", "localhost"],
+		["https://api.localhost/x.webp", "*.localhost"],
+		["https://127.0.0.1/x.webp", "loopback"],
+		["https://10.0.0.5/x.webp", "10/8"],
+		["https://172.16.0.1/x.webp", "172.16/12"],
+		["https://172.31.255.254/x.webp", "172.31 edge"],
+		["https://192.168.1.1/x.webp", "192.168/16"],
+		["https://169.254.169.254/meta", "AWS metadata link-local"],
+		["https://224.0.0.1/x.webp", "multicast"],
+		["https://[::1]/x.webp", "IPv6 literal"],
+		["https://0.0.0.0/x.webp", "0.0.0.0"],
+		["not a url", "garbage"],
+		["", "empty"],
+	])("rejects %s (%s)", (url) => {
+		expect(isSafePublicMediaUrl(url)).toBe(false);
+	});
+
+	it("rejects non-string inputs", () => {
+		expect(isSafePublicMediaUrl(null)).toBe(false);
+		expect(isSafePublicMediaUrl(undefined)).toBe(false);
+	});
+
+	it("excludes Google items whose image_link is http (was accepted pre-hardening)", () => {
+		const [item] = normalizeSaleorVariants(
+			[
+				makeVariant([
+					{ key: FEED_METADATA_KEYS.isMarketableForGmc, value: "true" },
+					{ key: FEED_METADATA_KEYS.gmcTitle, value: "Reference Material" },
+					{ key: FEED_METADATA_KEYS.gmcDescription, value: "Lab only." },
+				]),
+			],
+			options,
+		);
+		const google = validateGoogleCatalogItems([{ ...item, imageLink: "http://media.example.com/x.webp" }]);
+		expect(google.items).toHaveLength(0);
+		expect(google.exclusions[0]?.reason).toBe("invalid_image_link");
+	});
+
+	it("excludes items whose image points at a private IP", () => {
+		const [item] = normalizeSaleorVariants([makeVariant()], options);
+		const klaviyo = validateKlaviyoCatalogItems([{ ...item, imageLink: "https://192.168.1.5/x.webp" }]);
+		expect(klaviyo.items).toHaveLength(0);
+		expect(klaviyo.exclusions[0]?.reason).toBe("invalid_image_link");
+	});
+});
+
+describe("escapeXml hardening", () => {
+	it("strips XML 1.0 invalid control characters before escaping", () => {
+		expect(escapeXml("hello\x00world\x07!")).toBe("helloworld!");
+		expect(escapeXml("line1\x01line2")).toBe("line1line2");
+	});
+
+	it("preserves the legal whitespace controls (\\t, \\n, \\r)", () => {
+		expect(escapeXml("a\tb\nc\rd")).toBe("a\tb\nc\rd");
+	});
+
+	it("still escapes XML metacharacters", () => {
+		expect(escapeXml(`<tag attr="x" alt='y'>&</tag>`)).toBe(
+			"&lt;tag attr=&quot;x&quot; alt=&apos;y&apos;&gt;&amp;&lt;/tag&gt;",
+		);
+	});
+
+	it("produces a feed free of control characters even when metadata is hostile", () => {
+		const [item] = normalizeSaleorVariants(
+			[
+				makeVariant([
+					{ key: FEED_METADATA_KEYS.isMarketableForGmc, value: "true" },
+					{ key: FEED_METADATA_KEYS.gmcTitle, value: "Title\x00 with bell\x07 char" },
+					{ key: FEED_METADATA_KEYS.gmcDescription, value: "Lab \x01 only" },
+				]),
+			],
+			options,
+		);
+		const feed = buildGoogleMerchantFeed([item], "https://infinitybiolabs.com/api/feeds/google");
+		expect(feed.xml).not.toMatch(/[\x00-\x08\x0B\x0C\x0E-\x1F]/);
+		expect(feed.xml).toContain("Title with bell char");
+	});
+});
+
+describe("isDiagnosticsAuthorized", () => {
+	const ORIGINAL_TOKEN = process.env.FEED_DIAGNOSTICS_TOKEN;
+
+	afterEach(() => {
+		if (ORIGINAL_TOKEN === undefined) {
+			delete process.env.FEED_DIAGNOSTICS_TOKEN;
+		} else {
+			process.env.FEED_DIAGNOSTICS_TOKEN = ORIGINAL_TOKEN;
+		}
+	});
+
+	it("denies when no token is configured even with a header", () => {
+		delete process.env.FEED_DIAGNOSTICS_TOKEN;
+		expect(isDiagnosticsAuthorized({ authorization: "Bearer anything", queryToken: "anything" })).toBe(false);
+	});
+
+	it("accepts the correct token via Authorization header", () => {
+		process.env.FEED_DIAGNOSTICS_TOKEN = "s3cret-token-value";
+		expect(isDiagnosticsAuthorized({ authorization: "Bearer s3cret-token-value", queryToken: null })).toBe(
+			true,
+		);
+		expect(isDiagnosticsAuthorized({ authorization: "bearer s3cret-token-value", queryToken: null })).toBe(
+			true,
+		);
+	});
+
+	it("accepts the correct token via ?token query param", () => {
+		process.env.FEED_DIAGNOSTICS_TOKEN = "s3cret-token-value";
+		expect(isDiagnosticsAuthorized({ authorization: null, queryToken: "s3cret-token-value" })).toBe(true);
+	});
+
+	it("rejects an incorrect token", () => {
+		process.env.FEED_DIAGNOSTICS_TOKEN = "s3cret-token-value";
+		expect(isDiagnosticsAuthorized({ authorization: "Bearer wrong", queryToken: null })).toBe(false);
+		expect(isDiagnosticsAuthorized({ authorization: null, queryToken: "wrong" })).toBe(false);
+	});
+
+	it("rejects when no credential is supplied", () => {
+		process.env.FEED_DIAGNOSTICS_TOKEN = "s3cret-token-value";
+		expect(isDiagnosticsAuthorized({ authorization: null, queryToken: null })).toBe(false);
+		expect(isDiagnosticsAuthorized({ authorization: "Basic abc", queryToken: null })).toBe(false);
+	});
+});
+
+describe("catalog feed fetch hardening", () => {
+	const ORIGINAL_FETCH = globalThis.fetch;
+	const ORIGINAL_API_URL = process.env.NEXT_PUBLIC_SALEOR_API_URL;
+	const ORIGINAL_SERVER_URL = process.env.SALEOR_API_URL;
+
+	beforeEach(() => {
+		__resetFeedCacheForTests();
+		process.env.NEXT_PUBLIC_SALEOR_API_URL = "https://saleor.test/graphql/";
+		delete process.env.SALEOR_API_URL;
+	});
+
+	afterEach(() => {
+		globalThis.fetch = ORIGINAL_FETCH;
+		if (ORIGINAL_API_URL === undefined) {
+			delete process.env.NEXT_PUBLIC_SALEOR_API_URL;
+		} else {
+			process.env.NEXT_PUBLIC_SALEOR_API_URL = ORIGINAL_API_URL;
+		}
+		if (ORIGINAL_SERVER_URL === undefined) {
+			delete process.env.SALEOR_API_URL;
+		} else {
+			process.env.SALEOR_API_URL = ORIGINAL_SERVER_URL;
+		}
+		vi.useRealTimers();
+	});
+
+	function emptyPageResponse() {
+		return new Response(
+			JSON.stringify({
+				data: { productVariants: { pageInfo: { hasNextPage: false, endCursor: null }, edges: [] } },
+			}),
+			{ status: 200, headers: { "Content-Type": "application/json" } },
+		);
+	}
+
+	it("coalesces concurrent requests into a single Saleor fetch (single-flight)", async () => {
+		const fetchMock = vi.fn(async () => emptyPageResponse());
+		globalThis.fetch = fetchMock as unknown as typeof globalThis.fetch;
+
+		const [a, b, c] = await Promise.all([
+			getCachedNormalizedCatalogItems(options),
+			getCachedNormalizedCatalogItems(options),
+			getCachedNormalizedCatalogItems(options),
+		]);
+
+		expect(a).toEqual([]);
+		expect(b).toEqual([]);
+		expect(c).toEqual([]);
+		expect(fetchMock).toHaveBeenCalledTimes(1);
+	});
+
+	it("serves the cached snapshot within the TTL", async () => {
+		const fetchMock = vi.fn(async () => emptyPageResponse());
+		globalThis.fetch = fetchMock as unknown as typeof globalThis.fetch;
+
+		await getCachedNormalizedCatalogItems(options);
+		await getCachedNormalizedCatalogItems(options);
+		await getCachedNormalizedCatalogItems(options);
+
+		expect(fetchMock).toHaveBeenCalledTimes(1);
+	});
+
+	it("falls back to the stale snapshot if a refresh fails within the stale window", async () => {
+		process.env.FEED_CACHE_TTL_MS = "1";
+		process.env.FEED_STALE_TTL_MS = "60000";
+
+		let call = 0;
+		const fetchMock = vi.fn(async () => {
+			call += 1;
+			if (call === 1) return emptyPageResponse();
+			throw new Error("Saleor exploded");
+		});
+		globalThis.fetch = fetchMock as unknown as typeof globalThis.fetch;
+
+		const first = await getCachedNormalizedCatalogItems(options);
+		expect(first).toEqual([]);
+
+		await new Promise((resolve) => setTimeout(resolve, 5)); // exceed 1ms TTL
+
+		const second = await getCachedNormalizedCatalogItems(options);
+		expect(second).toEqual([]);
+		expect(fetchMock).toHaveBeenCalledTimes(2);
+
+		delete process.env.FEED_CACHE_TTL_MS;
+		delete process.env.FEED_STALE_TTL_MS;
+	});
+
+	it("aborts a hung Saleor request after FEED_GRAPHQL_TIMEOUT_MS", async () => {
+		process.env.FEED_GRAPHQL_TIMEOUT_MS = "20";
+
+		const fetchMock = vi.fn(
+			(_url: string, init?: RequestInit) =>
+				new Promise<Response>((_resolve, reject) => {
+					init?.signal?.addEventListener("abort", () => {
+						const abortError = new Error("aborted");
+						abortError.name = "AbortError";
+						reject(abortError);
+					});
+				}),
+		);
+		globalThis.fetch = fetchMock as unknown as typeof globalThis.fetch;
+
+		await expect(fetchNormalizedCatalogItems(options)).rejects.toThrow(/timed out after 20ms/);
+
+		delete process.env.FEED_GRAPHQL_TIMEOUT_MS;
+	});
+
+	it("throws when paginated pages exceed FEED_MAX_PAGES", async () => {
+		process.env.FEED_MAX_PAGES = "2";
+
+		const fetchMock = vi.fn(
+			async () =>
+				new Response(
+					JSON.stringify({
+						data: {
+							productVariants: {
+								pageInfo: { hasNextPage: true, endCursor: "cursor" },
+								edges: [],
+							},
+						},
+					}),
+					{ status: 200, headers: { "Content-Type": "application/json" } },
+				),
+		);
+		globalThis.fetch = fetchMock as unknown as typeof globalThis.fetch;
+
+		await expect(fetchNormalizedCatalogItems(options)).rejects.toThrow(/exceeded the limit of 2 pages/);
+
+		delete process.env.FEED_MAX_PAGES;
 	});
 });

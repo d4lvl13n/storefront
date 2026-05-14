@@ -74,8 +74,14 @@ function tag(name: string, value: string | number | null | undefined): string {
 	return `<${name}>${escapeXml(String(value))}</${name}>`;
 }
 
+// XML 1.0 forbids most C0 control characters and the unpaired-surrogate range.
+// Strip anything outside the legal set before escaping so Saleor metadata cannot
+// produce an invalid feed that GMC rejects wholesale.
+const XML_INVALID_CHARS = /[\x00-\x08\x0B\x0C\x0E-\x1F\x7F\uD800-\uDFFF￾￿]/g;
+
 export function escapeXml(value: string): string {
 	return value
+		.replace(XML_INVALID_CHARS, "")
 		.replace(/&/g, "&amp;")
 		.replace(/</g, "&lt;")
 		.replace(/>/g, "&gt;")

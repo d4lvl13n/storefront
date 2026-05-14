@@ -1,4 +1,5 @@
-import { NextResponse } from "next/server";
+import { NextRequest, NextResponse } from "next/server";
+import { isDiagnosticsAuthorized } from "@/lib/feeds/auth";
 import {
 	FEED_METADATA_KEYS,
 	fetchNormalizedCatalogItems,
@@ -9,7 +10,26 @@ import {
 
 export const dynamic = "force-dynamic";
 
-export async function GET() {
+const NO_STORE_HEADERS = {
+	"Cache-Control": "no-store",
+	"X-Robots-Tag": "noindex, nofollow",
+} as const;
+
+export async function GET(request: NextRequest) {
+	const authorized = isDiagnosticsAuthorized({
+		authorization: request.headers.get("authorization"),
+		queryToken: request.nextUrl.searchParams.get("token"),
+	});
+
+	if (!authorized) {
+		// Fail closed and indistinguishable from a missing route so unauthenticated
+		// scanners cannot confirm this endpoint exists.
+		return new NextResponse("Not found", {
+			status: 404,
+			headers: NO_STORE_HEADERS,
+		});
+	}
+
 	try {
 		const options = getCatalogFeedOptions();
 		const catalogItems = await fetchNormalizedCatalogItems(options);
@@ -41,9 +61,7 @@ export async function GET() {
 				},
 			},
 			{
-				headers: {
-					"Cache-Control": "no-store",
-				},
+				headers: NO_STORE_HEADERS,
 			},
 		);
 	} catch (error) {
@@ -53,9 +71,7 @@ export async function GET() {
 			{ error: "Unable to build feed diagnostics" },
 			{
 				status: 502,
-				headers: {
-					"Cache-Control": "no-store",
-				},
+				headers: NO_STORE_HEADERS,
 			},
 		);
 	}
