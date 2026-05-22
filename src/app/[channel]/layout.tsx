@@ -1,7 +1,19 @@
+import { notFound } from "next/navigation";
 import { type ReactNode } from "react";
 import { executePublicGraphQL } from "@/lib/graphql";
 import { ChannelsListDocument } from "@/gql/graphql";
 import { DefaultChannelSlug } from "@/app/config";
+
+/**
+ * Channel allowlist used by the runtime layout to reject unknown channel
+ * slugs. Mirrors the env-driven middleware allowlist — kept hardcoded here
+ * rather than read async from Saleor so the check is synchronous and
+ * doesn't add a per-request GraphQL roundtrip.
+ *
+ * Multi-channel deployments should extend this set (or convert to a
+ * cached upstream lookup) — single-channel today.
+ */
+const VALID_CHANNELS = new Set([DefaultChannelSlug, "default-channel"].filter(Boolean) as string[]);
 
 /**
  * Generate static params for channel routes.
@@ -48,6 +60,23 @@ export const generateStaticParams = async () => {
 	return channels.map((channel) => ({ channel }));
 };
 
-export default function ChannelLayout({ children }: { children: ReactNode }) {
+export default async function ChannelLayout({
+	children,
+	params,
+}: {
+	children: ReactNode;
+	params: Promise<{ channel: string }>;
+}) {
+	// Defense-in-depth against ghost pages: middleware canonicalizes unknown
+	// first-segments to /<DEFAULT_CHANNEL>/<rest>, but if the matcher excludes
+	// a path (static-file-looking) middleware never runs. The layout enforces
+	// the same allowlist at render time, returning 404 for any channel slug
+	// that isn't real (e.g. `/sample-coa.pdf/peptide-calculator` rendering as
+	// channel="sample-coa.pdf"). May 22 2026 audit confirmed the failure mode.
+	const { channel } = await params;
+	if (!VALID_CHANNELS.has(channel)) {
+		notFound();
+	}
+
 	return children;
 }

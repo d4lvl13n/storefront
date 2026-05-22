@@ -143,6 +143,14 @@ export function middleware(request: NextRequest) {
 }
 
 export const config = {
-	// Only run on page routes, skip API/static/internal paths
-	matcher: ["/((?!api|_next/static|_next/image|favicon.ico|.*\\..*).*)"],
+	// Only run on page routes, skip API/static/internal paths.
+	//
+	// The trailing `.*\\.[a-zA-Z0-9]+$` excludes paths whose LAST segment is
+	// a file extension (e.g. `/sitemap.xml`, `/sample-coa.pdf`). The earlier
+	// version excluded any path containing a dot anywhere, which let
+	// `/sample-coa.pdf/peptide-calculator` skip middleware entirely — bypassing
+	// channel canonicalization and producing ghost pages flagged by the
+	// May 22 2026 audit. Slugs with mid-path dots (`v2.0-blend`) still match
+	// because they don't end with `.ext$`.
+	matcher: ["/((?!api|_next/static|_next/image|favicon.ico|.*\\.[a-zA-Z0-9]+$).*)"],
 };
