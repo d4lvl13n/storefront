@@ -1,36 +1,40 @@
 import { NextResponse, type NextRequest } from "next/server";
 
-const RUO_COOKIE = "ruo_acknowledged";
-
 /**
- * Path segments that require a research-use affirmation before content is served.
- * Checked against the first segment after the channel prefix (e.g. /default-channel/products).
- */
-const RUO_GATED_SEGMENTS = new Set(["products", "categories", "collections", "cart", "checkout", "search"]);
-
-/**
- * Known good-bot user-agents that should be allowed past the research gate for SEO
- * indexing. They still see the page content; crawlers don't "purchase" so the risk is
- * minimal.
+ * Known good-bot user-agents. Used to skip the checkout auth redirect for bots
+ * (which would otherwise create redirect loops on the login page for bots that
+ * follow). The RUO attestation is enforced client-side via the ResearchGate
+ * modal overlay and server-side at commerce mutations, so we no longer gate
+ * browse routes server-side here — full HTML is served to all visitors so
+ * Googlebot can index PDPs, categories, and search pages.
  */
 const CRAWLER_UA = /(googlebot|bingbot|duckduckbot|yandex|baiduspider|facebot|twitterbot|slackbot)/i;
 
-function requiresResearchGate(pathname: string): boolean {
-	// Normalize: /{channel}/{segment}/... or /{segment}/...
-	const parts = pathname.split("/").filter(Boolean);
-	if (parts.length === 0) return false;
+/**
+ * Channel canonicalization.
+ *
+ * The storefront routes are organized as `/<channel>/<route>` via the
+ * `[channel]` dynamic segment in App Router. Because `[channel]` accepts
+ * ANY string, requests like `/waiver/peptide-calculator` resolve as
+ * `channel="waiver", route="peptide-calculator"` and render duplicate
+ * content under non-canonical URLs. The May 2026 SEO audit traced ~92% of
+ * indexed pages to this bug (34 sets of duplicates).
+ *
+ * VALID_CHANNELS: the canonical channel slugs the storefront serves.
+ * Sourced from NEXT_PUBLIC_DEFAULT_CHANNEL — extend if a multi-channel
+ * setup ever ships.
+ *
+ * NON_CHANNEL_ROOTS: first-segment paths that are REAL non-channel routes
+ * (e.g., the standalone `/checkout` flow and `/access-restricted` decline
+ * page) and must pass through untouched. Static assets and the metadata
+ * routes (`/sitemap.xml`, `/robots.txt`, `/favicon.ico`, etc.) are already
+ * excluded by the `matcher` config below — they never reach this code.
+ */
+const VALID_CHANNELS = new Set(
+	[process.env.NEXT_PUBLIC_DEFAULT_CHANNEL, "default-channel"].filter(Boolean) as string[],
+);
 
-	// Allow our own denial / verification pages
-	if (parts[0] === "access-restricted") return false;
-
-	// Path shape 1: /segment
-	if (RUO_GATED_SEGMENTS.has(parts[0] ?? "")) return true;
-
-	// Path shape 2: /channel/segment
-	if (parts.length >= 2 && RUO_GATED_SEGMENTS.has(parts[1] ?? "")) return true;
-
-	return false;
-}
+const NON_CHANNEL_ROOTS = new Set(["checkout", "access-restricted"]);
 
 /**
  * Authenticated-only checkout guard.
@@ -66,16 +70,33 @@ function requiresAuth(pathname: string): boolean {
 export function middleware(request: NextRequest) {
 	const url = request.nextUrl;
 
-	// ── 1. Research-use gate: block sensitive routes for un-affirmed visitors ──
-	const ruoAcknowledged = request.cookies.get(RUO_COOKIE)?.value === "1";
+	// ── Detect crawler UA (used by checkout auth gate to avoid redirect loops) ──
 	const ua = request.headers.get("user-agent") ?? "";
 	const isCrawler = CRAWLER_UA.test(ua);
 
-	if (!ruoAcknowledged && !isCrawler && requiresResearchGate(url.pathname)) {
-		const redirectUrl = url.clone();
-		redirectUrl.pathname = "/";
-		redirectUrl.searchParams.set("affirm", "1");
-		return NextResponse.redirect(redirectUrl);
+	// ── 1. Channel canonicalization: collapse duplicate-content URLs to /<channel>/* ──
+	//
+	// Without this, `/waiver/peptide-calculator` resolves as channel="waiver" and
+	// renders the calculator under a non-canonical URL. We 308-redirect any
+	// first-segment that isn't a real channel or a known non-channel root, prepending
+	// the default channel and preserving the rest of the path + query string.
+	//
+	// 308 (permanent) is used so search engines transfer ranking signals from the
+	// duplicate URLs to the canonical ones and stop re-crawling the dupes.
+	{
+		const parts = url.pathname.split("/").filter(Boolean);
+		const firstSegment = parts[0];
+		const defaultChannel = process.env.NEXT_PUBLIC_DEFAULT_CHANNEL;
+		if (
+			firstSegment &&
+			defaultChannel &&
+			!VALID_CHANNELS.has(firstSegment) &&
+			!NON_CHANNEL_ROOTS.has(firstSegment)
+		) {
+			const canonical = url.clone();
+			canonical.pathname = `/${defaultChannel}${url.pathname}`;
+			return NextResponse.redirect(canonical, 308);
+		}
 	}
 
 	// ── 2. Authenticated-only checkout: block guest purchase ──

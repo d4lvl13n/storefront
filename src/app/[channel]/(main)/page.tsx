@@ -18,6 +18,7 @@ export const metadata = {
 	title: "InfinityBio Labs — Pharmaceutical-Grade Research Peptides",
 	description:
 		"Premium research peptides and biotech compounds. HPLC-verified 99%+ purity, third-party tested with COA. Trusted by researchers worldwide. Fast shipping.",
+	alternates: { canonical: "/us-us" },
 };
 
 // ─── Data Fetchers ──────────────────────────────────────────

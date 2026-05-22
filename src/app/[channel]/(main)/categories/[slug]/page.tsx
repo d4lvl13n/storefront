@@ -43,6 +43,7 @@ export const generateMetadata = async (props: PageProps, parent: ResolvingMetada
 	return {
 		title: `${category?.name || "Category"} | ${category?.seoTitle || (await parent).title?.absolute}`,
 		description: category?.seoDescription || plainDescription || category?.seoTitle || category?.name,
+		alternates: { canonical: `/${params.channel}/categories/${params.slug}` },
 	};
 };
 

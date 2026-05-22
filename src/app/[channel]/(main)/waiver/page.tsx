@@ -5,6 +5,7 @@ export const metadata: Metadata = {
 	title: "Waiver & Release Agreement | Infinity BioLabs",
 	description:
 		"Waiver and Release Agreement governing the purchase, handling, and research use of products from Infinity BioLabs.",
+	alternates: { canonical: "/us-us/waiver" },
 };
 
 export default function WaiverPage() {

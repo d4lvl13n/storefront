@@ -3,6 +3,7 @@
 import { useState } from "react";
 import Link from "next/link";
 import { useParams, useSearchParams } from "next/navigation";
+import { LinkWithChannel } from "@/ui/atoms/link-with-channel";
 import { Mail, Lock, Eye, EyeOff, User } from "lucide-react";
 import { Input } from "@/ui/components/ui/input";
 import { Label } from "@/ui/components/ui/label";
@@ -284,19 +285,19 @@ export function SignUpForm() {
 
 						<p className="text-center text-xs leading-relaxed text-muted-foreground">
 							By creating an account, you agree to our{" "}
-							<Link
+							<LinkWithChannel
 								href="/terms"
 								className="text-muted-foreground underline underline-offset-2 hover:text-foreground"
 							>
 								Terms of Service
-							</Link>{" "}
+							</LinkWithChannel>{" "}
 							and{" "}
-							<Link
+							<LinkWithChannel
 								href="/privacy"
 								className="text-muted-foreground underline underline-offset-2 hover:text-foreground"
 							>
 								Privacy Policy
-							</Link>
+							</LinkWithChannel>
 						</p>
 					</form>
 				</div>

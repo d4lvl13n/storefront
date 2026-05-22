@@ -6,6 +6,7 @@ export const metadata: Metadata = {
 	title: "Affiliate Program | InfinityBio Labs",
 	description:
 		"Join the InfinityBio Labs affiliate program. Earn commissions promoting pharmaceutical-grade research peptides to your audience.",
+	alternates: { canonical: "/us-us/affiliate" },
 };
 
 const benefits = [

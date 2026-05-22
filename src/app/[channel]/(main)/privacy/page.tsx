@@ -5,6 +5,7 @@ export const metadata: Metadata = {
 	title: "Privacy Policy | Infinity BioLabs",
 	description:
 		"Privacy Policy for Infinity BioLabs — how we collect, use, share, and safeguard your information.",
+	alternates: { canonical: "/us-us/privacy" },
 };
 
 export default function PrivacyPage() {

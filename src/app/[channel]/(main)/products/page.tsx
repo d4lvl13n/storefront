@@ -12,6 +12,7 @@ export const metadata = {
 	title: "Research Compounds | InfinityBio Labs",
 	description:
 		"Browse our full catalog of pharmaceutical-grade research peptides and biotech compounds. HPLC-verified ≥98% purity, third-party tested, with Certificate of Analysis for every batch.",
+	alternates: { canonical: "/us-us/products" },
 };
 
 type PageProps = {

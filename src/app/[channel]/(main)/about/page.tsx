@@ -6,6 +6,7 @@ export const metadata: Metadata = {
 	title: "About | InfinityBio Labs",
 	description:
 		"InfinityBio Labs provides pharmaceutical-grade research peptides with 99%+ purity. Learn about our mission, quality standards, and commitment to advancing research.",
+	alternates: { canonical: "/us-us/about" },
 };
 
 const milestones = [

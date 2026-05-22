@@ -4,6 +4,7 @@ import { LegalLayout } from "../legal-layout";
 export const metadata: Metadata = {
 	title: "Terms of Service | Infinity BioLabs",
 	description: "Terms of Service governing access to and use of Infinity BioLabs website and services.",
+	alternates: { canonical: "/us-us/terms" },
 };
 
 export default function TermsPage() {

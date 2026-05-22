@@ -1,5 +1,5 @@
 import { cookies } from "next/headers";
-import Link from "next/link";
+import { LinkWithChannel } from "../atoms/link-with-channel";
 import { ResearchGateForm } from "./research-gate-form";
 
 export const RUO_COOKIE = "ruo_acknowledged";
@@ -103,21 +103,21 @@ export async function ResearchGate() {
 
 				<p className="mt-5 text-[11px] leading-relaxed text-muted-foreground">
 					By continuing you agree to our{" "}
-					<Link href="/terms" className="underline hover:text-foreground">
+					<LinkWithChannel href="/terms" className="underline hover:text-foreground">
 						Terms of Service
-					</Link>
+					</LinkWithChannel>
 					,{" "}
-					<Link href="/ruo-policy" className="underline hover:text-foreground">
+					<LinkWithChannel href="/ruo-policy" className="underline hover:text-foreground">
 						Research Use Only Policy
-					</Link>
+					</LinkWithChannel>
 					,{" "}
-					<Link href="/waiver" className="underline hover:text-foreground">
+					<LinkWithChannel href="/waiver" className="underline hover:text-foreground">
 						Waiver &amp; Release
-					</Link>
+					</LinkWithChannel>
 					, and{" "}
-					<Link href="/privacy" className="underline hover:text-foreground">
+					<LinkWithChannel href="/privacy" className="underline hover:text-foreground">
 						Privacy Policy
-					</Link>
+					</LinkWithChannel>
 					.
 				</p>
 			</div>

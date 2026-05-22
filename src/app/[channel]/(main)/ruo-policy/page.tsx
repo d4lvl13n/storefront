@@ -5,6 +5,7 @@ export const metadata: Metadata = {
 	title: "Research Use Only Policy | Infinity BioLabs",
 	description:
 		"Research Use Only (RUO) Policy — product classification, authorized purchasers, and compliance requirements for Infinity BioLabs.",
+	alternates: { canonical: "/us-us/ruo-policy" },
 };
 
 export default function RUOPolicyPage() {
