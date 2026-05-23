@@ -1,63 +1,71 @@
 import { notFound } from "next/navigation";
+import { cache } from "react";
 import { type ReactNode } from "react";
 import { executePublicGraphQL } from "@/lib/graphql";
 import { ChannelsListDocument } from "@/gql/graphql";
 import { DefaultChannelSlug } from "@/app/config";
 
 /**
- * Channel allowlist used by the runtime layout to reject unknown channel
- * slugs. Mirrors the env-driven middleware allowlist — kept hardcoded here
- * rather than read async from Saleor so the check is synchronous and
- * doesn't add a per-request GraphQL roundtrip.
+ * Fetch the set of active channel slugs from Saleor — the source of truth.
  *
- * Multi-channel deployments should extend this set (or convert to a
- * cached upstream lookup) — single-channel today.
+ * Cached for 1 hour at the GraphQL fetch layer (channels change rarely).
+ * Wrapped in React `cache()` so multiple call sites in one render tree
+ * dedupe to a single fetch per request.
+ *
+ * Saleor's `channels` query is permissioned (AUTHENTICATED_APP), so this
+ * requires SALEOR_APP_TOKEN at runtime. If the token is missing or Saleor
+ * is unreachable, we degrade gracefully to {DefaultChannelSlug} rather
+ * than 404 the whole site — but log loudly so the infra issue surfaces.
  */
-const VALID_CHANNELS = new Set([DefaultChannelSlug, "default-channel"].filter(Boolean) as string[]);
+const CHANNEL_LIST_REVALIDATE_SECONDS = 3600;
+
+const getActiveChannelSlugs = cache(async (): Promise<Set<string>> => {
+	const fallback = (): Set<string> => (DefaultChannelSlug ? new Set([DefaultChannelSlug]) : new Set());
+
+	if (!process.env.SALEOR_APP_TOKEN) {
+		console.warn(
+			"[ChannelLayout] SALEOR_APP_TOKEN not set — falling back to NEXT_PUBLIC_DEFAULT_CHANNEL " +
+				"for channel validation. This is acceptable for single-channel deployments but means " +
+				"new Saleor channels won't be auto-discovered at runtime.",
+		);
+		return fallback();
+	}
+
+	const result = await executePublicGraphQL(ChannelsListDocument, {
+		headers: { Authorization: `Bearer ${process.env.SALEOR_APP_TOKEN}` },
+		revalidate: CHANNEL_LIST_REVALIDATE_SECONDS,
+	});
+
+	if (!result.ok) {
+		console.warn(
+			"[ChannelLayout] Saleor channels query failed — using DefaultChannelSlug fallback:",
+			result.error.message,
+		);
+		return fallback();
+	}
+
+	if (!result.data.channels || result.data.channels.length === 0) {
+		console.warn("[ChannelLayout] Saleor returned no channels — using DefaultChannelSlug fallback.");
+		return fallback();
+	}
+
+	return new Set(result.data.channels.filter((ch) => ch.isActive).map((ch) => ch.slug));
+});
 
 /**
  * Generate static params for channel routes.
  *
- * Uses NEXT_PUBLIC_DEFAULT_CHANNEL as the primary channel.
- * Optionally discovers additional channels via SALEOR_APP_TOKEN (for multi-channel builds).
+ * Mirrors the runtime allowlist by reading the same Saleor channels query.
  */
 export const generateStaticParams = async () => {
-	const channels: string[] = [];
+	const slugs = await getActiveChannelSlugs();
 
-	// 1. Add default channel (required)
-	if (DefaultChannelSlug) {
-		channels.push(DefaultChannelSlug);
-	}
-
-	// 2. Optionally discover additional channels via API (for multi-channel setups)
-	if (process.env.SALEOR_APP_TOKEN) {
-		const result = await executePublicGraphQL(ChannelsListDocument, {
-			headers: {
-				Authorization: `Bearer ${process.env.SALEOR_APP_TOKEN}`,
-			},
-		});
-
-		if (result.ok && result.data.channels) {
-			const activeChannelSlugs = result.data.channels.filter((ch) => ch.isActive).map((ch) => ch.slug);
-
-			// Add channels not already in the list
-			for (const slug of activeChannelSlugs) {
-				if (!channels.includes(slug)) {
-					channels.push(slug);
-				}
-			}
-		} else if (!result.ok) {
-			console.warn("[Channels] Failed to fetch additional channels from API:", result.error.message);
-		}
-	}
-
-	// Return channels (or empty if none configured - will show setup page)
-	if (channels.length === 0) {
+	if (slugs.size === 0) {
 		console.warn("[Channels] No channels configured. Set NEXT_PUBLIC_DEFAULT_CHANNEL.");
 		return [];
 	}
 
-	return channels.map((channel) => ({ channel }));
+	return Array.from(slugs).map((channel) => ({ channel }));
 };
 
 export default async function ChannelLayout({
@@ -70,11 +78,12 @@ export default async function ChannelLayout({
 	// Defense-in-depth against ghost pages: middleware canonicalizes unknown
 	// first-segments to /<DEFAULT_CHANNEL>/<rest>, but if the matcher excludes
 	// a path (static-file-looking) middleware never runs. The layout enforces
-	// the same allowlist at render time, returning 404 for any channel slug
-	// that isn't real (e.g. `/sample-coa.pdf/peptide-calculator` rendering as
-	// channel="sample-coa.pdf"). May 22 2026 audit confirmed the failure mode.
+	// the Saleor-sourced channel allowlist at render time, returning 404 for
+	// any slug Saleor doesn't recognize (e.g. `/sample-coa.pdf/peptide-calculator`
+	// rendering as channel="sample-coa.pdf"). May 22 2026 audit failure mode.
 	const { channel } = await params;
-	if (!VALID_CHANNELS.has(channel)) {
+	const validChannels = await getActiveChannelSlugs();
+	if (!validChannels.has(channel)) {
 		notFound();
 	}
 
