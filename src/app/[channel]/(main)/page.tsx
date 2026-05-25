@@ -1,4 +1,3 @@
-import Image from "next/image";
 import {
 	ProductListByCollectionDocument,
 	CategoriesListDocument,
@@ -12,7 +11,6 @@ import { HowOrderingWorks } from "@/ui/components/how-ordering-works";
 import { VerifiedStoryCard } from "@/ui/components/verified-story-card";
 import { ShopGoalCard } from "@/ui/components/shop-goal-card";
 import { NewsletterForm } from "@/ui/components/newsletter-form";
-import { HeroScrollIndicator } from "@/ui/components/hero-scroll-indicator";
 
 export const metadata = {
 	title: "InfinityBio Labs — Pharmaceutical-Grade Research Peptides",
@@ -241,15 +239,6 @@ const qualityPillars = [
 	},
 ];
 
-// ─── Stats ──────────────────────────────────────────────────
-
-const statsData = [
-	{ value: "73+", label: "Research Compounds" },
-	{ value: "99%+", label: "Purity Standard" },
-	{ value: "48h", label: "Order Processing" },
-	{ value: "100%", label: "Batch Tested" },
-];
-
 // ─── Testimonials ────────────────────────────────────────────
 // TODO: Replace with real, attributable reviews before enabling
 // TestimonialsSection in <Page>. Do NOT ship placeholder quotes as
@@ -274,101 +263,68 @@ const institutions: string[] = [];
 
 function HeroSection() {
 	return (
-		<section className="noise-overlay relative -mt-16 flex min-h-[90vh] items-center overflow-hidden bg-background pt-16">
-			{/* Full-bleed background image */}
-			<Image src="/hero-2.webp" alt="" fill priority className="object-cover object-center" />
-
-			{/* Gradient overlay for text readability */}
+		<section className="relative -mt-16 min-h-[92svh] overflow-hidden bg-background pt-16 text-foreground">
+			<video
+				className="absolute inset-0 h-full w-full object-cover object-[58%_center]"
+				autoPlay
+				loop
+				muted
+				playsInline
+				preload="metadata"
+				poster="/hero-2.webp"
+				aria-hidden="true"
+				tabIndex={-1}
+			>
+				<source src="/videos/hero-final-v3.mp4" type="video/mp4" />
+			</video>
 			<div
 				className="absolute inset-0"
 				style={{
 					background:
-						"linear-gradient(to right, var(--background) 0%, color-mix(in oklch, var(--background) 80%, transparent) 50%, color-mix(in oklch, var(--background) 60%, transparent) 100%)",
+						"linear-gradient(90deg, var(--background) 0%, color-mix(in oklch, var(--background) 72%, transparent) 38%, color-mix(in oklch, var(--background) 18%, transparent) 100%)",
 				}}
 			/>
 			<div
 				className="absolute inset-0"
-				style={{ backgroundColor: "color-mix(in oklch, var(--background) 40%, transparent)" }}
-			/>
-
-			{/* Gradient orbs */}
-			<div className="pointer-events-none absolute inset-0">
-				<div className="absolute -left-40 -top-40 h-[500px] w-[500px] rounded-full bg-emerald-500/20 blur-[120px]" />
-				<div className="absolute -bottom-40 -right-40 h-[600px] w-[600px] rounded-full bg-teal-500/15 blur-[120px]" />
-				<div className="absolute left-1/2 top-1/3 h-[300px] w-[300px] -translate-x-1/2 rounded-full bg-green-500/10 blur-[100px]" />
-			</div>
-
-			{/* Subtle grid */}
-			<div
-				className="pointer-events-none absolute inset-0 opacity-[0.03]"
 				style={{
-					backgroundImage:
-						"linear-gradient(rgba(255,255,255,.1) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,.1) 1px, transparent 1px)",
-					backgroundSize: "60px 60px",
+					background:
+						"linear-gradient(180deg, color-mix(in oklch, var(--background) 6%, transparent) 0%, color-mix(in oklch, var(--background) 14%, transparent) 55%, color-mix(in oklch, var(--background) 62%, transparent) 100%)",
 				}}
 			/>
 
-			<div className="relative z-10 mx-auto w-full max-w-7xl px-6 py-20">
-				<div className="max-w-2xl">
-					<p className="mb-6 animate-fade-in text-sm font-medium uppercase tracking-[0.3em] text-muted-foreground opacity-0">
-						Pharmaceutical-Grade Research Peptides
+			<div className="relative z-10 mx-auto flex min-h-[calc(92svh-4rem)] w-full max-w-7xl items-end px-6 pb-16 pt-24 sm:pb-24 lg:pb-28">
+				<div className="max-w-4xl">
+					<p className="animate-fade-in text-xs font-semibold uppercase tracking-[0.28em] text-emerald-200 opacity-0">
+						Research supply platform
 					</p>
-					<h1 className="animate-fade-in-up text-3xl font-bold leading-[1.05] tracking-tight text-foreground opacity-0 sm:text-5xl md:text-6xl lg:text-7xl">
-						The Science
-						<br />
-						<span className="bg-gradient-to-r from-emerald-400 via-teal-400 to-cyan-400 bg-clip-text text-transparent">
-							of Purity
-						</span>
+					<h1 className="mt-5 animate-fade-in-up text-5xl font-semibold leading-none text-foreground opacity-0 sm:text-7xl lg:text-[6.5rem]">
+						Research compounds, fully documented.
 					</h1>
-					<p className="mt-6 max-w-xl animate-fade-in-up-delay-1 text-base leading-relaxed text-foreground opacity-0 sm:mt-8 sm:text-lg">
+					<p className="text-foreground/75 mt-6 max-w-2xl animate-fade-in-up-delay-1 text-base leading-7 opacity-0 sm:text-xl sm:leading-8">
 						HPLC-verified research peptides and biotech compounds with 99%+ purity. Every batch is
-						independently tested by accredited U.S. laboratories. Every order is fully traceable and ships
-						with its original U.S.-issued Certificate of Analysis.
+						independently tested by accredited U.S. laboratories.
 					</p>
 
-					{/* CTAs */}
-					<div className="mt-10 flex animate-fade-in-up-delay-2 flex-col gap-4 opacity-0 sm:flex-row sm:items-center">
+					<div className="mt-9 flex animate-fade-in-up-delay-2 opacity-0">
 						<LinkWithChannel
 							href="/products"
-							className="group inline-flex h-12 items-center justify-center gap-2 rounded-full bg-emerald-500 px-6 text-sm font-semibold text-foreground transition-all hover:bg-emerald-400 hover:shadow-lg hover:shadow-emerald-500/25 sm:px-8"
+							className="group inline-flex h-14 items-center justify-center gap-3 rounded-full bg-emerald-500 px-8 text-base font-semibold text-foreground transition-all hover:bg-emerald-400 hover:shadow-lg hover:shadow-emerald-500/25 sm:px-9"
 						>
-							Explore Compounds
+							Explore research compounds
 							<svg
 								className="h-4 w-4 transition-transform group-hover:translate-x-1"
 								fill="none"
 								viewBox="0 0 24 24"
 								stroke="currentColor"
 								strokeWidth={2}
+								aria-hidden="true"
 							>
 								<path strokeLinecap="round" strokeLinejoin="round" d="M13 7l5 5m0 0l-5 5m5-5H6" />
 							</svg>
 						</LinkWithChannel>
-						<a
-							href="#browse-by-mechanism"
-							className="inline-flex h-12 items-center justify-center rounded-full border border-border bg-background px-6 text-sm font-semibold text-foreground transition-colors hover:border-muted-foreground hover:text-foreground sm:px-8"
-						>
-							Browse by Mechanism
-						</a>
 					</div>
-
-					{/* Hero stats */}
-					<dl className="mt-10 flex animate-fade-in-up-delay-2 flex-wrap gap-6 opacity-0 sm:mt-12 sm:gap-8 lg:gap-12">
-						{statsData.map((stat) => (
-							<div key={stat.label}>
-								<dt className="text-xs font-medium uppercase tracking-wider text-muted-foreground">
-									{stat.label}
-								</dt>
-								<dd className="mt-1 font-mono text-xl font-bold text-emerald-400 sm:text-2xl">
-									{stat.value}
-								</dd>
-							</div>
-						))}
-					</dl>
 				</div>
 			</div>
-
-			{/* Scroll indicator (fades out on first scroll) */}
-			<HeroScrollIndicator />
 		</section>
 	);
 }

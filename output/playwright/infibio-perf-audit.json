@@ -1,0 +1,324 @@
+{
+	"liveWithKlaviyo": [
+		{
+			"url": "https://www.infinitybiolabs.com/us-us",
+			"title": "InfinityBio Labs — Pharmaceutical-Grade Research Peptides | InfinityBio Labs",
+			"vitals": {
+				"cls": 0,
+				"lcp": 2212,
+				"lcpUrl": "https://www.infinitybiolabs.com/hero-2.webp?dpl=dpl_EdGwv3EsXJFHRoXQ7x5MMwiGrG7Z",
+				"longTasks": 0
+			},
+			"nav": {
+				"domContentLoaded": 2187,
+				"load": 4125,
+				"responseEnd": 2150,
+				"transfer": 32382,
+				"encoded": 32082
+			},
+			"byType": {
+				"link": {
+					"count": 13,
+					"transfer": 208028,
+					"encoded": 206228
+				},
+				"script": {
+					"count": 38,
+					"transfer": 189498,
+					"encoded": 185598
+				},
+				"img": {
+					"count": 4,
+					"transfer": 1525511,
+					"encoded": 1525211
+				},
+				"fetch": {
+					"count": 28,
+					"transfer": 55893,
+					"encoded": 48093
+				},
+				"other": {
+					"count": 2,
+					"transfer": 3947,
+					"encoded": 3647
+				},
+				"xmlhttprequest": {
+					"count": 5,
+					"transfer": 0,
+					"encoded": 0
+				},
+				"css": {
+					"count": 1,
+					"transfer": 944,
+					"encoded": 644
+				}
+			},
+			"domNodes": 1226,
+			"imageCount": 16,
+			"scriptCount": 118,
+			"hasKlaviyoPopup": true
+		},
+		{
+			"url": "https://www.infinitybiolabs.com/us-us/products",
+			"title": "Research Compounds | InfinityBio Labs",
+			"vitals": {
+				"cls": 0,
+				"lcp": 1608,
+				"lcpUrl": "https://api.infinitybiolabs.com/media/thumbnails/products/glp-1_3ea3ca99_thumbnail_1024.webp",
+				"longTasks": 0
+			},
+			"nav": {
+				"domContentLoaded": 1608,
+				"load": 1729,
+				"responseEnd": 1605,
+				"transfer": 17761,
+				"encoded": 17461
+			},
+			"byType": {
+				"link": {
+					"count": 12,
+					"transfer": 0,
+					"encoded": 140656
+				},
+				"script": {
+					"count": 41,
+					"transfer": 33346,
+					"encoded": 217444
+				},
+				"img": {
+					"count": 8,
+					"transfer": 18371,
+					"encoded": 1543282
+				},
+				"other": {
+					"count": 2,
+					"transfer": 0,
+					"encoded": 3647
+				},
+				"fetch": {
+					"count": 13,
+					"transfer": 15103,
+					"encoded": 11503
+				},
+				"xmlhttprequest": {
+					"count": 5,
+					"transfer": 0,
+					"encoded": 0
+				},
+				"css": {
+					"count": 2,
+					"transfer": 0,
+					"encoded": 29932
+				}
+			},
+			"domNodes": 480,
+			"imageCount": 15,
+			"scriptCount": 67,
+			"hasKlaviyoPopup": true
+		},
+		{
+			"url": "https://www.infinitybiolabs.com/us-us/products/bpc-157",
+			"title": "BPC-157 Reference Standard | Cytoprotective Peptide",
+			"vitals": {
+				"cls": 0,
+				"lcp": 1468,
+				"lcpUrl": "https://api.infinitybiolabs.com/media/thumbnails/products/2026-04-23T05-28-12_ffc46326_thumbnail_1024.webp",
+				"longTasks": 0
+			},
+			"nav": {
+				"domContentLoaded": 1290,
+				"load": 1290,
+				"responseEnd": 1288,
+				"transfer": 22618,
+				"encoded": 22318
+			},
+			"byType": {
+				"link": {
+					"count": 9,
+					"transfer": 0,
+					"encoded": 140656
+				},
+				"script": {
+					"count": 42,
+					"transfer": 23853,
+					"encoded": 235852
+				},
+				"img": {
+					"count": 2,
+					"transfer": 0,
+					"encoded": 1525211
+				},
+				"other": {
+					"count": 2,
+					"transfer": 0,
+					"encoded": 3647
+				},
+				"fetch": {
+					"count": 7,
+					"transfer": 5598,
+					"encoded": 3798
+				},
+				"xmlhttprequest": {
+					"count": 5,
+					"transfer": 0,
+					"encoded": 0
+				},
+				"css": {
+					"count": 2,
+					"transfer": 0,
+					"encoded": 29932
+				}
+			},
+			"domNodes": 586,
+			"imageCount": 4,
+			"scriptCount": 83,
+			"hasKlaviyoPopup": true
+		}
+	],
+	"cleanNoKlaviyo": [
+		{
+			"url": "https://www.infinitybiolabs.com/us-us",
+			"title": "InfinityBio Labs — Pharmaceutical-Grade Research Peptides | InfinityBio Labs",
+			"vitals": {
+				"cls": 0,
+				"lcp": 1716,
+				"lcpUrl": "https://www.infinitybiolabs.com/hero-2.webp?dpl=dpl_EdGwv3EsXJFHRoXQ7x5MMwiGrG7Z",
+				"longTasks": 0
+			},
+			"nav": {
+				"domContentLoaded": 1585,
+				"load": 2239,
+				"responseEnd": 1544,
+				"transfer": 32373,
+				"encoded": 32073
+			},
+			"byType": {
+				"link": {
+					"count": 12,
+					"transfer": 208028,
+					"encoded": 206228
+				},
+				"script": {
+					"count": 13,
+					"transfer": 189498,
+					"encoded": 185598
+				},
+				"img": {
+					"count": 3,
+					"transfer": 1525511,
+					"encoded": 1525211
+				},
+				"fetch": {
+					"count": 25,
+					"transfer": 53114,
+					"encoded": 45914
+				},
+				"other": {
+					"count": 2,
+					"transfer": 7894,
+					"encoded": 7294
+				}
+			},
+			"domNodes": 1164,
+			"imageCount": 15,
+			"scriptCount": 105,
+			"hasKlaviyoPopup": true
+		},
+		{
+			"url": "https://www.infinitybiolabs.com/us-us/products",
+			"title": "Research Compounds | InfinityBio Labs",
+			"vitals": {
+				"cls": 0,
+				"lcp": 804,
+				"lcpUrl": "https://api.infinitybiolabs.com/media/thumbnails/products/glp-1_3ea3ca99_thumbnail_1024.webp",
+				"longTasks": 0
+			},
+			"nav": {
+				"domContentLoaded": 608,
+				"load": 853,
+				"responseEnd": 602,
+				"transfer": 17156,
+				"encoded": 16856
+			},
+			"byType": {
+				"link": {
+					"count": 12,
+					"transfer": 259360,
+					"encoded": 257260
+				},
+				"script": {
+					"count": 18,
+					"transfer": 222844,
+					"encoded": 217444
+				},
+				"img": {
+					"count": 8,
+					"transfer": 1587951,
+					"encoded": 1587351
+				},
+				"fetch": {
+					"count": 13,
+					"transfer": 14966,
+					"encoded": 11366
+				},
+				"other": {
+					"count": 1,
+					"transfer": 3947,
+					"encoded": 3647
+				}
+			},
+			"domNodes": 407,
+			"imageCount": 14,
+			"scriptCount": 49,
+			"hasKlaviyoPopup": false
+		},
+		{
+			"url": "https://www.infinitybiolabs.com/us-us/products/bpc-157",
+			"title": "BPC-157 Reference Standard | Cytoprotective Peptide",
+			"vitals": {
+				"cls": 0,
+				"lcp": 1532,
+				"lcpUrl": "https://api.infinitybiolabs.com/media/thumbnails/products/2026-04-23T05-28-12_ffc46326_thumbnail_1024.webp",
+				"longTasks": 0
+			},
+			"nav": {
+				"domContentLoaded": 1519,
+				"load": 1519,
+				"responseEnd": 1515,
+				"transfer": 22736,
+				"encoded": 22436
+			},
+			"byType": {
+				"link": {
+					"count": 8,
+					"transfer": 142156,
+					"encoded": 140656
+				},
+				"script": {
+					"count": 19,
+					"transfer": 241552,
+					"encoded": 235852
+				},
+				"img": {
+					"count": 1,
+					"transfer": 1525511,
+					"encoded": 1525211
+				},
+				"fetch": {
+					"count": 7,
+					"transfer": 5665,
+					"encoded": 3865
+				},
+				"other": {
+					"count": 1,
+					"transfer": 3947,
+					"encoded": 3647
+				}
+			},
+			"domNodes": 521,
+			"imageCount": 3,
+			"scriptCount": 69,
+			"hasKlaviyoPopup": false
+		}
+	]
+}

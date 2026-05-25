@@ -1,31 +1,60 @@
 import { Suspense } from "react";
 import { Logo } from "./logo";
-import { NavLinks } from "./nav/components/nav-links";
 import { CartNavItem } from "./nav/components/cart-nav-item";
 import { UserMenuContainer } from "./nav/components/user-menu/user-menu-container";
 import { MobileMenu } from "./nav/components/mobile-menu";
 import { SearchBar } from "./nav/components/search-bar";
 import { ScrollHeader } from "./scroll-header";
-import { ThemeToggle } from "./theme-toggle";
 import { LanguageSwitcher } from "./language-switcher";
+import { ThemeToggle } from "./theme-toggle";
 import { LinkWithChannel } from "@/ui/atoms/link-with-channel";
+
+const primaryNavItems = [
+	{ href: "/products", label: "Shop", description: "Full research catalog" },
+	{ href: "/coa", label: "COA", description: "Verify batch documentation" },
+	{ href: "/peptide-calculator", label: "Tools", description: "Protocol planning utilities" },
+	{ href: "/research-library", label: "Research", description: "Peer-reviewed literature" },
+	{ href: "/faq", label: "FAQ", description: "Shipping, storage, and orders" },
+];
 
 function SearchBarSkeleton() {
 	return <div className="h-10 w-full max-w-md animate-pulse rounded-lg bg-secondary" />;
 }
 
-function NavLinksSkeleton() {
+function DesktopNav() {
+	return (
+		<ul className="flex items-center gap-7">
+			{primaryNavItems.map((item) => (
+				<li key={item.href} className="inline-flex">
+					<LinkWithChannel
+						href={item.href}
+						prefetch={false}
+						className="text-[13px] font-medium text-muted-foreground transition-colors hover:text-foreground"
+					>
+						{item.label}
+					</LinkWithChannel>
+				</li>
+			))}
+		</ul>
+	);
+}
+
+function MobileNavItems({ channel }: { channel: string }) {
 	return (
 		<>
-			<li className="inline-flex">
-				<span className="h-4 w-8 animate-pulse rounded bg-muted" />
+			<li className="pb-2">
+				<Suspense fallback={<SearchBarSkeleton />}>
+					<SearchBar channel={channel} />
+				</Suspense>
 			</li>
-			<li className="inline-flex">
-				<span className="h-4 w-16 animate-pulse rounded bg-muted" />
-			</li>
-			<li className="inline-flex">
-				<span className="h-4 w-12 animate-pulse rounded bg-muted" />
-			</li>
+			{primaryNavItems.map((item) => (
+				<li key={item.href}>
+					<LinkWithChannel href={item.href} prefetch={false} className="block">
+						<span className="block text-base font-medium text-foreground">{item.label}</span>
+						<span className="mt-1 block text-sm text-muted-foreground">{item.description}</span>
+					</LinkWithChannel>
+				</li>
+			))}
 		</>
 	);
 }
@@ -35,32 +64,30 @@ export async function Header({ channel }: { channel: string }) {
 		<ScrollHeader>
 			<div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
 				<div className="flex h-16 items-center justify-between gap-4">
-					{/* Logo - no Suspense needed (simple server component) */}
-					<Logo className="-my-2 h-14 w-auto sm:-my-1 sm:h-16 lg:-my-2 lg:h-20" />
+					<Logo className="-my-1 h-12 w-auto sm:h-14 lg:h-16" />
 
-					{/* Search bar + All shortcut - Suspense for server action */}
-					<div className="hidden flex-1 items-center justify-center gap-3 md:flex">
-						<Suspense fallback={<SearchBarSkeleton />}>
-							<SearchBar channel={channel} />
-						</Suspense>
+					<nav className="hidden flex-1 justify-center lg:flex" aria-label="Primary navigation">
+						<DesktopNav />
+					</nav>
+
+					<div className="hidden flex-1 justify-center md:flex lg:hidden">
 						<LinkWithChannel
 							href="/products"
-							className="hover:bg-secondary/80 inline-flex h-10 shrink-0 items-center justify-center rounded-lg border border-border bg-secondary px-3 text-sm font-medium text-foreground transition-colors hover:border-emerald-500/40"
+							className="bg-background/70 inline-flex h-10 items-center justify-center rounded-full border border-border px-5 text-sm font-semibold text-foreground backdrop-blur transition-colors hover:border-emerald-500/40 hover:bg-secondary"
 						>
-							All
+							Shop catalog
 						</LinkWithChannel>
 					</div>
 
-					{/* Navigation - Suspense for cached data + client active state */}
-					<nav className="hidden items-center gap-6 lg:flex">
-						<Suspense fallback={<NavLinksSkeleton />}>
-							<NavLinks channel={channel} />
-						</Suspense>
-					</nav>
-
-					{/* Actions */}
-					<div className="flex items-center gap-1">
-						<LanguageSwitcher />
+					<div className="flex items-center gap-1.5">
+						<div className="hidden w-[18rem] xl:block">
+							<Suspense fallback={<SearchBarSkeleton />}>
+								<SearchBar channel={channel} />
+							</Suspense>
+						</div>
+						<div className="hidden 2xl:block">
+							<LanguageSwitcher />
+						</div>
 						<ThemeToggle />
 						<Suspense fallback={<div className="h-10 w-10" />}>
 							<UserMenuContainer />
@@ -70,12 +97,7 @@ export async function Header({ channel }: { channel: string }) {
 						</Suspense>
 						<Suspense>
 							<MobileMenu>
-								<Suspense fallback={<SearchBarSkeleton />}>
-									<SearchBar channel={channel} />
-								</Suspense>
-								<Suspense fallback={<NavLinksSkeleton />}>
-									<NavLinks channel={channel} />
-								</Suspense>
+								<MobileNavItems channel={channel} />
 							</MobileMenu>
 						</Suspense>
 					</div>
