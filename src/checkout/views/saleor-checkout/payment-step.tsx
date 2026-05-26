@@ -414,7 +414,7 @@ export const PaymentStep: FC<PaymentStepProps> = ({
 									data-tax-cents={totals?.tax_cents}
 									data-discount-cents={totals?.discount_cents}
 									data-total-cents={totals?.total_cents}
-									data-success-url={`${window.location.origin}/checkout`}
+									data-success-url={`${window.location.origin}/checkout?step=confirmation`}
 									data-from-api-payload={JSON.stringify(hostedPaymentData.fromApiPayload)}
 									className="min-h-[450px] w-full rounded-lg bg-white"
 								/>

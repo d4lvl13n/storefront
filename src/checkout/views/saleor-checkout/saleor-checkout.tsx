@@ -14,6 +14,7 @@ import { useCustomerAttach } from "@/checkout/hooks/use-customer-attach";
 import { useAffiliateCode } from "@/checkout/hooks/use-affiliate-code";
 import { EmptyCartPage } from "../empty-cart-page";
 import { PageNotFound } from "../page-not-found";
+import { PostPaymentConfirmation } from "./post-payment-confirmation";
 import { CheckoutSkeleton } from "./checkout-skeleton";
 import { getCheckoutSteps, getCurrentStepFromParams, type CheckoutStepType } from "./flow";
 import { createQueryString } from "@/checkout/lib/utils/url";
@@ -62,6 +63,13 @@ export const SaleorCheckout: FC = () => {
 
 	// Only show skeleton on initial load when we have no data yet
 	const showInitialSkeleton = !checkout && (isAuthenticating || fetchingCheckout);
+
+	// After a successful payment, the checkout is consumed by Saleor.
+	// If we land on ?step=confirmation without a valid checkout, show the success page.
+	const stepSlug = searchParams.get("step");
+	if (isCheckoutInvalid && stepSlug === "confirmation") {
+		return <PostPaymentConfirmation />;
+	}
 
 	if (isCheckoutInvalid) {
 		return <PageNotFound />;
