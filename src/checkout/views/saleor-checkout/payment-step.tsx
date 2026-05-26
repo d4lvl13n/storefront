@@ -24,6 +24,7 @@ type HostedPaymentData = {
 	widgetUrl?: string;
 	widgetMode?: string;
 	merchantId?: string;
+	currency?: string;
 	fromApiPayload?: Record<string, unknown>;
 	redirectUrl?: string;
 };
@@ -345,6 +346,7 @@ export const PaymentStep: FC<PaymentStepProps> = ({
 							widgetUrl: responseData.widgetUrl as string,
 							widgetMode: responseData.widgetMode as string,
 							merchantId: responseData.merchantId as string,
+							currency: responseData.currency as string,
 							fromApiPayload: responseData.fromApiPayload as Record<string, unknown>,
 						});
 						return;
@@ -513,17 +515,17 @@ export const PaymentStep: FC<PaymentStepProps> = ({
 
 			{/* Payment widget (when hosted provider returned widget data) */}
 			{hostedPaymentData?.fromApiPayload && (
-				<div className="space-y-4">
-					<h2 className="text-lg font-semibold">Payment</h2>
+				<div className="w-full space-y-4">
 					<div
 						data-sellabroad-payment-container
 						data-merchant-id={hostedPaymentData.merchantId}
 						data-platform="api"
 						data-mode={hostedPaymentData.widgetMode}
+						data-currency={hostedPaymentData.currency}
 						data-success-url={`${window.location.origin}/checkout`}
 						data-from-api-payload={JSON.stringify(hostedPaymentData.fromApiPayload)}
+						className="w-full"
 					/>
-					{ }
 					<script src={hostedPaymentData.widgetUrl} async />
 				</div>
 			)}
