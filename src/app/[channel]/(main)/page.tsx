@@ -11,6 +11,7 @@ import { HowOrderingWorks } from "@/ui/components/how-ordering-works";
 import { VerifiedStoryCard } from "@/ui/components/verified-story-card";
 import { ShopGoalCard } from "@/ui/components/shop-goal-card";
 import { NewsletterForm } from "@/ui/components/newsletter-form";
+import Image from "next/image";
 
 export const metadata = {
 	title: "InfinityBio Labs — Pharmaceutical-Grade Research Peptides",
@@ -212,6 +213,33 @@ const trustItems = [
 	{ label: "Same-Day Processing", icon: IconMolecule },
 ];
 
+const infinityStandardPoints = [
+	{
+		title: "99%+ HPLC verification",
+		description: "Purity reviewed at the lot level before catalog release.",
+		icon: IconShield,
+		position: "left-[8%] top-[18%]",
+	},
+	{
+		title: "Independent U.S. lab testing",
+		description: "Batch documentation is tied to third-party analytical review.",
+		icon: IconFlask,
+		position: "right-[8%] top-[16%]",
+	},
+	{
+		title: "Lot-specific COA",
+		description: "Published reports connect the compound, lot, and documentation path.",
+		icon: IconCertificate,
+		position: "left-[12%] bottom-[16%]",
+	},
+	{
+		title: "Controlled fulfillment",
+		description: "Research-use orders move through tracked account checkout and packing.",
+		icon: IconTruck,
+		position: "right-[10%] bottom-[18%]",
+	},
+];
+
 // ─── Quality Pillars ────────────────────────────────────────
 
 const qualityPillars = [
@@ -329,7 +357,84 @@ function HeroSection() {
 	);
 }
 
-// ─── 2. Guarantee Strip (static, 3-up, high-visibility) ─────
+// ─── 2. Infinity Standard (product-system trust bridge) ─────
+
+function InfinityStandardSection() {
+	return (
+		<section
+			className="border-b border-border bg-card text-card-foreground"
+			aria-labelledby="infinity-standard-title"
+		>
+			<div className="mx-auto max-w-7xl px-6 py-20 sm:py-24 lg:py-28">
+				<div className="mx-auto max-w-4xl text-center">
+					<p className="text-xs font-semibold uppercase tracking-[0.28em] text-emerald-500">
+						The Infinity Standard
+					</p>
+					<h2
+						id="infinity-standard-title"
+						className="mt-5 scroll-mt-24 text-4xl font-semibold tracking-tight text-card-foreground sm:text-5xl lg:text-6xl"
+					>
+						A controlled supply system for documented research compounds.
+					</h2>
+					<p className="mx-auto mt-5 max-w-2xl text-base leading-7 text-muted-foreground sm:text-lg sm:leading-8">
+						Every catalog entry is built around source review, lot-level verification, clear documentation,
+						and tracked research-use fulfillment.
+					</p>
+				</div>
+
+				<div className="mt-12 overflow-hidden rounded-lg border border-border bg-background shadow-2xl shadow-black/10 sm:mt-16">
+					<div className="relative aspect-[16/10] min-h-[420px] sm:aspect-[16/9]">
+						<Image
+							src="/screenshot.png"
+							alt="Infinity Bio Labs laboratory sample kit with research-use vials"
+							fill
+							sizes="(min-width: 1280px) 1216px, calc(100vw - 48px)"
+							className="object-contain"
+							priority={false}
+						/>
+						<div className="from-background/0 via-background/0 to-background/30 pointer-events-none absolute inset-0 bg-gradient-to-b" />
+
+						<div className="pointer-events-none absolute inset-0 hidden md:block" aria-hidden="true">
+							{infinityStandardPoints.map((point, index) => {
+								const Icon = point.icon;
+								return (
+									<div key={point.title} className={`absolute ${point.position} max-w-[240px]`}>
+										<div className="inline-flex items-center gap-3 rounded-full border border-white/15 bg-black/75 px-4 py-3 text-sm font-semibold text-white shadow-lg shadow-black/25 backdrop-blur">
+											<span className="flex h-8 w-8 items-center justify-center rounded-full bg-emerald-500 text-black">
+												<Icon className="h-4 w-4" />
+											</span>
+											<span>{point.title}</span>
+										</div>
+										<div className="ml-7 mt-2 h-8 w-px bg-gradient-to-b from-emerald-500/60 to-transparent" />
+										<span className="ml-[1.35rem] flex h-3 w-3 rounded-full border-2 border-background bg-emerald-500 shadow-lg shadow-emerald-500/30" />
+										<span className="sr-only">{index + 1}</span>
+									</div>
+								);
+							})}
+						</div>
+					</div>
+				</div>
+
+				<div className="mt-8 grid gap-8 border-y border-border py-7 sm:grid-cols-2 lg:grid-cols-4">
+					{infinityStandardPoints.map((point) => {
+						const Icon = point.icon;
+						return (
+							<div key={point.title} className="min-w-0">
+								<div className="mb-4 flex h-10 w-10 items-center justify-center rounded-full bg-emerald-500/10 text-emerald-500">
+									<Icon className="h-5 w-5" />
+								</div>
+								<h3 className="text-sm font-semibold text-foreground">{point.title}</h3>
+								<p className="mt-2 text-sm leading-6 text-muted-foreground">{point.description}</p>
+							</div>
+						);
+					})}
+				</div>
+			</div>
+		</section>
+	);
+}
+
+// ─── 3. Guarantee Strip (static, 3-up, high-visibility) ─────
 
 function GuaranteeStrip() {
 	const guarantees = [
@@ -864,6 +969,7 @@ export default async function Page(props: { params: Promise<{ channel: string }>
 	return (
 		<>
 			<HeroSection />
+			<InfinityStandardSection />
 			<GuaranteeStrip />
 			<TrustBar />
 

@@ -1,11 +1,11 @@
 "use client";
 
 import { type FC, useState } from "react";
-import { CreditCard, ExternalLink, Lock } from "lucide-react";
+import { CreditCard, Lock } from "lucide-react";
 import { Input } from "@/ui/components/ui/input";
 import { cn } from "@/lib/utils";
 
-export type PaymentMethodType = "digiteal" | "card" | "paypal" | "ideal";
+export type PaymentMethodType = "hosted" | "card" | "paypal" | "ideal";
 
 export interface CardData {
 	cardNumber: string;
@@ -57,7 +57,7 @@ export const PaymentMethodSelector: FC<PaymentMethodSelectorProps> = ({
 	onChange,
 	cardData,
 	onCardDataChange,
-	hostedPaymentName = "Digiteal",
+	hostedPaymentName = "Secure Payment",
 	availableMethods = ["card", "paypal", "ideal"],
 }) => {
 	// Local card state if not controlled
@@ -100,32 +100,29 @@ export const PaymentMethodSelector: FC<PaymentMethodSelectorProps> = ({
 			<p className="text-sm text-muted-foreground">All transactions are secure and encrypted.</p>
 
 			<div className="space-y-3">
-				{/* Hosted Digiteal payment */}
-				{availableMethods.includes("digiteal") && (
+				{/* Hosted payment gateway (any external provider) */}
+				{availableMethods.includes("hosted") && (
 					<label
 						className={cn(
 							"flex cursor-pointer items-center gap-4 rounded-lg border p-4 transition-colors",
 							"focus-within:ring-2 focus-within:ring-foreground focus-within:ring-offset-2",
-							value === "digiteal" ? "border-foreground" : "border-border",
+							value === "hosted" ? "border-foreground" : "border-border",
 						)}
 					>
 						<input
 							type="radio"
 							name="payment"
-							value="digiteal"
-							checked={value === "digiteal"}
-							onChange={() => onChange("digiteal")}
+							value="hosted"
+							checked={value === "hosted"}
+							onChange={() => onChange("hosted")}
 							className="sr-only"
 						/>
-						<RadioIndicator selected={value === "digiteal"} />
+						<RadioIndicator selected={value === "hosted"} />
 						<CreditCard className="h-5 w-5 text-muted-foreground" />
 						<div className="min-w-0 flex-1">
 							<span className="block font-medium">{hostedPaymentName}</span>
-							<span className="block text-sm text-muted-foreground">
-								Card payment on the secure payment page
-							</span>
+							<span className="block text-sm text-muted-foreground">Secure payment</span>
 						</div>
-						<ExternalLink className="h-4 w-4 shrink-0 text-muted-foreground" />
 					</label>
 				)}
 

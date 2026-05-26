@@ -16,8 +16,17 @@ import {
 import { useCheckout } from "@/checkout/hooks/use-checkout";
 import { useUser } from "@/checkout/hooks/use-user";
 import { getAddressInputData } from "@/checkout/components/address-form/utils";
-// Dummy payment gateway ID (from Saleor Dummy Payment app)
 const dummyGatewayId = "mirumee.payments.dummy";
+
+type HostedPaymentData = {
+	gateway: PaymentGateway;
+	provider?: string;
+	widgetUrl?: string;
+	widgetMode?: string;
+	merchantId?: string;
+	fromApiPayload?: Record<string, unknown>;
+	redirectUrl?: string;
+};
 import { createQueryString } from "@/checkout/lib/utils/url";
 import { localeConfig } from "@/config/locale";
 import { MobileStickyAction } from "./mobile-sticky-action";
@@ -44,12 +53,7 @@ interface PaymentStepProps {
 
 type PaymentGateway = NonNullable<CheckoutFragment["availablePaymentGateways"]>[number];
 
-const isDigitealGateway = (gateway: PaymentGateway) => {
-	const id = gateway.id.toLowerCase();
-	const name = gateway.name.toLowerCase();
-
-	return id.includes("digiteal") || name.includes("digiteal");
-};
+const isHostedGateway = (gateway: PaymentGateway) => gateway.id !== dummyGatewayId;
 
 const parsePaymentData = (data: unknown): Record<string, unknown> | null => {
 	if (typeof data === "string") {
@@ -175,20 +179,22 @@ export const PaymentStep: FC<PaymentStepProps> = ({
 
 	// Check for available payment gateways
 	const availableGateways = checkout.availablePaymentGateways || [];
-	const digitealGateway = availableGateways.find(isDigitealGateway);
-	const hasDigitealGateway = Boolean(digitealGateway);
+	const hostedGateway = availableGateways.find(isHostedGateway);
+	const hasHostedGateway = Boolean(hostedGateway);
 	const hasDummyGateway = availableGateways.some((g) => g.id === dummyGatewayId);
-	const hasSupportedGateway = hasDigitealGateway || hasDummyGateway;
+	const hasSupportedGateway = hasHostedGateway || hasDummyGateway;
+
+	const [hostedPaymentData, setHostedPaymentData] = useState<HostedPaymentData | null>(null);
 
 	useEffect(() => {
-		if (hasDigitealGateway && paymentMethod !== "digiteal") {
-			setPaymentMethod("digiteal");
+		if (hasHostedGateway && paymentMethod !== "hosted") {
+			setPaymentMethod("hosted");
 		}
 
-		if (!hasDigitealGateway && paymentMethod === "digiteal") {
+		if (!hasHostedGateway && paymentMethod === "hosted") {
 			setPaymentMethod("card");
 		}
-	}, [hasDigitealGateway, paymentMethod]);
+	}, [hasHostedGateway, paymentMethod]);
 
 	const shippingAddress = checkout.shippingAddress;
 
@@ -299,8 +305,7 @@ export const PaymentStep: FC<PaymentStepProps> = ({
 					});
 				}
 
-				// Hosted Digiteal payments are completed by Digiteal and confirmed asynchronously by Saleor/app webhooks.
-				if (paymentMethod === "digiteal" && digitealGateway) {
+				if (paymentMethod === "hosted" && hostedGateway) {
 					const checkoutId = checkout.id;
 					const amount = checkout.totalPrice?.gross.amount;
 
@@ -313,41 +318,55 @@ export const PaymentStep: FC<PaymentStepProps> = ({
 						checkoutId,
 						amount,
 						paymentGateway: {
-							id: digitealGateway.id,
+							id: hostedGateway.id,
 							data: {},
 						},
 					});
 
 					if (initResult.error) {
-						console.error("Digiteal initialization error:", initResult.error);
+						console.error("Payment initialization error:", initResult.error);
 						setErrors({ payment: "Payment initialization failed. Please try again." });
 						return;
 					}
 
 					const transactionErrors = initResult.data?.transactionInitialize?.errors;
 					if (transactionErrors?.length) {
-						console.error("Digiteal transaction errors:", transactionErrors);
 						setErrors({ payment: transactionErrors[0].message || "Payment initialization failed" });
 						return;
 					}
 
-					const paymentUrl = extractHostedPaymentUrl(
-						initResult.data?.transactionInitialize?.data,
-						initResult.data?.transactionInitialize?.transactionEvent?.externalUrl,
-					);
-					if (!paymentUrl) {
-						console.error("Digiteal transaction initialized without a hosted payment URL", initResult.data);
-						setErrors({
-							payment:
-								extractPaymentMessage(
-									initResult.data?.transactionInitialize?.data,
-									initResult.data?.transactionInitialize?.transactionEvent?.message,
-								) || "Payment page is unavailable. Please try again.",
+					const responseData = parsePaymentData(initResult.data?.transactionInitialize?.data);
+					const provider = (responseData?.provider as string) || undefined;
+
+					if (responseData?.fromApiPayload) {
+						setHostedPaymentData({
+							gateway: hostedGateway,
+							provider,
+							widgetUrl: responseData.widgetUrl as string,
+							widgetMode: responseData.widgetMode as string,
+							merchantId: responseData.merchantId as string,
+							fromApiPayload: responseData.fromApiPayload as Record<string, unknown>,
 						});
 						return;
 					}
 
-					window.location.assign(paymentUrl);
+					const redirectUrl = extractHostedPaymentUrl(
+						initResult.data?.transactionInitialize?.data,
+						initResult.data?.transactionInitialize?.transactionEvent?.externalUrl,
+					);
+
+					if (redirectUrl) {
+						window.location.assign(redirectUrl);
+						return;
+					}
+
+					setErrors({
+						payment:
+							extractPaymentMessage(
+								initResult.data?.transactionInitialize?.data,
+								initResult.data?.transactionInitialize?.transactionEvent?.message,
+							) || "Payment is unavailable. Please try again.",
+					});
 					return;
 				}
 
@@ -431,7 +450,7 @@ export const PaymentStep: FC<PaymentStepProps> = ({
 			shippingAddress,
 			checkout.id,
 			checkout.totalPrice?.gross.amount,
-			digitealGateway,
+			hostedGateway,
 			hasDummyGateway,
 			hasSupportedGateway,
 			paymentMethod,
@@ -453,7 +472,7 @@ export const PaymentStep: FC<PaymentStepProps> = ({
 		? completeState.fetching
 			? "Creating order..."
 			: "Processing payment..."
-		: paymentMethod === "digiteal"
+		: paymentMethod === "hosted"
 			? "Continue to secure payment"
 			: `Pay ${totalStr}`;
 
@@ -480,7 +499,7 @@ export const PaymentStep: FC<PaymentStepProps> = ({
 			)}
 
 			{/* Test Mode Indicator */}
-			{hasDummyGateway && !hasDigitealGateway && (
+			{hasDummyGateway && !hasHostedGateway && (
 				<div className="flex items-start gap-3 rounded-lg border border-blue-200 bg-blue-50 p-4">
 					<AlertCircle className="mt-0.5 h-5 w-5 shrink-0 text-blue-600" />
 					<div>
@@ -492,15 +511,34 @@ export const PaymentStep: FC<PaymentStepProps> = ({
 				</div>
 			)}
 
-			{/* Payment Method */}
-			<PaymentMethodSelector
-				value={paymentMethod}
-				onChange={setPaymentMethod}
-				cardData={cardData}
-				onCardDataChange={setCardData}
-				availableMethods={hasDigitealGateway ? ["digiteal"] : ["card"]}
-				hostedPaymentName={digitealGateway?.name || "Digiteal"}
-			/>
+			{/* Payment widget (when hosted provider returned widget data) */}
+			{hostedPaymentData?.fromApiPayload && (
+				<div className="space-y-4">
+					<h2 className="text-lg font-semibold">Payment</h2>
+					<div
+						data-sellabroad-payment-container
+						data-merchant-id={hostedPaymentData.merchantId}
+						data-platform="api"
+						data-mode={hostedPaymentData.widgetMode}
+						data-success-url={`${window.location.origin}/checkout`}
+						data-from-api-payload={JSON.stringify(hostedPaymentData.fromApiPayload)}
+					/>
+					{ }
+					<script src={hostedPaymentData.widgetUrl} async />
+				</div>
+			)}
+
+			{/* Payment Method (when no widget is active) */}
+			{!hostedPaymentData && (
+				<PaymentMethodSelector
+					value={paymentMethod}
+					onChange={setPaymentMethod}
+					cardData={cardData}
+					onCardDataChange={setCardData}
+					availableMethods={hasHostedGateway ? ["hosted"] : ["card"]}
+					hostedPaymentName={hostedGateway?.name || "Secure Payment"}
+				/>
+			)}
 
 			{/* Billing Address */}
 			<BillingAddressSection
