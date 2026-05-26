@@ -1,7 +1,7 @@
 "use client";
 
-import { useState, useEffect, useCallback, type FC } from "react";
-import { ChevronLeft, AlertCircle } from "lucide-react";
+import { useState, useEffect, useCallback, useRef, type FC } from "react";
+import { ChevronLeft, AlertCircle, Lock, CreditCard } from "lucide-react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { Button } from "@/ui/components/ui/button";
 import { CheckoutSummaryContext, buildPaymentSummaryRows } from "./checkout-summary-context";
@@ -16,34 +16,28 @@ import {
 import { useCheckout } from "@/checkout/hooks/use-checkout";
 import { useUser } from "@/checkout/hooks/use-user";
 import { getAddressInputData } from "@/checkout/components/address-form/utils";
-const dummyGatewayId = "mirumee.payments.dummy";
-
-type HostedPaymentData = {
-	gateway: PaymentGateway;
-	provider?: string;
-	widgetUrl?: string;
-	widgetMode?: string;
-	merchantId?: string;
-	currency?: string;
-	fromApiPayload?: Record<string, unknown>;
-	redirectUrl?: string;
-};
 import { createQueryString } from "@/checkout/lib/utils/url";
 import { localeConfig } from "@/config/locale";
 import { MobileStickyAction } from "./mobile-sticky-action";
 import { getStepNumber } from "./flow";
-
-// Extracted reusable components
 import {
-	PaymentMethodSelector,
 	BillingAddressSection,
-	type PaymentMethodType,
 	type CardData,
 	type BillingAddressData,
 	isCardDataValid,
 } from "@/checkout/components/payment";
 import { LoadingSpinner } from "@/checkout/ui-kit/loading-spinner";
 import { formatMoneyWithFallback } from "@/checkout/lib/utils/money";
+
+const dummyGatewayId = "mirumee.payments.dummy";
+
+type HostedPaymentData = {
+	widgetUrl: string;
+	widgetMode: string;
+	merchantId: string;
+	currency: string;
+	fromApiPayload: Record<string, unknown>;
+};
 
 interface PaymentStepProps {
 	checkout: CheckoutFragment;
@@ -59,79 +53,54 @@ const isHostedGateway = (gateway: PaymentGateway) => gateway.id !== dummyGateway
 const parsePaymentData = (data: unknown): Record<string, unknown> | null => {
 	if (typeof data === "string") {
 		try {
-			const parsed = JSON.parse(data) as unknown;
-			return parsePaymentData(parsed);
+			return parsePaymentData(JSON.parse(data) as unknown);
 		} catch {
 			return null;
 		}
 	}
-
-	if (!data || typeof data !== "object") {
-		return null;
-	}
-
+	if (!data || typeof data !== "object") return null;
 	return data as Record<string, unknown>;
 };
 
 const extractHostedPaymentUrl = (data: unknown, externalUrl?: string | null): string | null => {
-	if (externalUrl) {
-		return externalUrl;
-	}
-
+	if (externalUrl) return externalUrl;
 	const payload = parsePaymentData(data);
-
-	if (!payload) {
-		return null;
-	}
-
+	if (!payload) return null;
 	const paymentUrl = payload.paymentUrl ?? payload.externalUrl;
-
 	return typeof paymentUrl === "string" && paymentUrl.length > 0 ? paymentUrl : null;
 };
 
 const extractPaymentMessage = (data: unknown, eventMessage?: string | null): string | null => {
 	const payload = parsePaymentData(data);
 	const dataMessage = payload?.message;
-
-	if (typeof dataMessage === "string" && dataMessage.length > 0) {
-		return dataMessage;
-	}
-
+	if (typeof dataMessage === "string" && dataMessage.length > 0) return dataMessage;
 	return eventMessage || null;
 };
 
 export const PaymentStep: FC<PaymentStepProps> = ({
 	checkout: initialCheckout,
 	onBack,
-	onComplete,
+	onComplete: _onComplete,
 	onGoToInformation,
 }) => {
 	const router = useRouter();
 	const searchParams = useSearchParams();
-	// Use live checkout data to ensure we have the latest total (including shipping)
 	const { checkout: liveCheckout } = useCheckout();
 	const checkout = liveCheckout || initialCheckout;
-
-	// Get user data for saved addresses
 	const { user, authenticated } = useUser();
 
-	// For digital products, there's no shipping address, so can't use "same as billing"
 	const isShippingRequired = checkout.isShippingRequired;
 	const hasShippingAddress = !!checkout.shippingAddress;
+	const shippingAddress = checkout.shippingAddress;
 
-	// Payment method state
-	const [paymentMethod, setPaymentMethod] = useState<PaymentMethodType>("card");
-	// Lazy initialization - object only created once on mount
-	const [cardData, setCardData] = useState<CardData>(() => ({
+	const [cardData] = useState<CardData>(() => ({
 		cardNumber: "",
 		expiry: "",
 		cvc: "",
 		nameOnCard: "",
 	}));
 
-	// Billing address state
 	const [sameAsBilling, setSameAsBilling] = useState(isShippingRequired && hasShippingAddress);
-	// Lazy initialization - complex object only created once on mount
 	const [billingData, setBillingData] = useState<BillingAddressData>(() => ({
 		countryCode: (checkout.billingAddress?.country?.code as CountryCode) || "US",
 		formData: {
@@ -147,7 +116,6 @@ export const PaymentStep: FC<PaymentStepProps> = ({
 		},
 	}));
 
-	// Sync billing address from server state
 	useEffect(() => {
 		const billing = checkout.billingAddress;
 		if (billing) {
@@ -172,71 +140,146 @@ export const PaymentStep: FC<PaymentStepProps> = ({
 
 	const [isProcessing, setIsProcessing] = useState(false);
 	const [errors, setErrors] = useState<Record<string, string>>({});
+	const [hostedPaymentData, setHostedPaymentData] = useState<HostedPaymentData | null>(null);
+	const widgetInitialized = useRef(false);
 
-	// Mutations
 	const [, updateBillingAddress] = useCheckoutBillingAddressUpdateMutation();
 	const [transactionState, transactionInitialize] = useTransactionInitializeMutation();
 	const [completeState, checkoutComplete] = useCheckoutCompleteMutation();
 
-	// Check for available payment gateways
 	const availableGateways = checkout.availablePaymentGateways || [];
 	const hostedGateway = availableGateways.find(isHostedGateway);
 	const hasHostedGateway = Boolean(hostedGateway);
 	const hasDummyGateway = availableGateways.some((g) => g.id === dummyGatewayId);
 	const hasSupportedGateway = hasHostedGateway || hasDummyGateway;
 
-	const [hostedPaymentData, setHostedPaymentData] = useState<HostedPaymentData | null>(null);
+	const syncBillingAddress = useCallback(async () => {
+		if (sameAsBilling && shippingAddress) {
+			const addressInput = getAddressInputData({
+				firstName: shippingAddress.firstName || "",
+				lastName: shippingAddress.lastName || "",
+				streetAddress1: shippingAddress.streetAddress1 || "",
+				streetAddress2: shippingAddress.streetAddress2 || "",
+				companyName: shippingAddress.companyName || "",
+				city: shippingAddress.city || "",
+				postalCode: shippingAddress.postalCode || "",
+				countryArea: shippingAddress.countryArea || "",
+				phone: shippingAddress.phone || "",
+				countryCode: shippingAddress.country?.code as CountryCode,
+			});
+			await updateBillingAddress({
+				checkoutId: checkout.id,
+				billingAddress: addressInput,
+				languageCode: localeConfig.graphqlLanguageCode,
+			});
+		}
+	}, [sameAsBilling, shippingAddress, checkout.id, updateBillingAddress]);
+
+	const initializeHostedPayment = useCallback(async () => {
+		if (!hostedGateway || widgetInitialized.current) return;
+		widgetInitialized.current = true;
+
+		setIsProcessing(true);
+		try {
+			await syncBillingAddress();
+
+			const amount = checkout.totalPrice?.gross.amount;
+			if (!amount) {
+				setErrors({ payment: "Checkout total is missing." });
+				return;
+			}
+
+			const initResult = await transactionInitialize({
+				checkoutId: checkout.id,
+				amount,
+				paymentGateway: { id: hostedGateway.id, data: {} },
+			});
+
+			if (initResult.error) {
+				setErrors({ payment: "Payment initialization failed. Please try again." });
+				widgetInitialized.current = false;
+				return;
+			}
+
+			const txErrors = initResult.data?.transactionInitialize?.errors;
+			if (txErrors?.length) {
+				setErrors({ payment: txErrors[0].message || "Payment initialization failed" });
+				widgetInitialized.current = false;
+				return;
+			}
+
+			const responseData = parsePaymentData(initResult.data?.transactionInitialize?.data);
+
+			if (responseData?.fromApiPayload) {
+				setHostedPaymentData({
+					widgetUrl: responseData.widgetUrl as string,
+					widgetMode: responseData.widgetMode as string,
+					merchantId: responseData.merchantId as string,
+					currency: responseData.currency as string,
+					fromApiPayload: responseData.fromApiPayload as Record<string, unknown>,
+				});
+				return;
+			}
+
+			const redirectUrl = extractHostedPaymentUrl(
+				initResult.data?.transactionInitialize?.data,
+				initResult.data?.transactionInitialize?.transactionEvent?.externalUrl,
+			);
+			if (redirectUrl) {
+				window.location.assign(redirectUrl);
+				return;
+			}
+
+			setErrors({
+				payment:
+					extractPaymentMessage(
+						initResult.data?.transactionInitialize?.data,
+						initResult.data?.transactionInitialize?.transactionEvent?.message,
+					) || "Payment is unavailable. Please try again.",
+			});
+			widgetInitialized.current = false;
+		} finally {
+			setIsProcessing(false);
+		}
+	}, [
+		hostedGateway,
+		checkout.id,
+		checkout.totalPrice?.gross.amount,
+		transactionInitialize,
+		syncBillingAddress,
+	]);
 
 	useEffect(() => {
-		if (hasHostedGateway && paymentMethod !== "hosted") {
-			setPaymentMethod("hosted");
+		if (hasHostedGateway && !hostedPaymentData && !widgetInitialized.current) {
+			initializeHostedPayment();
 		}
+	}, [hasHostedGateway, hostedPaymentData, initializeHostedPayment]);
 
-		if (!hasHostedGateway && paymentMethod === "hosted") {
-			setPaymentMethod("card");
-		}
-	}, [hasHostedGateway, paymentMethod]);
-
-	const shippingAddress = checkout.shippingAddress;
-
-	// Memoize billing data handler to avoid infinite loops
 	const handleBillingDataChange = useCallback((data: BillingAddressData) => {
 		setBillingData(data);
 	}, []);
 
-	// Summary rows for context display
 	const summaryRows = buildPaymentSummaryRows(checkout);
 
-	// Handle step navigation from summary
 	const handleGoToStep = (step: number) => {
-		if (step === 1 && onGoToInformation) {
-			onGoToInformation();
-		} else if (step === 2) {
-			onBack();
-		}
+		if (step === 1 && onGoToInformation) onGoToInformation();
+		else if (step === 2) onBack();
 	};
 
 	const total = checkout.totalPrice?.gross;
 	const totalStr = formatMoneyWithFallback(total);
 
-	const handleSubmit = useCallback(
+	const handleDummySubmit = useCallback(
 		async (event?: React.FormEvent) => {
-			if (event) {
-				event.preventDefault();
-			}
-
+			if (event) event.preventDefault();
 			setErrors({});
-
-			// Validate billing address if different from shipping (or for digital products)
-			const needsBillingForm = !sameAsBilling || !hasShippingAddress;
-
 			setIsProcessing(true);
+
 			try {
-				// Update billing address
+				const needsBillingForm = !sameAsBilling || !hasShippingAddress;
+
 				if (needsBillingForm) {
 					let addressInput;
-
-					// Check if user selected a saved address
 					if (billingData.selectedAddressId && user?.addresses) {
 						const selectedAddress = user.addresses.find((addr) => addr.id === billingData.selectedAddressId);
 						if (selectedAddress) {
@@ -254,15 +297,12 @@ export const PaymentStep: FC<PaymentStepProps> = ({
 							});
 						}
 					}
-
-					// If no saved address selected, use form data
 					if (!addressInput) {
 						addressInput = getAddressInputData({
 							...billingData.formData,
 							countryCode: billingData.countryCode,
 						});
 					}
-
 					const result = await updateBillingAddress({
 						checkoutId: checkout.id,
 						billingAddress: addressInput,
@@ -280,166 +320,37 @@ export const PaymentStep: FC<PaymentStepProps> = ({
 							errorMap[field] = err.message || "Invalid value";
 						});
 						setErrors(errorMap);
-						const firstField = Object.keys(errorMap)[0];
-						const element = document.querySelector(`[name="${firstField}"]`) as HTMLElement;
-						element?.focus();
 						return;
 					}
 				} else if (shippingAddress) {
-					// Copy shipping address to billing
-					const addressInput = getAddressInputData({
-						firstName: shippingAddress.firstName || "",
-						lastName: shippingAddress.lastName || "",
-						streetAddress1: shippingAddress.streetAddress1 || "",
-						streetAddress2: shippingAddress.streetAddress2 || "",
-						companyName: shippingAddress.companyName || "",
-						city: shippingAddress.city || "",
-						postalCode: shippingAddress.postalCode || "",
-						countryArea: shippingAddress.countryArea || "",
-						phone: shippingAddress.phone || "",
-						countryCode: shippingAddress.country?.code as CountryCode,
-					});
-					await updateBillingAddress({
-						checkoutId: checkout.id,
-						billingAddress: addressInput,
-						languageCode: localeConfig.graphqlLanguageCode,
-					});
+					await syncBillingAddress();
 				}
 
-				if (paymentMethod === "hosted" && hostedGateway) {
-					const checkoutId = checkout.id;
-					const amount = checkout.totalPrice?.gross.amount;
+				const initResult = await transactionInitialize({
+					checkoutId: checkout.id,
+					paymentGateway: {
+						id: dummyGatewayId,
+						data: { event: { includePspReference: true, type: "CHARGE_SUCCESS" } },
+					},
+				});
 
-					if (!amount) {
-						setErrors({ payment: "Checkout total is missing. Please refresh and try again." });
-						return;
-					}
-
-					const initResult = await transactionInitialize({
-						checkoutId,
-						amount,
-						paymentGateway: {
-							id: hostedGateway.id,
-							data: {},
-						},
-					});
-
-					if (initResult.error) {
-						console.error("Payment initialization error:", initResult.error);
-						setErrors({ payment: "Payment initialization failed. Please try again." });
-						return;
-					}
-
-					const transactionErrors = initResult.data?.transactionInitialize?.errors;
-					if (transactionErrors?.length) {
-						setErrors({ payment: transactionErrors[0].message || "Payment initialization failed" });
-						return;
-					}
-
-					const responseData = parsePaymentData(initResult.data?.transactionInitialize?.data);
-					const provider = (responseData?.provider as string) || undefined;
-
-					if (responseData?.fromApiPayload) {
-						setHostedPaymentData({
-							gateway: hostedGateway,
-							provider,
-							widgetUrl: responseData.widgetUrl as string,
-							widgetMode: responseData.widgetMode as string,
-							merchantId: responseData.merchantId as string,
-							currency: responseData.currency as string,
-							fromApiPayload: responseData.fromApiPayload as Record<string, unknown>,
-						});
-						return;
-					}
-
-					const redirectUrl = extractHostedPaymentUrl(
-						initResult.data?.transactionInitialize?.data,
-						initResult.data?.transactionInitialize?.transactionEvent?.externalUrl,
-					);
-
-					if (redirectUrl) {
-						window.location.assign(redirectUrl);
-						return;
-					}
-
-					setErrors({
-						payment:
-							extractPaymentMessage(
-								initResult.data?.transactionInitialize?.data,
-								initResult.data?.transactionInitialize?.transactionEvent?.message,
-							) || "Payment is unavailable. Please try again.",
-					});
+				if (initResult.error || initResult.data?.transactionInitialize?.errors?.length) {
+					setErrors({ payment: "Payment failed. Please try again." });
 					return;
 				}
 
-				// Process test payment using Saleor Dummy Payment app.
-				if (hasDummyGateway) {
-					const checkoutId = checkout.id;
-
-					const initResult = await transactionInitialize({
-						checkoutId,
-						paymentGateway: {
-							id: dummyGatewayId,
-							data: {
-								event: {
-									includePspReference: true,
-									type: "CHARGE_SUCCESS",
-								},
-							},
-						},
-					});
-
-					if (initResult.error) {
-						console.error("Payment initialization error:", initResult.error);
-						setErrors({ streetAddress1: "Payment failed. Please try again." });
-						return;
-					}
-
-					const transactionErrors = initResult.data?.transactionInitialize?.errors;
-					if (transactionErrors?.length) {
-						console.error("Transaction errors:", transactionErrors);
-						setErrors({ streetAddress1: transactionErrors[0].message || "Payment failed" });
-						return;
-					}
-
-					// Complete the checkout and create the order
-					const completeResult = await checkoutComplete({
-						checkoutId,
-					});
-
-					if (completeResult.error) {
-						console.error("Checkout complete error:", completeResult.error);
-						setErrors({ streetAddress1: "Failed to complete order. Please try again." });
-						return;
-					}
-
-					const completeErrors = completeResult.data?.checkoutComplete?.errors;
-					if (completeErrors?.length) {
-						const errorDetails = completeErrors.map((e) => `${e.field}: ${e.message} (${e.code})`).join(", ");
-						console.error("Checkout complete errors:", errorDetails, completeErrors);
-						// Show a more descriptive error
-						const firstError = completeErrors[0];
-						const errorMessage = firstError.message || firstError.code || "Failed to complete order";
-						setErrors({ payment: errorMessage });
-						return;
-					}
-
-					// Redirect to order confirmation
-					const order = completeResult.data?.checkoutComplete?.order;
-					if (order) {
-						const newQuery = createQueryString(searchParams, { orderId: order.id });
-						router.replace(`?${newQuery}`, { scroll: false });
-						return;
-					}
-				} else if (!hasSupportedGateway) {
-					// No payment gateway configured
-					setErrors({
-						payment: "No payment gateway configured. Please contact support.",
-					});
+				const completeResult = await checkoutComplete({ checkoutId: checkout.id });
+				if (completeResult.error || completeResult.data?.checkoutComplete?.errors?.length) {
+					const firstError = completeResult.data?.checkoutComplete?.errors?.[0];
+					setErrors({ payment: firstError?.message || "Failed to complete order." });
 					return;
 				}
 
-				onComplete();
+				const order = completeResult.data?.checkoutComplete?.order;
+				if (order) {
+					const newQuery = createQueryString(searchParams, { orderId: order.id });
+					router.replace(`?${newQuery}`, { scroll: false });
+				}
 			} finally {
 				setIsProcessing(false);
 			}
@@ -451,57 +362,110 @@ export const PaymentStep: FC<PaymentStepProps> = ({
 			user?.addresses,
 			shippingAddress,
 			checkout.id,
-			checkout.totalPrice?.gross.amount,
-			hostedGateway,
-			hasDummyGateway,
-			hasSupportedGateway,
-			paymentMethod,
+			syncBillingAddress,
 			updateBillingAddress,
 			transactionInitialize,
 			checkoutComplete,
-			onComplete,
 			searchParams,
 			router,
 		],
 	);
 
-	const isCardValid = isCardDataValid(cardData);
-
 	const isPaymentProcessing = transactionState.fetching || completeState.fetching;
-
 	const isLoading = isProcessing || isPaymentProcessing;
+
+	if (hasHostedGateway) {
+		return (
+			<div className="space-y-8">
+				<CheckoutSummaryContext checkout={checkout} rows={summaryRows} onGoToStep={handleGoToStep} />
+
+				{isLoading && !hostedPaymentData && (
+					<div className="flex flex-col items-center justify-center gap-4 py-12">
+						<LoadingSpinner />
+						<p className="text-sm text-muted-foreground">Preparing secure payment...</p>
+					</div>
+				)}
+
+				{errors.payment && (
+					<div className="border-destructive/50 bg-destructive/10 flex items-start gap-3 rounded-lg border p-4">
+						<AlertCircle className="h-5 w-5 flex-shrink-0 text-destructive" />
+						<div>
+							<p className="font-medium text-destructive">Payment failed</p>
+							<p className="text-destructive/80 text-sm">{errors.payment}</p>
+						</div>
+					</div>
+				)}
+
+				{hostedPaymentData &&
+					(() => {
+						const totals = hostedPaymentData.fromApiPayload?.merchantSuppliedTotals as
+							| Record<string, number | string>
+							| undefined;
+						return (
+							<section>
+								<div className="mb-4 flex items-center gap-2">
+									<Lock className="h-4 w-4 text-muted-foreground" />
+									<p className="text-sm text-muted-foreground">Secure payment</p>
+								</div>
+								<div
+									data-sellabroad-payment-container
+									data-merchant-id={hostedPaymentData.merchantId}
+									data-platform="api"
+									data-mode={hostedPaymentData.widgetMode}
+									data-currency={hostedPaymentData.currency}
+									data-subtotal-cents={totals?.subtotal_cents}
+									data-shipping-cents={totals?.shipping_cents}
+									data-tax-cents={totals?.tax_cents}
+									data-discount-cents={totals?.discount_cents}
+									data-total-cents={totals?.total_cents}
+									data-success-url={`${window.location.origin}/checkout`}
+									data-from-api-payload={JSON.stringify(hostedPaymentData.fromApiPayload)}
+									className="w-full"
+								/>
+								<script src={hostedPaymentData.widgetUrl} async />
+							</section>
+						);
+					})()}
+
+				<div className="flex items-center">
+					<button
+						type="button"
+						onClick={onBack}
+						className="flex items-center gap-1 text-sm text-muted-foreground transition-colors hover:text-foreground"
+					>
+						<ChevronLeft className="h-4 w-4" />
+						{isShippingRequired ? "Return to shipping" : "Return to information"}
+					</button>
+				</div>
+			</div>
+		);
+	}
+
+	const isCardValid = isCardDataValid(cardData);
+	const isDisabled = isLoading || !hasSupportedGateway || !isCardValid;
 	const buttonText = isLoading
 		? completeState.fetching
 			? "Creating order..."
 			: "Processing payment..."
-		: paymentMethod === "hosted"
-			? "Continue to secure payment"
-			: `Pay ${totalStr}`;
-
-	const isDisabled =
-		isLoading || !hasSupportedGateway || (paymentMethod === "card" && !hasDummyGateway && !isCardValid);
+		: `Pay ${totalStr}`;
 
 	return (
-		<form className="space-y-8" onSubmit={handleSubmit}>
-			{/* Summary Context */}
+		<form className="space-y-8" onSubmit={handleDummySubmit}>
 			<CheckoutSummaryContext checkout={checkout} rows={summaryRows} onGoToStep={handleGoToStep} />
 
-			{/* No Payment Gateway Warning */}
 			{!hasSupportedGateway && (
 				<div className="flex items-start gap-3 rounded-lg border border-amber-200 bg-amber-50 p-4">
 					<AlertCircle className="mt-0.5 h-5 w-5 shrink-0 text-amber-600" />
 					<div>
 						<p className="font-medium text-amber-800">No payment gateway configured</p>
 						<p className="mt-1 text-sm text-amber-700">
-							To accept payments, install a payment app (like Saleor Dummy Payment for testing, or
-							Stripe/Adyen for production) from the Saleor Dashboard.
+							To accept payments, install a payment app from the Saleor Dashboard.
 						</p>
 					</div>
 				</div>
 			)}
 
-			{/* Test Mode Indicator */}
-			{hasDummyGateway && !hasHostedGateway && (
+			{hasDummyGateway && (
 				<div className="flex items-start gap-3 rounded-lg border border-blue-200 bg-blue-50 p-4">
 					<AlertCircle className="mt-0.5 h-5 w-5 shrink-0 text-blue-600" />
 					<div>
@@ -513,47 +477,17 @@ export const PaymentStep: FC<PaymentStepProps> = ({
 				</div>
 			)}
 
-			{/* Payment widget (when hosted provider returned widget data) */}
-			{hostedPaymentData?.fromApiPayload &&
-				(() => {
-					const totals = hostedPaymentData.fromApiPayload?.merchantSuppliedTotals as
-						| Record<string, number | string>
-						| undefined;
-					return (
-						<div className="w-full space-y-4">
-							<div
-								data-sellabroad-payment-container
-								data-merchant-id={hostedPaymentData.merchantId}
-								data-platform="api"
-								data-mode={hostedPaymentData.widgetMode}
-								data-currency={hostedPaymentData.currency}
-								data-subtotal-cents={totals?.subtotal_cents}
-								data-shipping-cents={totals?.shipping_cents}
-								data-tax-cents={totals?.tax_cents}
-								data-discount-cents={totals?.discount_cents}
-								data-total-cents={totals?.total_cents}
-								data-success-url={`${window.location.origin}/checkout`}
-								data-from-api-payload={JSON.stringify(hostedPaymentData.fromApiPayload)}
-								className="w-full"
-							/>
-							<script src={hostedPaymentData.widgetUrl} async />
-						</div>
-					);
-				})()}
+			<section className="space-y-4">
+				<h2 className="text-lg font-semibold">Payment</h2>
+				<div className="rounded-lg border border-foreground p-4">
+					<div className="flex items-center gap-3">
+						<CreditCard className="h-5 w-5 text-muted-foreground" />
+						<span className="font-medium">Credit card</span>
+						<span className="ml-auto text-xs text-muted-foreground">Test mode</span>
+					</div>
+				</div>
+			</section>
 
-			{/* Payment Method (when no widget is active) */}
-			{!hostedPaymentData && (
-				<PaymentMethodSelector
-					value={paymentMethod}
-					onChange={setPaymentMethod}
-					cardData={cardData}
-					onCardDataChange={setCardData}
-					availableMethods={hasHostedGateway ? ["hosted"] : ["card"]}
-					hostedPaymentName={hostedGateway?.name || "Secure Payment"}
-				/>
-			)}
-
-			{/* Billing Address */}
 			<BillingAddressSection
 				billingAddress={checkout.billingAddress}
 				shippingAddress={shippingAddress}
@@ -566,7 +500,6 @@ export const PaymentStep: FC<PaymentStepProps> = ({
 				initialSameAsShipping={sameAsBilling}
 			/>
 
-			{/* Payment/Checkout Error Display */}
 			{errors.payment && (
 				<div className="border-destructive/50 bg-destructive/10 flex items-start gap-3 rounded-lg border p-4">
 					<AlertCircle className="h-5 w-5 flex-shrink-0 text-destructive" />
@@ -577,7 +510,6 @@ export const PaymentStep: FC<PaymentStepProps> = ({
 				</div>
 			)}
 
-			{/* Navigation */}
 			<div className="flex items-center justify-between">
 				<button
 					type="button"
@@ -603,7 +535,7 @@ export const PaymentStep: FC<PaymentStepProps> = ({
 				step={getStepNumber("PAYMENT", isShippingRequired)}
 				isShippingRequired={isShippingRequired}
 				type="submit"
-				onAction={handleSubmit}
+				onAction={handleDummySubmit}
 				isLoading={isLoading}
 				disabled={isDisabled}
 				total={totalStr}
