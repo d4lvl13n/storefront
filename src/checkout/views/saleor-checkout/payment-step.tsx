@@ -376,22 +376,22 @@ export const PaymentStep: FC<PaymentStepProps> = ({
 
 	if (hasHostedGateway) {
 		return (
-			<div className="space-y-8">
-				<CheckoutSummaryContext checkout={checkout} rows={summaryRows} onGoToStep={handleGoToStep} />
-
+			<div className="-mx-6 -my-6 md:-mx-8 md:-my-8">
 				{isLoading && !hostedPaymentData && (
-					<div className="flex flex-col items-center justify-center gap-4 py-12">
+					<div className="flex flex-col items-center justify-center gap-6 py-20">
 						<LoadingSpinner />
 						<p className="text-sm text-muted-foreground">Preparing secure payment...</p>
 					</div>
 				)}
 
 				{errors.payment && (
-					<div className="border-destructive/50 bg-destructive/10 flex items-start gap-3 rounded-lg border p-4">
-						<AlertCircle className="h-5 w-5 flex-shrink-0 text-destructive" />
-						<div>
-							<p className="font-medium text-destructive">Payment failed</p>
-							<p className="text-destructive/80 text-sm">{errors.payment}</p>
+					<div className="m-6 md:m-8">
+						<div className="border-destructive/50 bg-destructive/10 flex items-start gap-3 rounded-lg border p-4">
+							<AlertCircle className="h-5 w-5 flex-shrink-0 text-destructive" />
+							<div>
+								<p className="font-medium text-destructive">Payment failed</p>
+								<p className="text-destructive/80 text-sm">{errors.payment}</p>
+							</div>
 						</div>
 					</div>
 				)}
@@ -402,7 +402,7 @@ export const PaymentStep: FC<PaymentStepProps> = ({
 							| Record<string, number | string>
 							| undefined;
 						return (
-							<section className="-mx-6 -mb-6 md:-mx-8 md:-mb-8">
+							<>
 								<div
 									data-sellabroad-payment-container
 									data-merchant-id={hostedPaymentData.merchantId}
@@ -416,14 +416,14 @@ export const PaymentStep: FC<PaymentStepProps> = ({
 									data-total-cents={totals?.total_cents}
 									data-success-url={`${window.location.origin}/checkout`}
 									data-from-api-payload={JSON.stringify(hostedPaymentData.fromApiPayload)}
-									className="min-h-[400px] w-full"
+									className="min-h-[450px] w-full rounded-lg bg-white"
 								/>
 								<script src={hostedPaymentData.widgetUrl} async />
-							</section>
+							</>
 						);
 					})()}
 
-				<div className="flex items-center">
+				<div className="px-6 py-4 md:px-8">
 					<button
 						type="button"
 						onClick={onBack}
