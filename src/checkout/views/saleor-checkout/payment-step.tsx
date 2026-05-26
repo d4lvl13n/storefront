@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect, useCallback, useRef, type FC } from "react";
-import { ChevronLeft, AlertCircle, CreditCard } from "lucide-react";
+import { ChevronLeft, AlertCircle, CreditCard, ShieldCheck } from "lucide-react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { Button } from "@/ui/components/ui/button";
 import { CheckoutSummaryContext, buildPaymentSummaryRows } from "./checkout-summary-context";
@@ -379,13 +379,21 @@ export const PaymentStep: FC<PaymentStepProps> = ({
 			<div className="-mx-6 -my-6 md:-mx-8 md:-my-8">
 				{isLoading && !hostedPaymentData && (
 					<div className="flex flex-col items-center justify-center gap-6 py-20">
-						<LoadingSpinner />
-						<p className="text-sm text-muted-foreground">Preparing secure payment...</p>
+						<div className="relative">
+							<div className="bg-primary/20 absolute inset-0 animate-ping rounded-full" />
+							<div className="bg-primary/10 relative rounded-full p-4">
+								<LoadingSpinner />
+							</div>
+						</div>
+						<div className="text-center">
+							<p className="font-medium">Preparing secure payment</p>
+							<p className="mt-1 text-sm text-muted-foreground">Connecting to payment provider...</p>
+						</div>
 					</div>
 				)}
 
 				{errors.payment && (
-					<div className="m-6 md:m-8">
+					<div className="p-6 md:p-8">
 						<div className="border-destructive/50 bg-destructive/10 flex items-start gap-3 rounded-lg border p-4">
 							<AlertCircle className="h-5 w-5 flex-shrink-0 text-destructive" />
 							<div>
@@ -393,6 +401,14 @@ export const PaymentStep: FC<PaymentStepProps> = ({
 								<p className="text-destructive/80 text-sm">{errors.payment}</p>
 							</div>
 						</div>
+						<button
+							type="button"
+							onClick={onBack}
+							className="mt-4 flex items-center gap-1 text-sm text-muted-foreground transition-colors hover:text-foreground"
+						>
+							<ChevronLeft className="h-4 w-4" />
+							Return to shipping
+						</button>
 					</div>
 				)}
 
@@ -402,37 +418,45 @@ export const PaymentStep: FC<PaymentStepProps> = ({
 							| Record<string, number | string>
 							| undefined;
 						return (
-							<>
-								<div
-									data-sellabroad-payment-container
-									data-merchant-id={hostedPaymentData.merchantId}
-									data-platform="api"
-									data-mode={hostedPaymentData.widgetMode}
-									data-currency={hostedPaymentData.currency}
-									data-subtotal-cents={totals?.subtotal_cents}
-									data-shipping-cents={totals?.shipping_cents}
-									data-tax-cents={totals?.tax_cents}
-									data-discount-cents={totals?.discount_cents}
-									data-total-cents={totals?.total_cents}
-									data-success-url={`${window.location.origin}/checkout?step=confirmation`}
-									data-from-api-payload={JSON.stringify(hostedPaymentData.fromApiPayload)}
-									className="min-h-[450px] w-full rounded-lg bg-white"
-								/>
-								<script src={hostedPaymentData.widgetUrl} async />
-							</>
+							<div className="flex flex-col">
+								{/* Widget container — clean white surface */}
+								<div className="overflow-hidden rounded-t-lg bg-white">
+									<div
+										data-sellabroad-payment-container
+										data-merchant-id={hostedPaymentData.merchantId}
+										data-platform="api"
+										data-mode={hostedPaymentData.widgetMode}
+										data-currency={hostedPaymentData.currency}
+										data-subtotal-cents={totals?.subtotal_cents}
+										data-shipping-cents={totals?.shipping_cents}
+										data-tax-cents={totals?.tax_cents}
+										data-discount-cents={totals?.discount_cents}
+										data-total-cents={totals?.total_cents}
+										data-success-url={`${window.location.origin}/checkout?step=confirmation`}
+										data-from-api-payload={JSON.stringify(hostedPaymentData.fromApiPayload)}
+										className="min-h-[420px] w-full"
+									/>
+									<script src={hostedPaymentData.widgetUrl} async />
+								</div>
+
+								{/* Footer bar */}
+								<div className="bg-card/50 flex items-center justify-between border-t border-border px-6 py-4">
+									<button
+										type="button"
+										onClick={onBack}
+										className="flex items-center gap-1 text-sm text-muted-foreground transition-colors hover:text-foreground"
+									>
+										<ChevronLeft className="h-4 w-4" />
+										{isShippingRequired ? "Return to shipping" : "Return to information"}
+									</button>
+									<div className="flex items-center gap-2 text-xs text-muted-foreground">
+										<ShieldCheck className="h-3.5 w-3.5" />
+										<span>256-bit SSL encrypted</span>
+									</div>
+								</div>
+							</div>
 						);
 					})()}
-
-				<div className="px-6 py-4 md:px-8">
-					<button
-						type="button"
-						onClick={onBack}
-						className="flex items-center gap-1 text-sm text-muted-foreground transition-colors hover:text-foreground"
-					>
-						<ChevronLeft className="h-4 w-4" />
-						{isShippingRequired ? "Return to shipping" : "Return to information"}
-					</button>
-				</div>
 			</div>
 		);
 	}
