@@ -57,19 +57,19 @@ export const SaleorCheckout: FC = () => {
 		stepRef.current?.focus();
 	}, [currentStep.id]);
 
+	// Post-payment: if step=confirmation, show success page immediately.
+	// The checkout is consumed by Saleor after payment, so don't wait for it.
+	const stepSlug = searchParams.get("step");
+	if (stepSlug === "confirmation") {
+		return <PostPaymentConfirmation />;
+	}
+
 	// Checkout is invalid if: no checkout ID in URL, or fetching is done but no checkout data
 	const isCheckoutInvalid = !hasCheckoutId || (!fetchingCheckout && !checkout && !isAuthenticating);
 	const isEmptyCart = checkout && !checkout.lines.length;
 
 	// Only show skeleton on initial load when we have no data yet
 	const showInitialSkeleton = !checkout && (isAuthenticating || fetchingCheckout);
-
-	// After a successful payment, the checkout is consumed by Saleor.
-	// If we land on ?step=confirmation without a valid checkout, show the success page.
-	const stepSlug = searchParams.get("step");
-	if (isCheckoutInvalid && stepSlug === "confirmation") {
-		return <PostPaymentConfirmation />;
-	}
 
 	if (isCheckoutInvalid) {
 		return <PageNotFound />;
