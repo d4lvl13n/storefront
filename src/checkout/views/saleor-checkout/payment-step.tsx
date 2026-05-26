@@ -514,21 +514,32 @@ export const PaymentStep: FC<PaymentStepProps> = ({
 			)}
 
 			{/* Payment widget (when hosted provider returned widget data) */}
-			{hostedPaymentData?.fromApiPayload && (
-				<div className="w-full space-y-4">
-					<div
-						data-sellabroad-payment-container
-						data-merchant-id={hostedPaymentData.merchantId}
-						data-platform="api"
-						data-mode={hostedPaymentData.widgetMode}
-						data-currency={hostedPaymentData.currency}
-						data-success-url={`${window.location.origin}/checkout`}
-						data-from-api-payload={JSON.stringify(hostedPaymentData.fromApiPayload)}
-						className="w-full"
-					/>
-					<script src={hostedPaymentData.widgetUrl} async />
-				</div>
-			)}
+			{hostedPaymentData?.fromApiPayload &&
+				(() => {
+					const totals = hostedPaymentData.fromApiPayload?.merchantSuppliedTotals as
+						| Record<string, number | string>
+						| undefined;
+					return (
+						<div className="w-full space-y-4">
+							<div
+								data-sellabroad-payment-container
+								data-merchant-id={hostedPaymentData.merchantId}
+								data-platform="api"
+								data-mode={hostedPaymentData.widgetMode}
+								data-currency={hostedPaymentData.currency}
+								data-subtotal-cents={totals?.subtotal_cents}
+								data-shipping-cents={totals?.shipping_cents}
+								data-tax-cents={totals?.tax_cents}
+								data-discount-cents={totals?.discount_cents}
+								data-total-cents={totals?.total_cents}
+								data-success-url={`${window.location.origin}/checkout`}
+								data-from-api-payload={JSON.stringify(hostedPaymentData.fromApiPayload)}
+								className="w-full"
+							/>
+							<script src={hostedPaymentData.widgetUrl} async />
+						</div>
+					);
+				})()}
 
 			{/* Payment Method (when no widget is active) */}
 			{!hostedPaymentData && (
