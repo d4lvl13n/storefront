@@ -39,7 +39,7 @@ export const BuyerTypeSelect: FC<BuyerTypeSelectProps> = ({ value, onChange }) =
 					className="flex h-12 w-full appearance-none rounded-md border border-input bg-background pl-10 pr-10 text-sm text-foreground ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
 				>
 					{BUYER_TYPE_OPTIONS.map((option) => (
-						<option key={option.value} value={option.value}>
+						<option key={option.value} value={option.value} className="bg-background text-foreground">
 							{option.label}
 						</option>
 					))}

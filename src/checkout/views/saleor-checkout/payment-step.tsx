@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect, useCallback, useRef, type FC } from "react";
-import { ChevronLeft, AlertCircle, Lock, CreditCard } from "lucide-react";
+import { ChevronLeft, AlertCircle, CreditCard } from "lucide-react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { Button } from "@/ui/components/ui/button";
 import { CheckoutSummaryContext, buildPaymentSummaryRows } from "./checkout-summary-context";
@@ -402,11 +402,7 @@ export const PaymentStep: FC<PaymentStepProps> = ({
 							| Record<string, number | string>
 							| undefined;
 						return (
-							<section>
-								<div className="mb-4 flex items-center gap-2">
-									<Lock className="h-4 w-4 text-muted-foreground" />
-									<p className="text-sm text-muted-foreground">Secure payment</p>
-								</div>
+							<section className="-mx-6 -mb-6 md:-mx-8 md:-mb-8">
 								<div
 									data-sellabroad-payment-container
 									data-merchant-id={hostedPaymentData.merchantId}
@@ -420,7 +416,7 @@ export const PaymentStep: FC<PaymentStepProps> = ({
 									data-total-cents={totals?.total_cents}
 									data-success-url={`${window.location.origin}/checkout`}
 									data-from-api-payload={JSON.stringify(hostedPaymentData.fromApiPayload)}
-									className="w-full"
+									className="min-h-[400px] w-full"
 								/>
 								<script src={hostedPaymentData.widgetUrl} async />
 							</section>
