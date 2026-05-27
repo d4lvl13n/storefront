@@ -46,6 +46,10 @@ export const SaleorCheckout: FC = () => {
 	// For physical products, full flow (1 = info, 2 = shipping, 3 = payment, 4 = confirmation)
 	const isShippingRequired = checkout?.isShippingRequired ?? true;
 
+	const dummyGatewayId = "mirumee.payments.dummy";
+	const isHostedPaymentStep =
+		currentStep.id === "PAYMENT" && checkout?.availablePaymentGateways?.some((g) => g.id !== dummyGatewayId);
+
 	// Determine current step from URL
 	const currentStep = getCurrentStepFromParams(searchParams, isShippingRequired);
 
@@ -110,53 +114,60 @@ export const SaleorCheckout: FC = () => {
 				isShippingRequired={isShippingRequired}
 			/>
 
-			{/* Main content - centered, same max-width as main page */}
-			{/* pb-24 on mobile accounts for the fixed bottom action bar */}
-			<main className="mx-auto max-w-7xl px-4 py-6 pb-24 sm:px-6 md:py-8 md:pb-8 lg:px-8">
-				{/* Two column layout: ~70% Form + ~30% Summary */}
-				<div className="flex flex-col gap-8 md:flex-row">
-					{/* Left column: Form (~70%) */}
-					<div className="min-w-0 flex-1">
-						{/* Mobile Order Summary - collapsible, inside scrollable content */}
-						<div className="mb-4 overflow-hidden rounded-lg border border-border bg-card md:hidden">
-							<OrderSummary checkout={checkout} />
+			{isHostedPaymentStep ? (
+				<main className="flex-1">
+					<div ref={stepRef} tabIndex={-1} className="outline-none">
+						<PaymentStep
+							checkout={checkout}
+							onBack={() => goToStep(isShippingRequired ? "SHIPPING" : "INFO")}
+							onComplete={() => goToStep("CONFIRMATION")}
+							onGoToInformation={() => goToStep("INFO")}
+						/>
+					</div>
+				</main>
+			) : (
+				<main className="mx-auto max-w-7xl px-4 py-6 pb-24 sm:px-6 md:py-8 md:pb-8 lg:px-8">
+					<div className="flex flex-col gap-8 md:flex-row">
+						<div className="min-w-0 flex-1">
+							<div className="mb-4 overflow-hidden rounded-lg border border-border bg-card md:hidden">
+								<OrderSummary checkout={checkout} />
+							</div>
+							<div className="rounded-lg border border-border bg-card p-6 md:p-8">
+								<div ref={stepRef} tabIndex={-1} className="outline-none">
+									{currentStep.id === "INFO" && (
+										<InformationStep
+											checkout={checkout}
+											onNext={() => goToStep(isShippingRequired ? "SHIPPING" : "PAYMENT")}
+										/>
+									)}
+									{currentStep.id === "SHIPPING" && (
+										<ShippingStep
+											checkout={checkout}
+											onBack={() => goToStep("INFO")}
+											onNext={() => goToStep("PAYMENT")}
+										/>
+									)}
+									{currentStep.id === "PAYMENT" && (
+										<PaymentStep
+											checkout={checkout}
+											onBack={() => goToStep(isShippingRequired ? "SHIPPING" : "INFO")}
+											onComplete={() => goToStep("CONFIRMATION")}
+											onGoToInformation={() => goToStep("INFO")}
+										/>
+									)}
+									{currentStep.id === "CONFIRMATION" && <ConfirmationStep checkout={checkout} />}
+								</div>
+							</div>
 						</div>
-						<div className="rounded-lg border border-border bg-card p-6 md:p-8">
-							<div ref={stepRef} tabIndex={-1} className="outline-none">
-								{currentStep.id === "INFO" && (
-									<InformationStep
-										checkout={checkout}
-										onNext={() => goToStep(isShippingRequired ? "SHIPPING" : "PAYMENT")}
-									/>
-								)}
-								{currentStep.id === "SHIPPING" && (
-									<ShippingStep
-										checkout={checkout}
-										onBack={() => goToStep("INFO")}
-										onNext={() => goToStep("PAYMENT")}
-									/>
-								)}
-								{currentStep.id === "PAYMENT" && (
-									<PaymentStep
-										checkout={checkout}
-										onBack={() => goToStep(isShippingRequired ? "SHIPPING" : "INFO")}
-										onComplete={() => goToStep("CONFIRMATION")}
-										onGoToInformation={() => goToStep("INFO")}
-									/>
-								)}
-								{currentStep.id === "CONFIRMATION" && <ConfirmationStep checkout={checkout} />}
+
+						<div className="hidden md:block md:shrink-0 md:basis-[30%]">
+							<div className="overflow-hidden rounded-lg border border-border bg-card md:sticky md:top-8">
+								<OrderSummary checkout={checkout} />
 							</div>
 						</div>
 					</div>
-
-					{/* Right column: Summary (~30%) - hidden on mobile, shown on desktop */}
-					<div className="hidden md:block md:shrink-0 md:basis-[30%]">
-						<div className="overflow-hidden rounded-lg border border-border bg-card md:sticky md:top-8">
-							<OrderSummary checkout={checkout} />
-						</div>
-					</div>
-				</div>
-			</main>
+				</main>
+			)}
 		</div>
 	);
 };

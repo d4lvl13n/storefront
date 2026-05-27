@@ -1,7 +1,8 @@
 "use client";
 
 import { useState, useEffect, useCallback, useRef, type FC } from "react";
-import { ChevronLeft, AlertCircle, CreditCard, ShieldCheck } from "lucide-react";
+import Image from "next/image";
+import { ChevronLeft, AlertCircle, CreditCard, ShieldCheck, Tag, RotateCcw, Truck, Lock } from "lucide-react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { Button } from "@/ui/components/ui/button";
 import { CheckoutSummaryContext, buildPaymentSummaryRows } from "./checkout-summary-context";
@@ -375,90 +376,201 @@ export const PaymentStep: FC<PaymentStepProps> = ({
 	const isLoading = isProcessing || isPaymentProcessing;
 
 	if (hasHostedGateway) {
+		const lines = checkout.lines ?? [];
+		const currency = checkout.totalPrice?.gross?.currency || "USD";
+		const subtotalAmount = checkout.subtotalPrice?.gross?.amount || 0;
+		const shippingAmount = checkout.shippingPrice?.gross?.amount || 0;
+		const discountAmount = checkout.discount?.amount || 0;
+		const totalAmount = checkout.totalPrice?.gross?.amount || 0;
+		const itemCount = lines.reduce((sum, l) => sum + l.quantity, 0);
+
+		const fmtMoney = (amount: number) =>
+			new Intl.NumberFormat("en-US", { style: "currency", currency }).format(amount);
+
+		const summaryPanel = (
+			<div className="flex h-full flex-col bg-zinc-950 text-white">
+				<div className="flex-1 overflow-y-auto px-8 py-10 lg:px-12">
+					{/* Items */}
+					<ul className="space-y-4">
+						{lines.map((line) => {
+							const variantImage = line.variant?.media?.find((m) => m.type === "IMAGE");
+							const productImage = line.variant?.product?.media?.find((m) => m.type === "IMAGE");
+							const image = variantImage || productImage;
+							const name = line.variant?.product?.name || "Product";
+							const lineTotal = line.totalPrice?.gross?.amount || 0;
+
+							return (
+								<li key={line.id} className="flex items-center gap-4">
+									<figure className="relative shrink-0">
+										{line.quantity > 1 && (
+											<span className="absolute -right-1.5 -top-1.5 z-10 flex h-5 w-5 items-center justify-center rounded-full bg-zinc-600 text-[10px] font-semibold text-white">
+												{line.quantity}
+											</span>
+										)}
+										<div className="h-14 w-14 overflow-hidden rounded-lg border border-zinc-700 bg-zinc-800">
+											{image?.url ? (
+												<Image
+													src={image.url}
+													alt={image.alt || name}
+													width={56}
+													height={56}
+													className="h-full w-full object-contain"
+												/>
+											) : (
+												<div className="flex h-full w-full items-center justify-center text-zinc-500">
+													<Tag className="h-5 w-5" />
+												</div>
+											)}
+										</div>
+									</figure>
+									<div className="min-w-0 flex-1">
+										<p className="truncate text-sm font-medium text-zinc-100">{name}</p>
+									</div>
+									<span className="text-sm font-medium tabular-nums text-zinc-100">
+										{fmtMoney(lineTotal)}
+									</span>
+								</li>
+							);
+						})}
+					</ul>
+
+					{/* Totals */}
+					<div className="mt-8 space-y-2.5 border-t border-zinc-800 pt-6 text-sm">
+						<div className="flex justify-between">
+							<span className="text-zinc-400">Subtotal</span>
+							<span className="tabular-nums text-zinc-200">{fmtMoney(subtotalAmount)}</span>
+						</div>
+						<div className="flex justify-between">
+							<span className="text-zinc-400">Shipping</span>
+							<span className={`tabular-nums ${shippingAmount === 0 ? "text-emerald-400" : "text-zinc-200"}`}>
+								{shippingAmount === 0 ? "Free" : fmtMoney(shippingAmount)}
+							</span>
+						</div>
+						{discountAmount > 0 && (
+							<div className="flex justify-between">
+								<span className="text-emerald-400">Discount</span>
+								<span className="tabular-nums text-emerald-400">-{fmtMoney(discountAmount)}</span>
+							</div>
+						)}
+						<div className="flex items-baseline justify-between border-t border-zinc-800 pt-4">
+							<span className="text-base font-semibold text-white">Total</span>
+							<span className="text-2xl font-semibold tabular-nums text-white">{fmtMoney(totalAmount)}</span>
+						</div>
+					</div>
+
+					{/* Trust badges */}
+					<div className="mt-8 grid grid-cols-3 gap-3">
+						<div className="flex flex-col items-center rounded-lg border border-zinc-800 bg-zinc-900 p-3 text-center">
+							<ShieldCheck className="mb-1.5 h-4 w-4 text-zinc-500" />
+							<span className="text-[10px] leading-tight text-zinc-500">Secure checkout</span>
+						</div>
+						<div className="flex flex-col items-center rounded-lg border border-zinc-800 bg-zinc-900 p-3 text-center">
+							<RotateCcw className="mb-1.5 h-4 w-4 text-zinc-500" />
+							<span className="text-[10px] leading-tight text-zinc-500">30-day returns</span>
+						</div>
+						<div className="flex flex-col items-center rounded-lg border border-zinc-800 bg-zinc-900 p-3 text-center">
+							<Truck className="mb-1.5 h-4 w-4 text-zinc-500" />
+							<span className="text-[10px] leading-tight text-zinc-500">Free shipping</span>
+						</div>
+					</div>
+				</div>
+			</div>
+		);
+
 		return (
-			<div className="-mx-6 -my-6 md:-mx-8 md:-my-8">
-				{isLoading && !hostedPaymentData && (
-					<div className="flex flex-col items-center justify-center gap-6 py-20">
-						<div className="relative">
-							<div className="bg-primary/20 absolute inset-0 animate-ping rounded-full" />
-							<div className="bg-primary/10 relative rounded-full p-4">
-								<LoadingSpinner />
-							</div>
-						</div>
-						<div className="text-center">
-							<p className="font-medium">Preparing secure payment</p>
-							<p className="mt-1 text-sm text-muted-foreground">Connecting to payment provider...</p>
-						</div>
-					</div>
-				)}
-
-				{errors.payment && (
-					<div className="p-6 md:p-8">
-						<div className="border-destructive/50 bg-destructive/10 flex items-start gap-3 rounded-lg border p-4">
-							<AlertCircle className="h-5 w-5 flex-shrink-0 text-destructive" />
-							<div>
-								<p className="font-medium text-destructive">Payment failed</p>
-								<p className="text-destructive/80 text-sm">{errors.payment}</p>
-							</div>
-						</div>
-						<button
-							type="button"
-							onClick={onBack}
-							className="mt-4 flex items-center gap-1 text-sm text-muted-foreground transition-colors hover:text-foreground"
-						>
-							<ChevronLeft className="h-4 w-4" />
-							Return to shipping
-						</button>
-					</div>
-				)}
-
-				{hostedPaymentData &&
-					(() => {
-						const totals = hostedPaymentData.fromApiPayload?.merchantSuppliedTotals as
-							| Record<string, number | string>
-							| undefined;
-						return (
-							<div className="flex flex-col">
-								{/* Widget container — clean white surface */}
-								<div className="overflow-hidden rounded-t-lg bg-white">
-									<div
-										data-sellabroad-payment-container
-										data-merchant-id={hostedPaymentData.merchantId}
-										data-platform="api"
-										data-mode={hostedPaymentData.widgetMode}
-										data-currency={hostedPaymentData.currency}
-										data-subtotal-cents={totals?.subtotal_cents}
-										data-shipping-cents={totals?.shipping_cents}
-										data-tax-cents={totals?.tax_cents}
-										data-discount-cents={totals?.discount_cents}
-										data-total-cents={totals?.total_cents}
-										data-success-url={`${window.location.origin}/checkout?checkout=${encodeURIComponent(
-											checkout.id,
-										)}&step=confirmation`}
-										data-from-api-payload={JSON.stringify(hostedPaymentData.fromApiPayload)}
-										className="min-h-[420px] w-full"
-									/>
-									<script src={hostedPaymentData.widgetUrl} async />
+			<div className="flex min-h-[calc(100vh-64px)] flex-col md:flex-row">
+				{/* Left — Payment widget (white) */}
+				<div className="flex min-w-0 flex-1 flex-col bg-white">
+					{isLoading && !hostedPaymentData && (
+						<div className="flex flex-1 flex-col items-center justify-center gap-6 py-20">
+							<div className="relative">
+								<div className="absolute inset-0 animate-ping rounded-full bg-emerald-500/20" />
+								<div className="relative rounded-full bg-emerald-500/10 p-4">
+									<LoadingSpinner />
 								</div>
+							</div>
+							<div className="text-center">
+								<p className="font-medium text-zinc-900">Preparing secure payment</p>
+								<p className="mt-1 text-sm text-zinc-500">Connecting to payment provider...</p>
+							</div>
+						</div>
+					)}
 
-								{/* Footer bar */}
-								<div className="bg-card/50 flex items-center justify-between border-t border-border px-6 py-4">
-									<button
-										type="button"
-										onClick={onBack}
-										className="flex items-center gap-1 text-sm text-muted-foreground transition-colors hover:text-foreground"
-									>
-										<ChevronLeft className="h-4 w-4" />
-										{isShippingRequired ? "Return to shipping" : "Return to information"}
-									</button>
-									<div className="flex items-center gap-2 text-xs text-muted-foreground">
-										<ShieldCheck className="h-3.5 w-3.5" />
-										<span>256-bit SSL encrypted</span>
+					{errors.payment && (
+						<div className="p-8">
+							<div className="flex items-start gap-3 rounded-lg border border-red-200 bg-red-50 p-4">
+								<AlertCircle className="h-5 w-5 flex-shrink-0 text-red-600" />
+								<div>
+									<p className="font-medium text-red-800">Payment failed</p>
+									<p className="text-sm text-red-600">{errors.payment}</p>
+								</div>
+							</div>
+							<button
+								type="button"
+								onClick={onBack}
+								className="mt-4 flex items-center gap-1 text-sm text-zinc-500 transition-colors hover:text-zinc-900"
+							>
+								<ChevronLeft className="h-4 w-4" />
+								Return to shipping
+							</button>
+						</div>
+					)}
+
+					{hostedPaymentData &&
+						(() => {
+							const totals = hostedPaymentData.fromApiPayload?.merchantSuppliedTotals as
+								| Record<string, number | string>
+								| undefined;
+							return (
+								<div className="flex flex-1 flex-col">
+									{/* Mobile summary — visible only on small screens */}
+									<div className="border-b border-zinc-200 md:hidden">{summaryPanel}</div>
+
+									<div className="flex-1 px-6 py-8 md:px-12 lg:px-20">
+										<div className="mx-auto max-w-lg">
+											<div
+												data-sellabroad-payment-container
+												data-merchant-id={hostedPaymentData.merchantId}
+												data-platform="api"
+												data-mode={hostedPaymentData.widgetMode}
+												data-currency={hostedPaymentData.currency}
+												data-subtotal-cents={totals?.subtotal_cents}
+												data-shipping-cents={totals?.shipping_cents}
+												data-tax-cents={totals?.tax_cents}
+												data-discount-cents={totals?.discount_cents}
+												data-total-cents={totals?.total_cents}
+												data-success-url={`${window.location.origin}/checkout?checkout=${encodeURIComponent(
+													checkout.id,
+												)}&step=confirmation`}
+												data-from-api-payload={JSON.stringify(hostedPaymentData.fromApiPayload)}
+												className="min-h-[420px] w-full"
+											/>
+											<script src={hostedPaymentData.widgetUrl} async />
+										</div>
+									</div>
+
+									{/* Footer */}
+									<div className="flex items-center justify-between border-t border-zinc-200 px-6 py-4 md:px-12 lg:px-20">
+										<button
+											type="button"
+											onClick={onBack}
+											className="flex items-center gap-1 text-sm text-zinc-500 transition-colors hover:text-zinc-900"
+										>
+											<ChevronLeft className="h-4 w-4" />
+											{isShippingRequired ? "Return to shipping" : "Return to information"}
+										</button>
+										<div className="flex items-center gap-2 text-xs text-zinc-400">
+											<Lock className="h-3.5 w-3.5" />
+											<span>256-bit SSL encrypted</span>
+										</div>
 									</div>
 								</div>
-							</div>
-						);
-					})()}
+							);
+						})()}
+				</div>
+
+				{/* Right — Order summary (dark) — hidden on mobile */}
+				<div className="hidden w-[420px] shrink-0 md:block">{summaryPanel}</div>
 			</div>
 		);
 	}
