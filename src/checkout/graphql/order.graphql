@@ -111,3 +111,19 @@ query order($id: ID!, $languageCode: LanguageCodeEnum!) {
 		...OrderFragment
 	}
 }
+
+query LatestOrder($languageCode: LanguageCodeEnum!) {
+	me {
+		orders(first: 1) {
+			edges {
+				node {
+					...OrderFragment
+					checkoutId
+					created
+					status
+					statusDisplay
+				}
+			}
+		}
+	}
+}
