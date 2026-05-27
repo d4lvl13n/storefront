@@ -15,7 +15,7 @@ export const metadata = {
  * Entire page is dynamic (reads searchParams for checkout ID).
  */
 export default function CheckoutPage(props: {
-	searchParams: Promise<{ checkout?: string; order?: string }>;
+	searchParams: Promise<{ checkout?: string; order?: string; step?: string }>;
 }) {
 	return (
 		<Suspense fallback={<CheckoutSkeleton />}>
@@ -30,12 +30,12 @@ export default function CheckoutPage(props: {
 async function CheckoutContent({
 	searchParams: searchParamsPromise,
 }: {
-	searchParams: Promise<{ checkout?: string; order?: string }>;
+	searchParams: Promise<{ checkout?: string; order?: string; step?: string }>;
 }) {
 	const searchParams = await searchParamsPromise;
 	invariant(process.env.NEXT_PUBLIC_SALEOR_API_URL, "Missing NEXT_PUBLIC_SALEOR_API_URL env variable");
 
-	if (!searchParams.checkout && !searchParams.order) {
+	if (!searchParams.checkout && !searchParams.order && searchParams.step !== "confirmation") {
 		return null;
 	}
 
