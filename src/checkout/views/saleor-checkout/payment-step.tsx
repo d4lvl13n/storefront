@@ -386,100 +386,56 @@ export const PaymentStep: FC<PaymentStepProps> = ({
 		const fmtMoney = (amount: number) =>
 			new Intl.NumberFormat("en-US", { style: "currency", currency }).format(amount);
 
-		const summaryPanel = (
-			<div className="flex h-full flex-col bg-zinc-950 text-white">
-				<div className="flex-1 overflow-y-auto px-8 py-10 lg:px-12">
-					{/* Items */}
-					<ul className="space-y-4">
-						{lines.map((line) => {
-							const variantImage = line.variant?.media?.find((m) => m.type === "IMAGE");
-							const productImage = line.variant?.product?.media?.find((m) => m.type === "IMAGE");
-							const image = variantImage || productImage;
-							const name = line.variant?.product?.name || "Product";
-							const lineTotal = line.totalPrice?.gross?.amount || 0;
-
-							return (
-								<li key={line.id} className="flex items-center gap-4">
-									<figure className="relative shrink-0">
-										{line.quantity > 1 && (
-											<span className="absolute -right-1.5 -top-1.5 z-10 flex h-5 w-5 items-center justify-center rounded-full bg-zinc-600 text-[10px] font-semibold text-white">
-												{line.quantity}
-											</span>
-										)}
-										<div className="h-14 w-14 overflow-hidden rounded-lg border border-zinc-700 bg-zinc-800">
-											{image?.url ? (
-												<Image
-													src={image.url}
-													alt={image.alt || name}
-													width={56}
-													height={56}
-													className="h-full w-full object-contain"
-												/>
-											) : (
-												<div className="flex h-full w-full items-center justify-center text-zinc-500">
-													<Tag className="h-5 w-5" />
-												</div>
-											)}
-										</div>
-									</figure>
-									<div className="min-w-0 flex-1">
-										<p className="truncate text-sm font-medium text-zinc-100">{name}</p>
-									</div>
-									<span className="text-sm font-medium tabular-nums text-zinc-100">
-										{fmtMoney(lineTotal)}
-									</span>
-								</li>
-							);
-						})}
-					</ul>
-
-					{/* Totals */}
-					<div className="mt-8 space-y-2.5 border-t border-zinc-800 pt-6 text-sm">
-						<div className="flex justify-between">
-							<span className="text-zinc-400">Subtotal</span>
-							<span className="tabular-nums text-zinc-200">{fmtMoney(subtotalAmount)}</span>
-						</div>
-						<div className="flex justify-between">
-							<span className="text-zinc-400">Shipping</span>
-							<span className={`tabular-nums ${shippingAmount === 0 ? "text-emerald-400" : "text-zinc-200"}`}>
-								{shippingAmount === 0 ? "Free" : fmtMoney(shippingAmount)}
-							</span>
-						</div>
-						{discountAmount > 0 && (
-							<div className="flex justify-between">
-								<span className="text-emerald-400">Discount</span>
-								<span className="tabular-nums text-emerald-400">-{fmtMoney(discountAmount)}</span>
-							</div>
-						)}
-						<div className="flex items-baseline justify-between border-t border-zinc-800 pt-4">
-							<span className="text-base font-semibold text-white">Total</span>
-							<span className="text-2xl font-semibold tabular-nums text-white">{fmtMoney(totalAmount)}</span>
-						</div>
-					</div>
-
-					{/* Trust badges */}
-					<div className="mt-8 grid grid-cols-3 gap-3">
-						<div className="flex flex-col items-center rounded-lg border border-zinc-800 bg-zinc-900 p-3 text-center">
-							<ShieldCheck className="mb-1.5 h-4 w-4 text-zinc-500" />
-							<span className="text-[10px] leading-tight text-zinc-500">Secure checkout</span>
-						</div>
-						<div className="flex flex-col items-center rounded-lg border border-zinc-800 bg-zinc-900 p-3 text-center">
-							<RotateCcw className="mb-1.5 h-4 w-4 text-zinc-500" />
-							<span className="text-[10px] leading-tight text-zinc-500">30-day returns</span>
-						</div>
-						<div className="flex flex-col items-center rounded-lg border border-zinc-800 bg-zinc-900 p-3 text-center">
-							<Truck className="mb-1.5 h-4 w-4 text-zinc-500" />
-							<span className="text-[10px] leading-tight text-zinc-500">Free shipping</span>
-						</div>
-					</div>
-				</div>
-			</div>
-		);
-
 		return (
-			<div className="flex min-h-[calc(100vh-64px)] flex-col md:flex-row">
+			<div className="flex min-h-[calc(100vh-64px)] flex-col lg:flex-row">
 				{/* Left — Payment widget (white) */}
-				<div className="flex min-w-0 flex-1 flex-col bg-white">
+				<div className="flex min-w-0 flex-col bg-white lg:flex-1">
+					{/* Mobile summary — collapsible on small screens */}
+					{hostedPaymentData && (
+						<div className="bg-zinc-950 px-6 py-6 text-white lg:hidden">
+							<ul className="space-y-3">
+								{lines.map((line) => {
+									const img =
+										line.variant?.media?.find((m) => m.type === "IMAGE") ||
+										line.variant?.product?.media?.find((m) => m.type === "IMAGE");
+									const name = line.variant?.product?.name || "Product";
+									return (
+										<li key={line.id} className="flex items-center gap-3">
+											<div className="relative shrink-0">
+												{line.quantity > 1 && (
+													<span className="absolute -right-1 -top-1 z-10 flex h-4 w-4 items-center justify-center rounded-full bg-zinc-600 text-[9px] font-bold">
+														{line.quantity}
+													</span>
+												)}
+												<div className="h-10 w-10 overflow-hidden rounded-md border border-zinc-700 bg-zinc-800">
+													{img?.url ? (
+														<Image
+															src={img.url}
+															alt={img.alt || name}
+															width={40}
+															height={40}
+															className="h-full w-full object-contain"
+														/>
+													) : (
+														<Tag className="m-auto h-4 w-4 text-zinc-600" />
+													)}
+												</div>
+											</div>
+											<span className="min-w-0 flex-1 truncate text-sm text-zinc-200">{name}</span>
+											<span className="text-sm tabular-nums text-zinc-200">
+												{fmtMoney(line.totalPrice?.gross?.amount || 0)}
+											</span>
+										</li>
+									);
+								})}
+							</ul>
+							<div className="mt-4 flex items-baseline justify-between border-t border-zinc-800 pt-4">
+								<span className="font-semibold">Total</span>
+								<span className="text-xl font-semibold tabular-nums">{fmtMoney(totalAmount)}</span>
+							</div>
+						</div>
+					)}
+
 					{isLoading && !hostedPaymentData && (
 						<div className="flex flex-1 flex-col items-center justify-center gap-6 py-20">
 							<div className="relative">
@@ -496,7 +452,7 @@ export const PaymentStep: FC<PaymentStepProps> = ({
 					)}
 
 					{errors.payment && (
-						<div className="p-8">
+						<div className="mx-auto w-full max-w-lg px-6 py-12">
 							<div className="flex items-start gap-3 rounded-lg border border-red-200 bg-red-50 p-4">
 								<AlertCircle className="h-5 w-5 flex-shrink-0 text-red-600" />
 								<div>
@@ -507,7 +463,7 @@ export const PaymentStep: FC<PaymentStepProps> = ({
 							<button
 								type="button"
 								onClick={onBack}
-								className="mt-4 flex items-center gap-1 text-sm text-zinc-500 transition-colors hover:text-zinc-900"
+								className="mt-4 flex items-center gap-1 text-sm text-zinc-500 hover:text-zinc-900"
 							>
 								<ChevronLeft className="h-4 w-4" />
 								Return to shipping
@@ -522,11 +478,8 @@ export const PaymentStep: FC<PaymentStepProps> = ({
 								| undefined;
 							return (
 								<div className="flex flex-1 flex-col">
-									{/* Mobile summary — visible only on small screens */}
-									<div className="border-b border-zinc-200 md:hidden">{summaryPanel}</div>
-
-									<div className="flex-1 px-6 py-8 md:px-12 lg:px-20">
-										<div className="mx-auto max-w-lg">
+									<div className="flex flex-1 items-start justify-center px-6 py-10 md:px-12 lg:items-center lg:px-20">
+										<div className="w-full max-w-md">
 											<div
 												data-sellabroad-payment-container
 												data-merchant-id={hostedPaymentData.merchantId}
@@ -547,20 +500,18 @@ export const PaymentStep: FC<PaymentStepProps> = ({
 											<script src={hostedPaymentData.widgetUrl} async />
 										</div>
 									</div>
-
-									{/* Footer */}
-									<div className="flex items-center justify-between border-t border-zinc-200 px-6 py-4 md:px-12 lg:px-20">
+									<div className="flex items-center justify-between border-t border-zinc-100 px-6 py-4 md:px-12 lg:px-20">
 										<button
 											type="button"
 											onClick={onBack}
-											className="flex items-center gap-1 text-sm text-zinc-500 transition-colors hover:text-zinc-900"
+											className="flex items-center gap-1 text-sm text-zinc-400 transition-colors hover:text-zinc-700"
 										>
 											<ChevronLeft className="h-4 w-4" />
 											{isShippingRequired ? "Return to shipping" : "Return to information"}
 										</button>
-										<div className="flex items-center gap-2 text-xs text-zinc-400">
-											<Lock className="h-3.5 w-3.5" />
-											<span>256-bit SSL encrypted</span>
+										<div className="flex items-center gap-1.5 text-xs text-zinc-300">
+											<Lock className="h-3 w-3" />
+											<span>Encrypted</span>
 										</div>
 									</div>
 								</div>
@@ -569,7 +520,100 @@ export const PaymentStep: FC<PaymentStepProps> = ({
 				</div>
 
 				{/* Right — Order summary (dark) — hidden on mobile */}
-				<div className="hidden w-[420px] shrink-0 md:block">{summaryPanel}</div>
+				<div className="hidden min-h-[calc(100vh-64px)] bg-zinc-950 text-white lg:flex lg:w-[45%] lg:shrink-0 lg:flex-col">
+					<div className="flex flex-1 flex-col justify-center px-10 py-12 xl:px-16">
+						{/* Items */}
+						<ul className="space-y-5">
+							{lines.map((line) => {
+								const variantImage = line.variant?.media?.find((m) => m.type === "IMAGE");
+								const productImage = line.variant?.product?.media?.find((m) => m.type === "IMAGE");
+								const image = variantImage || productImage;
+								const name = line.variant?.product?.name || "Product";
+								const lineTotal = line.totalPrice?.gross?.amount || 0;
+
+								return (
+									<li key={line.id} className="flex items-center gap-4">
+										<figure className="relative shrink-0">
+											{line.quantity > 1 && (
+												<span className="absolute -right-2 -top-2 z-10 flex h-5 w-5 items-center justify-center rounded-full bg-zinc-600 text-[10px] font-semibold">
+													{line.quantity}
+												</span>
+											)}
+											<div className="h-16 w-16 overflow-hidden rounded-xl border border-zinc-800 bg-zinc-900">
+												{image?.url ? (
+													<Image
+														src={image.url}
+														alt={image.alt || name}
+														width={64}
+														height={64}
+														className="h-full w-full object-contain p-1"
+													/>
+												) : (
+													<div className="flex h-full w-full items-center justify-center text-zinc-600">
+														<Tag className="h-5 w-5" />
+													</div>
+												)}
+											</div>
+										</figure>
+										<div className="min-w-0 flex-1">
+											<p className="truncate text-sm font-medium text-zinc-100">{name}</p>
+											{line.quantity > 1 && <p className="text-xs text-zinc-500">Qty {line.quantity}</p>}
+										</div>
+										<span className="text-sm font-medium tabular-nums text-zinc-100">
+											{fmtMoney(lineTotal)}
+										</span>
+									</li>
+								);
+							})}
+						</ul>
+
+						{/* Divider + Totals */}
+						<div className="mt-10 space-y-3 border-t border-zinc-800 pt-8 text-sm">
+							<div className="flex justify-between">
+								<span className="text-zinc-400">Subtotal</span>
+								<span className="tabular-nums text-zinc-200">{fmtMoney(subtotalAmount)}</span>
+							</div>
+							<div className="flex justify-between">
+								<span className="text-zinc-400">Shipping</span>
+								<span
+									className={`tabular-nums ${shippingAmount === 0 ? "text-emerald-400" : "text-zinc-200"}`}
+								>
+									{shippingAmount === 0 ? "Free" : fmtMoney(shippingAmount)}
+								</span>
+							</div>
+							{discountAmount > 0 && (
+								<div className="flex justify-between">
+									<span className="text-emerald-400">Discount</span>
+									<span className="tabular-nums text-emerald-400">-{fmtMoney(discountAmount)}</span>
+								</div>
+							)}
+						</div>
+
+						{/* Total — prominent */}
+						<div className="mt-6 flex items-baseline justify-between border-t border-zinc-800 pt-6">
+							<span className="text-lg font-semibold text-white">Total</span>
+							<span className="text-3xl font-bold tabular-nums tracking-tight text-white">
+								{fmtMoney(totalAmount)}
+							</span>
+						</div>
+
+						{/* Trust badges */}
+						<div className="mt-10 grid grid-cols-3 gap-2">
+							<div className="flex flex-col items-center rounded-lg border border-zinc-800/60 bg-zinc-900/50 px-3 py-3 text-center">
+								<ShieldCheck className="mb-1 h-4 w-4 text-zinc-600" />
+								<span className="text-[10px] leading-tight text-zinc-500">Secure checkout</span>
+							</div>
+							<div className="flex flex-col items-center rounded-lg border border-zinc-800/60 bg-zinc-900/50 px-3 py-3 text-center">
+								<RotateCcw className="mb-1 h-4 w-4 text-zinc-600" />
+								<span className="text-[10px] leading-tight text-zinc-500">30-day returns</span>
+							</div>
+							<div className="flex flex-col items-center rounded-lg border border-zinc-800/60 bg-zinc-900/50 px-3 py-3 text-center">
+								<Truck className="mb-1 h-4 w-4 text-zinc-600" />
+								<span className="text-[10px] leading-tight text-zinc-500">Free shipping</span>
+							</div>
+						</div>
+					</div>
+				</div>
 			</div>
 		);
 	}
