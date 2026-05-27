@@ -382,7 +382,6 @@ export const PaymentStep: FC<PaymentStepProps> = ({
 		const shippingAmount = checkout.shippingPrice?.gross?.amount || 0;
 		const discountAmount = checkout.discount?.amount || 0;
 		const totalAmount = checkout.totalPrice?.gross?.amount || 0;
-		const itemCount = lines.reduce((sum, l) => sum + l.quantity, 0);
 
 		const fmtMoney = (amount: number) =>
 			new Intl.NumberFormat("en-US", { style: "currency", currency }).format(amount);
