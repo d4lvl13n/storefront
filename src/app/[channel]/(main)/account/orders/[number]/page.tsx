@@ -1,22 +1,22 @@
 import { connection } from "next/server";
 import { notFound } from "next/navigation";
 import Image from "next/image";
+import Link from "next/link";
 import { MapPin, CreditCard } from "lucide-react";
 import { OrderByNumberDocument } from "@/gql/graphql";
 import { executeAuthenticatedGraphQL } from "@/lib/graphql";
-import { LinkWithChannel } from "@/ui/atoms/link-with-channel";
 import { formatDate, formatMoney } from "@/lib/utils";
 import { OrderTimeline } from "@/ui/components/account/order-timeline";
 import { OrderStatusBadge } from "@/ui/components/account/order-status-badge";
 import { type AddressDetailsFragment } from "@/gql/graphql";
 
 type Props = {
-	params: Promise<{ number: string }>;
+	params: Promise<{ channel: string; number: string }>;
 };
 
 export default async function OrderDetailPage({ params }: Props) {
 	await connection();
-	const { number } = await params;
+	const { channel, number } = await params;
 
 	let result;
 	try {
@@ -87,12 +87,12 @@ export default async function OrderDetailPage({ params }: Props) {
 											</div>
 										)}
 										<div className="min-w-0 flex-1">
-											<LinkWithChannel
-												href={`/products/${product.slug}`}
+											<Link
+												href={`/${channel}/products/${product.slug}`}
 												className="text-sm font-medium text-foreground hover:text-emerald-400 hover:underline"
 											>
 												{product.name}
-											</LinkWithChannel>
+											</Link>
 											{line.variant.name !== line.variant.id && Boolean(line.variant.name) && (
 												<p className="text-[13px] text-muted-foreground">{line.variant.name}</p>
 											)}
@@ -161,12 +161,12 @@ export default async function OrderDetailPage({ params }: Props) {
 						</div>
 					)}
 
-					<LinkWithChannel
-						href="/contact"
+					<Link
+						href={`/${channel}/contact`}
 						className="block w-full rounded-xl border border-white/[0.06] px-5 py-3 text-center text-sm font-medium text-foreground transition-colors hover:bg-white/[0.04] hover:text-foreground"
 					>
 						Need Help?
-					</LinkWithChannel>
+					</Link>
 				</div>
 			</div>
 		</div>
