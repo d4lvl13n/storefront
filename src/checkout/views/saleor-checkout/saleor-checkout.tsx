@@ -46,12 +46,12 @@ export const SaleorCheckout: FC = () => {
 	// For physical products, full flow (1 = info, 2 = shipping, 3 = payment, 4 = confirmation)
 	const isShippingRequired = checkout?.isShippingRequired ?? true;
 
+	// Determine current step from URL
+	const currentStep = getCurrentStepFromParams(searchParams, isShippingRequired);
+
 	const dummyGatewayId = "mirumee.payments.dummy";
 	const isHostedPaymentStep =
 		currentStep.id === "PAYMENT" && checkout?.availablePaymentGateways?.some((g) => g.id !== dummyGatewayId);
-
-	// Determine current step from URL
-	const currentStep = getCurrentStepFromParams(searchParams, isShippingRequired);
 
 	const stepRef = useRef<HTMLDivElement>(null);
 
