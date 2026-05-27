@@ -18,17 +18,24 @@ export default async function OrderDetailPage({ params }: Props) {
 	await connection();
 	const { number } = await params;
 
-	// Saleor's `me.orders` doesn't support filtering by number (UserOrdersArgs
-	// only has pagination args). We fetch a page and find client-side. This covers
-	// the vast majority of customers; a dedicated `orderByToken` query would be
-	// more efficient if order counts grow large.
-	const result = await executeAuthenticatedGraphQL(OrderByNumberDocument, {
-		variables: { first: 100 },
-		cache: "no-cache",
-	});
+	let result;
+	try {
+		result = await executeAuthenticatedGraphQL(OrderByNumberDocument, {
+			variables: { first: 100 },
+			cache: "no-cache",
+		});
+	} catch (error) {
+		console.error("[OrderDetailPage] Failed to fetch orders:", error);
+		notFound();
+	}
 
-	if (!result.ok || !result.data.me) {
-		return null;
+	if (!result.ok) {
+		console.error("[OrderDetailPage] GraphQL error:", result.error);
+		notFound();
+	}
+
+	if (!result.data.me) {
+		notFound();
 	}
 
 	const orders = result.data.me.orders?.edges ?? [];

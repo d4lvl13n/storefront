@@ -16,16 +16,32 @@ export default async function AccountOrdersPage({ searchParams }: Props) {
 	await connection();
 	const { after } = await searchParams;
 
-	const result = await executeAuthenticatedGraphQL(CurrentUserOrdersPaginatedDocument, {
-		variables: {
-			first: ORDERS_PER_PAGE,
-			after: after || null,
-		},
-		cache: "no-cache",
-	});
+	let result;
+	try {
+		result = await executeAuthenticatedGraphQL(CurrentUserOrdersPaginatedDocument, {
+			variables: {
+				first: ORDERS_PER_PAGE,
+				after: after || null,
+			},
+			cache: "no-cache",
+		});
+	} catch (error) {
+		console.error("[AccountOrdersPage] Failed to fetch orders:", error);
+		return (
+			<div className="space-y-6">
+				<h1 className="text-2xl font-semibold tracking-tight text-foreground">Orders</h1>
+				<p className="text-sm text-muted-foreground">Unable to load orders. Please try again.</p>
+			</div>
+		);
+	}
 
 	if (!result.ok || !result.data.me) {
-		return null;
+		return (
+			<div className="space-y-6">
+				<h1 className="text-2xl font-semibold tracking-tight text-foreground">Orders</h1>
+				<p className="text-sm text-muted-foreground">Unable to load orders. Please try again.</p>
+			</div>
+		);
 	}
 
 	const ordersConnection = result.data.me.orders;
