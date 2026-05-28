@@ -31,20 +31,13 @@ export const rootMetadata: Metadata = {
 	// Base URL for resolving relative URLs
 	metadataBase: getMetadataBase(),
 
-	// OpenGraph defaults
+	// OpenGraph defaults — the `src/app/opengraph-image.tsx` file is auto-detected
+	// by Next.js and supplies the default image for every page that doesn't override.
 	...(seoConfig.enableOpenGraph && {
 		openGraph: {
 			type: "website",
 			siteName: seoConfig.siteName,
 			locale: seoConfig.locale,
-			images: [
-				{
-					url: "/opengraph-image.png",
-					width: 1200,
-					height: 630,
-					alt: seoConfig.siteName,
-				},
-			],
 		},
 	}),
 
