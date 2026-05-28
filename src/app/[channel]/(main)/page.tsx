@@ -11,7 +11,6 @@ import { HowOrderingWorks } from "@/ui/components/how-ordering-works";
 import { VerifiedStoryCard } from "@/ui/components/verified-story-card";
 import { ShopGoalCard } from "@/ui/components/shop-goal-card";
 import { NewsletterForm } from "@/ui/components/newsletter-form";
-import Image from "next/image";
 
 export const metadata = {
 	title: { absolute: "InfinityBio Labs — Research Peptides, 99%+ Purity" },
@@ -384,14 +383,19 @@ function InfinityStandardSection() {
 
 				<div className="mt-12 overflow-hidden rounded-lg border border-border bg-background shadow-2xl shadow-black/10 sm:mt-16">
 					<div className="relative aspect-[16/10] min-h-[420px] sm:aspect-[16/9]">
-						<Image
-							src="/screenshot.png"
-							alt="Infinity Bio Labs laboratory sample kit with research-use vials"
-							fill
-							sizes="(min-width: 1280px) 1216px, calc(100vw - 48px)"
-							className="object-contain"
-							priority={false}
-						/>
+						<video
+							className="absolute inset-0 h-full w-full object-cover"
+							autoPlay
+							loop
+							muted
+							playsInline
+							preload="metadata"
+							poster="/screenshot.png"
+							aria-hidden="true"
+							tabIndex={-1}
+						>
+							<source src="/videos/box-hero-v3.mp4" type="video/mp4" />
+						</video>
 						<div className="from-background/0 via-background/0 to-background/30 pointer-events-none absolute inset-0 bg-gradient-to-b" />
 
 						<div className="pointer-events-none absolute inset-0 hidden md:block" aria-hidden="true">
