@@ -398,7 +398,8 @@ function InfinityStandardSection() {
 						</video>
 						<div className="from-background/0 via-background/0 to-background/30 pointer-events-none absolute inset-0 bg-gradient-to-b" />
 
-						<div className="pointer-events-none absolute inset-0 hidden md:block" aria-hidden="true">
+						{/* Callout overlays — hidden while we preview the video clean. Change `hidden` back to `hidden md:block` to restore. */}
+						<div className="pointer-events-none absolute inset-0 hidden" aria-hidden="true">
 							{infinityStandardPoints.map((point, index) => {
 								const Icon = point.icon;
 								return (
