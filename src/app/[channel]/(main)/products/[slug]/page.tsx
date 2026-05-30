@@ -15,7 +15,7 @@ import {
 import { buildPageMetadata, buildProductJsonLd, buildFaqJsonLd, buildBreadcrumbJsonLd } from "@/lib/seo";
 import { formatMoney } from "@/lib/utils";
 import { Breadcrumbs } from "@/ui/components/breadcrumbs";
-import { ResearchSearch } from "@/ui/components/research-search";
+import { WhatScienceSays } from "@/ui/components/pdp/what-science-says";
 import { transformToProductCard } from "@/ui/components/plp";
 import { ProductCard } from "@/ui/components/plp/product-card";
 import {
@@ -334,11 +334,9 @@ async function ProductContent({
 				</PdpSection>
 			)}
 
-			<PdpSection id="research" label="The science" title="Explore the research">
-				<div className="mx-auto max-w-3xl">
-					<ResearchSearch initialQuery={product.name} />
-				</div>
-			</PdpSection>
+			<Suspense fallback={null}>
+				<WhatScienceSays query={product.name} />
+			</Suspense>
 
 			{protocolItems.length > 0 && (
 				<PdpSection id="protocol" label="Pairs with" title="Complete your protocol">

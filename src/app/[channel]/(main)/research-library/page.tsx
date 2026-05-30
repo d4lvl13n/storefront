@@ -14,8 +14,12 @@ export async function generateMetadata(props: { params: Promise<{ channel: strin
 	});
 }
 
-export default async function ResearchLibraryPage(props: { params: Promise<{ channel: string }> }) {
+export default async function ResearchLibraryPage(props: {
+	params: Promise<{ channel: string }>;
+	searchParams: Promise<{ q?: string }>;
+}) {
 	const { channel } = await props.params;
+	const { q } = await props.searchParams;
 
 	const breadcrumbJsonLd = buildBreadcrumbJsonLd([
 		{ label: "Home", href: `/${channel}` },
@@ -58,7 +62,7 @@ export default async function ResearchLibraryPage(props: { params: Promise<{ cha
 					</div>
 
 					{/* Live search */}
-					<ResearchSearch />
+					<ResearchSearch initialQuery={q} />
 
 					{/* Footer note */}
 					<div className="mt-14 border-t border-border pt-6 text-xs leading-relaxed text-muted-foreground">
