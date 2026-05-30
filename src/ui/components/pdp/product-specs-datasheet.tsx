@@ -11,12 +11,11 @@ function formatValue(value: string | string[]): string {
 }
 
 /**
- * Lab-data datasheet for the PDP.
+ * Lab-data datasheet (bare).
  *
- * Promotes the high-signal specs out of the flat accordion into an always-
- * visible "Specifications" panel styled in the storefront's scientific
- * language (mono labels, emerald accents), with the amino-acid sequence
- * surfaced as a dedicated copy-able card.
+ * Renders the spec grid + a copy-able amino-acid sequence card with no outer
+ * chrome — it lives inside a <PdpSection label="Lab data" title="Specifications">
+ * which supplies the heading and spacing.
  */
 export function ProductSpecsDatasheet({ attributes }: { attributes: Attribute[] }) {
 	const sequenceAttr = attributes.find((a) => a.name.toLowerCase() === "sequence");
@@ -26,21 +25,11 @@ export function ProductSpecsDatasheet({ attributes }: { attributes: Attribute[] 
 	if (specs.length === 0 && !sequence) return null;
 
 	return (
-		<div className="bg-card/50 rounded-2xl border border-border p-5">
-			<div className="mb-4 flex items-center gap-2">
-				<span className="h-1.5 w-1.5 rounded-full bg-emerald-400" aria-hidden="true" />
-				<h2 className="font-mono text-xs font-semibold uppercase tracking-[0.18em] text-muted-foreground">
-					Specifications
-				</h2>
-			</div>
-
+		<div className="flex flex-col gap-8">
 			{specs.length > 0 && (
-				<dl className="grid grid-cols-1 gap-x-8 gap-y-3 sm:grid-cols-2">
+				<dl className="grid grid-cols-1 gap-x-12 gap-y-5 sm:grid-cols-2 lg:grid-cols-3">
 					{specs.map((spec) => (
-						<div
-							key={spec.name}
-							className="border-border/50 flex flex-col gap-0.5 border-b pb-2.5 last:border-b-0"
-						>
+						<div key={spec.name} className="border-border/50 flex flex-col gap-1 border-b pb-3">
 							<dt className="font-mono text-[10px] uppercase tracking-[0.14em] text-muted-foreground">
 								{spec.name}
 							</dt>
@@ -51,7 +40,7 @@ export function ProductSpecsDatasheet({ attributes }: { attributes: Attribute[] 
 			)}
 
 			{sequence && (
-				<div className="mt-4 rounded-xl border border-emerald-500/15 bg-emerald-500/[0.04] p-4">
+				<div className="rounded-xl border border-emerald-500/15 bg-emerald-500/[0.04] p-4 sm:max-w-2xl">
 					<div className="mb-2 flex items-center justify-between gap-3">
 						<span className="inline-flex items-center gap-1.5 font-mono text-[10px] uppercase tracking-[0.16em] text-emerald-300/80">
 							<Dna className="h-3.5 w-3.5" />

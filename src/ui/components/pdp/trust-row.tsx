@@ -1,11 +1,8 @@
 import Link from "next/link";
-import { Beaker, FileCheck, Truck, Calculator, ArrowUpRight, ShieldCheck } from "lucide-react";
+import { Truck, Calculator } from "lucide-react";
 import { type ReactNode } from "react";
 
 interface TrustRowProps {
-	purity?: string | null;
-	coaUrl?: string | null;
-	lotNumber?: string | null;
 	channel: string;
 }
 
@@ -46,60 +43,20 @@ function MiniTile({
 }
 
 /**
- * High-trust signal block rendered in the PDP buy box.
- *
- * The Certificate of Analysis is the single most important trust artefact for
- * research peptides, so it is promoted to a prominent proof bar; purity,
- * cold-chain shipping and the reconstitution calculator sit underneath as
- * supporting tiles.
+ * Slim reassurance strip in the buy box: cold-chain shipping speed and the
+ * reconstitution calculator. (The Certificate of Analysis now lives in its own
+ * Quality & Verification section below the fold.)
  */
-export function PdpTrustRow({ purity, coaUrl, lotNumber, channel }: TrustRowProps) {
-	const resolvedCoa = coaUrl || "/sample-coa.pdf";
-	const lotLabel = lotNumber ? `Lot ${lotNumber}` : "Per-batch tested";
-
+export function PdpTrustRow({ channel }: TrustRowProps) {
 	return (
-		<div className="space-y-2" aria-label="Product trust signals">
-			{/* COA proof bar — the headline trust element */}
-			<a
-				href={resolvedCoa}
-				target="_blank"
-				rel="noopener noreferrer"
-				className="group flex items-center gap-3 rounded-xl border border-emerald-500/25 bg-emerald-500/[0.06] p-3 transition-colors hover:border-emerald-500/40 hover:bg-emerald-500/[0.1]"
-			>
-				<span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-emerald-500/15 text-emerald-400">
-					<FileCheck className="h-5 w-5" />
-				</span>
-				<span className="min-w-0 flex-1">
-					<span className="block text-sm font-semibold text-foreground">Certificate of Analysis</span>
-					<span className="block truncate text-xs text-muted-foreground">
-						Independently HPLC-verified · {lotLabel}
-					</span>
-				</span>
-				<span className="inline-flex shrink-0 items-center gap-1 text-xs font-medium text-emerald-400">
-					View PDF
-					<ArrowUpRight className="h-3.5 w-3.5 transition-transform group-hover:-translate-y-0.5 group-hover:translate-x-0.5" />
-				</span>
-			</a>
-
-			{/* Supporting tiles */}
-			<div className="grid grid-cols-3 gap-2">
-				{purity ? (
-					<MiniTile icon={<Beaker className="h-4 w-4" />} title={purity} subtitle="HPLC purity" />
-				) : (
-					<MiniTile
-						icon={<ShieldCheck className="h-4 w-4" />}
-						title="Research-grade"
-						subtitle="Lab verified"
-					/>
-				)}
-				<MiniTile icon={<Truck className="h-4 w-4" />} title="Ships in 24h" subtitle="Cold-chain" />
-				<MiniTile
-					icon={<Calculator className="h-4 w-4" />}
-					title="Reconstitution"
-					subtitle="Calculator"
-					href={`/${channel}/peptide-calculator`}
-				/>
-			</div>
+		<div className="grid grid-cols-2 gap-2" aria-label="Product trust signals">
+			<MiniTile icon={<Truck className="h-4 w-4" />} title="Ships in 24h" subtitle="Cold-chain" />
+			<MiniTile
+				icon={<Calculator className="h-4 w-4" />}
+				title="Reconstitution"
+				subtitle="Calculator"
+				href={`/${channel}/peptide-calculator`}
+			/>
 		</div>
 	);
 }

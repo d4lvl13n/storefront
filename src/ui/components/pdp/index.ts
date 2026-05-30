@@ -1,5 +1,4 @@
 export { ProductGallery } from "./product-gallery";
-export { ProductAttributes } from "./product-attributes";
 export { AddToCart } from "./add-to-cart";
 export { PdpTrustRow } from "./trust-row";
 export { StickyBar } from "./sticky-bar";
@@ -22,3 +21,9 @@ export { VariantSectionError } from "./variant-section-error";
 export { CompleteYourProtocol, type ProtocolItem } from "./complete-your-protocol";
 export { ProductSpecsDatasheet } from "./product-specs-datasheet";
 export { ProductReviews, RatingSummary, extractReviews, type ReviewsData } from "./product-reviews";
+
+// Phase 3 - full-width section system
+export { PdpSection } from "./pdp-section";
+export { TalkToExpertBand } from "./talk-to-expert";
+export { QualityVerification } from "./quality-verification";
+export { ProductFaq, type FaqEntry } from "./product-faq";

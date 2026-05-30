@@ -19,12 +19,16 @@ import { transformToProductCard } from "@/ui/components/plp";
 import { ProductCard } from "@/ui/components/plp/product-card";
 import {
 	ProductGallery,
-	ProductAttributes,
 	ProductSpecsDatasheet,
 	CompleteYourProtocol,
 	ProductReviews,
 	extractReviews,
 	type ProtocolItem,
+	PdpSection,
+	TalkToExpertBand,
+	QualityVerification,
+	ProductFaq,
+	type FaqEntry,
 	VariantSectionDynamic,
 	VariantSectionSkeleton,
 	VariantSectionError,
@@ -145,6 +149,34 @@ async function ProductContent({
 	const faqItems = extractFaqItems(product);
 	const references = extractReferences(product);
 	const reviews = extractReviews(product.metadata);
+
+	const storageAttr = productAttributes.find((a) => a.name.toLowerCase() === "storage");
+	const storage = storageAttr
+		? Array.isArray(storageAttr.value)
+			? storageAttr.value.join(", ")
+			: storageAttr.value || null
+		: null;
+	const metaMap = new Map((product.metadata || []).map((m) => [m.key, m.value]));
+	const coaUrl = metaMap.get("coa_url") ?? null;
+	const lotNumber = metaMap.get("lot_number") ?? metaMap.get("batch_number") ?? null;
+
+	// FAQ section = product FAQs + storage/handling + shipping/returns
+	const faqEntries: FaqEntry[] = [
+		...(faqItems ?? []),
+		...(careInstructions
+			? [{ question: "How should it be stored and handled?", answer: careInstructions }]
+			: []),
+		{
+			question: "How is it shipped?",
+			answer:
+				"Free shipping on orders over $150. Standard delivery 3–7 business days, shipped in temperature-controlled packaging to maintain stability.",
+		},
+		{
+			question: "What is your return policy?",
+			answer:
+				"Returns are accepted within 14 days of delivery for unopened, sealed items only. Contact support for return authorization.",
+		},
+	];
 
 	const breadcrumbs = [
 		{ label: "Home", href: `/${params.channel}` },
@@ -269,28 +301,49 @@ async function ProductContent({
 								/>
 							</Suspense>
 						</ErrorBoundary>
-
-						{protocolItems.length > 0 && (
-							<div className="order-5 mt-4">
-								<CompleteYourProtocol items={protocolItems} channel={params.channel} />
-							</div>
-						)}
-
-						<div className="order-6 mt-4">
-							<ProductSpecsDatasheet attributes={productAttributes} />
-						</div>
-
-						<div className="order-7 mt-6">
-							<ProductAttributes
-								descriptionHtml={descriptionHtml}
-								careInstructions={careInstructions}
-								faqItems={faqItems}
-								references={references}
-							/>
-						</div>
 					</div>
 				</div>
 			</main>
+
+			{descriptionHtml && descriptionHtml.length > 0 && (
+				<PdpSection id="overview" label="Overview" title={`About ${product.name}`}>
+					<div className="prose prose-sm max-w-3xl text-muted-foreground prose-headings:text-foreground prose-p:text-muted-foreground prose-a:text-emerald-400 prose-strong:text-foreground">
+						{descriptionHtml.map((html, i) => (
+							<div key={i} dangerouslySetInnerHTML={{ __html: html }} />
+						))}
+					</div>
+				</PdpSection>
+			)}
+
+			{productAttributes.length > 0 && (
+				<PdpSection id="specifications" label="Lab data" title="Specifications">
+					<ProductSpecsDatasheet attributes={productAttributes} />
+				</PdpSection>
+			)}
+
+			{(purity || coaUrl) && (
+				<PdpSection id="quality" label="Verified" title="Quality & Verification">
+					<QualityVerification
+						purity={purity}
+						storage={storage}
+						coaUrl={coaUrl}
+						lotNumber={lotNumber}
+						references={references}
+					/>
+				</PdpSection>
+			)}
+
+			{protocolItems.length > 0 && (
+				<PdpSection id="protocol" label="Pairs with" title="Complete your protocol">
+					<CompleteYourProtocol items={protocolItems} channel={params.channel} />
+				</PdpSection>
+			)}
+
+			<PdpSection id="faq" label="Answers" title="Frequently asked questions">
+				<ProductFaq items={faqEntries} />
+			</PdpSection>
+
+			<TalkToExpertBand />
 
 			<ProductReviews data={reviews} productName={product.name} />
 

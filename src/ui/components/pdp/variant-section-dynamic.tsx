@@ -1,5 +1,6 @@
 import { revalidatePath } from "next/cache";
 import { type ReactNode } from "react";
+import { AlertTriangle } from "lucide-react";
 
 import { formatMoney, formatMoneyRange, cn } from "@/lib/utils";
 import { getDiscountInfo } from "@/lib/pricing";
@@ -39,10 +40,6 @@ function extractPurity(product: Product): string | null {
 	return value ?? null;
 }
 
-function extractMeta(product: Product, key: string): string | null {
-	return (product.metadata || []).find((m) => m.key === key)?.value ?? null;
-}
-
 function getAttrValue(product: Product, name: string): string | null {
 	const attr = (product.attributes || []).find(
 		(a) => (a.attribute.name ?? "").toLowerCase() === name.toLowerCase(),
@@ -77,10 +74,8 @@ export async function VariantSectionDynamic({ product, channel, searchParams }: 
 	const { variant: variantParam } = await searchParams;
 	const variants = product.variants || [];
 
-	// Trust-row data
+	// Purity drives the accent spec chip
 	const purity = extractPurity(product);
-	const coaUrl = extractMeta(product, "coa_url");
-	const lotNumber = extractMeta(product, "lot_number") ?? extractMeta(product, "batch_number");
 
 	// Auto-select variant: use URL param, or auto-select if only one variant exists
 	const selectedVariantID = variantParam || (variants.length === 1 ? variants[0].id : undefined);
@@ -242,8 +237,8 @@ export async function VariantSectionDynamic({ product, channel, searchParams }: 
 					channel={channel}
 				/>
 
-				{/* Trust Row: COA proof, purity, shipping, reconstitution calculator */}
-				<PdpTrustRow purity={purity} coaUrl={coaUrl} lotNumber={lotNumber} channel={channel} />
+				{/* Trust Row: cold-chain shipping + reconstitution calculator */}
+				<PdpTrustRow channel={channel} />
 
 				{/* Stock indicator */}
 				{showStock && (
@@ -261,6 +256,15 @@ export async function VariantSectionDynamic({ product, channel, searchParams }: 
 
 				{/* Add to Cart */}
 				<AddToCart disabled={isAddToCartDisabled} disabledReason={disabledReason} />
+
+				{/* Compact Research Use Only note (full detail lives in the policy pages) */}
+				<div className="flex items-start gap-2 rounded-lg border border-amber-500/20 bg-amber-500/5 px-3 py-2.5">
+					<AlertTriangle className="mt-0.5 h-3.5 w-3.5 shrink-0 text-amber-500" />
+					<p className="text-[11px] leading-relaxed text-amber-700 dark:text-amber-400">
+						<span className="font-semibold">For Research Use Only.</span> Not for human consumption. Sold
+						strictly for in-vitro laboratory research.
+					</p>
+				</div>
 
 				{/* Open the cart drawer + refresh badge after a successful add */}
 				<AddToCartSync />
