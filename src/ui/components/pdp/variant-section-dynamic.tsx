@@ -1,12 +1,14 @@
 import { revalidatePath } from "next/cache";
+import { type ReactNode } from "react";
 
-import { formatMoney, formatMoneyRange } from "@/lib/utils";
+import { formatMoney, formatMoneyRange, cn } from "@/lib/utils";
 import { getDiscountInfo } from "@/lib/pricing";
 import { CheckoutAddLineDocument, type ProductDetailsQuery } from "@/gql/graphql";
 import { executeAuthenticatedGraphQL } from "@/lib/graphql";
 import * as Checkout from "@/lib/checkout";
 
 import { AddToCart } from "./add-to-cart";
+import { AddToCartSync } from "./add-to-cart-sync";
 import { PdpTrustRow } from "./trust-row";
 import { VariantSelectionSection } from "./variant-selection";
 import { StickyBar } from "./sticky-bar";
@@ -38,6 +40,36 @@ function extractPurity(product: Product): string | null {
 
 function extractMeta(product: Product, key: string): string | null {
 	return (product.metadata || []).find((m) => m.key === key)?.value ?? null;
+}
+
+function getAttrValue(product: Product, name: string): string | null {
+	const attr = (product.attributes || []).find(
+		(a) => (a.attribute.name ?? "").toLowerCase() === name.toLowerCase(),
+	);
+	const value = attr?.values
+		.map((v) => v.name)
+		.filter(Boolean)
+		.join(", ");
+	return value || null;
+}
+
+/** Below this many units in stock, surface a low-stock nudge. */
+const LOW_STOCK_THRESHOLD = 25;
+
+/** Compact glanceable spec pill shown under the product title. */
+function SpecChip({ children, accent = false }: { children: ReactNode; accent?: boolean }) {
+	return (
+		<span
+			className={cn(
+				"inline-flex items-center gap-1.5 rounded-full border px-3 py-1 text-xs font-medium",
+				accent
+					? "border-emerald-500/30 bg-emerald-500/10 text-emerald-300"
+					: "bg-secondary/60 border-border text-foreground",
+			)}
+		>
+			{children}
+		</span>
+	);
 }
 
 export async function VariantSectionDynamic({ product, channel, searchParams }: VariantSectionDynamicProps) {
@@ -86,6 +118,17 @@ export async function VariantSectionDynamic({ product, channel, searchParams }: 
 					selectedVariant.pricing.priceUndiscounted.gross.currency,
 				)
 			: null;
+
+	// Glanceable key-spec chips (dose, purity, form, CAS) shown under the title
+	const dose = selectedVariant?.name ?? null;
+	const form = getAttrValue(product, "Form");
+	const cas = getAttrValue(product, "CAS Number");
+	const hasSpecChips = Boolean(dose || purity || form || cas);
+
+	// Stock signal for the selected variant
+	const stockQty = selectedVariant?.quantityAvailable ?? 0;
+	const showStock = Boolean(selectedVariant) && stockQty > 0;
+	const isLowStock = stockQty > 0 && stockQty <= LOW_STOCK_THRESHOLD;
 
 	// Server action for adding to cart
 	async function addToCart(formData: FormData) {
@@ -140,7 +183,11 @@ export async function VariantSectionDynamic({ product, channel, searchParams }: 
 		<>
 			{/* Category + Sale/Stock badges row - order:1 so it appears ABOVE the h1 */}
 			<div className="order-1 flex items-center gap-2">
-				{product.category && <span className="text-sm text-muted-foreground">{product.category.name}</span>}
+				{product.category && (
+					<span className="text-xs font-medium uppercase tracking-[0.18em] text-emerald-400">
+						{product.category.name}
+					</span>
+				)}
 				{isOnSale && (
 					<Badge variant="destructive" className="text-xs">
 						Sale
@@ -153,8 +200,34 @@ export async function VariantSectionDynamic({ product, channel, searchParams }: 
 				)}
 			</div>
 
-			{/* Rest of variant section - order:3 so it appears BELOW the h1 */}
-			<form action={addToCart} className="order-3 mt-4 space-y-6">
+			{/* Key-spec chips + price - order:3 so it appears BELOW the h1, above the buy form */}
+			<div className="order-3 mt-1 flex flex-col gap-4">
+				{hasSpecChips && (
+					<div className="flex flex-wrap gap-2">
+						{dose && <SpecChip accent>{dose}</SpecChip>}
+						{purity && <SpecChip accent>{purity}</SpecChip>}
+						{form && <SpecChip>{form}</SpecChip>}
+						{cas && <SpecChip>CAS {cas}</SpecChip>}
+					</div>
+				)}
+
+				<div className="flex items-baseline gap-3">
+					<span className="text-3xl font-semibold tracking-tight text-foreground">{price}</span>
+					{compareAtPrice && (
+						<>
+							<span className="text-lg text-muted-foreground line-through">{compareAtPrice}</span>
+							{discountPercent && (
+								<span className="bg-destructive/15 rounded-full px-2 py-0.5 text-sm font-semibold text-destructive">
+									-{discountPercent}%
+								</span>
+							)}
+						</>
+					)}
+				</div>
+			</div>
+
+			{/* Buy form - order:4 */}
+			<form action={addToCart} className="order-4 mt-2 space-y-5">
 				{/* Variant Selectors */}
 				<VariantSelectionSection
 					variants={variants}
@@ -163,17 +236,28 @@ export async function VariantSectionDynamic({ product, channel, searchParams }: 
 					channel={channel}
 				/>
 
-				{/* Trust Row: purity, per-lot COA, shipping, reconstitution calculator */}
+				{/* Trust Row: COA proof, purity, shipping, reconstitution calculator */}
 				<PdpTrustRow purity={purity} coaUrl={coaUrl} lotNumber={lotNumber} channel={channel} />
 
+				{/* Stock indicator */}
+				{showStock && (
+					<div className="flex flex-wrap items-center gap-x-2 gap-y-1 text-xs font-medium">
+						<span
+							className={cn("h-2 w-2 rounded-full", isLowStock ? "bg-amber-400" : "bg-emerald-400")}
+							aria-hidden="true"
+						/>
+						<span className={isLowStock ? "text-amber-400" : "text-emerald-400"}>
+							{isLowStock ? `Only ${stockQty} left` : "In stock"}
+						</span>
+						<span className="text-muted-foreground">· ships within 24 hours</span>
+					</div>
+				)}
+
 				{/* Add to Cart */}
-				<AddToCart
-					price={price}
-					compareAtPrice={compareAtPrice}
-					discountPercent={discountPercent}
-					disabled={isAddToCartDisabled}
-					disabledReason={disabledReason}
-				/>
+				<AddToCart disabled={isAddToCartDisabled} disabledReason={disabledReason} />
+
+				{/* Open the cart drawer + refresh badge after a successful add */}
+				<AddToCartSync />
 
 				{/* Sticky Add to Cart Bar (Mobile) */}
 				<StickyBar productName={product.name} price={price} show={!isAddToCartDisabled} />
@@ -192,25 +276,25 @@ export function VariantSectionSkeleton() {
 	return (
 		<>
 			{/* Category skeleton - order:1, delayed visibility */}
-			<div className="order-1 h-4 w-20 animate-pulse animate-skeleton-delayed rounded bg-muted opacity-0" />
+			<div className="order-1 h-3 w-24 animate-pulse animate-skeleton-delayed rounded bg-muted opacity-0" />
 
-			{/* Variant section skeleton - order:3, delayed visibility */}
-			<div className="order-3 mt-4 animate-pulse animate-skeleton-delayed space-y-6 opacity-0">
-				{/* Variant selector skeleton */}
-				<div className="space-y-4">
-					<div className="h-4 w-16 rounded bg-muted" />
-					<div className="flex gap-2">
-						<div className="h-10 w-16 rounded bg-muted" />
-						<div className="h-10 w-16 rounded bg-muted" />
-						<div className="h-10 w-16 rounded bg-muted" />
-					</div>
+			{/* Spec chips + price skeleton - order:3 */}
+			<div className="order-3 mt-1 animate-pulse animate-skeleton-delayed space-y-3 opacity-0">
+				<div className="flex gap-2">
+					<div className="h-6 w-20 rounded-full bg-muted" />
+					<div className="h-6 w-24 rounded-full bg-muted" />
 				</div>
+				<div className="h-9 w-28 rounded bg-muted" />
+			</div>
 
-				{/* Price skeleton */}
-				<div className="h-8 w-24 rounded bg-muted" />
-
+			{/* Buy form skeleton - order:4 */}
+			<div className="order-4 mt-2 animate-pulse animate-skeleton-delayed space-y-5 opacity-0">
+				{/* Trust row skeleton */}
+				<div className="h-16 w-full rounded-xl bg-muted" />
+				{/* Quantity skeleton */}
+				<div className="h-10 w-40 rounded-full bg-muted" />
 				{/* Add to cart button skeleton */}
-				<div className="h-12 w-full rounded bg-muted" />
+				<div className="h-14 w-full rounded bg-muted" />
 			</div>
 		</>
 	);

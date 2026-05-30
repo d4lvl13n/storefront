@@ -40,6 +40,7 @@ function StickyAddButton() {
 		<Button
 			type="submit"
 			size="lg"
+			variant="accent"
 			disabled={pending}
 			className={cn(
 				"min-w-[130px] shrink-0",

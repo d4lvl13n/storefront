@@ -127,6 +127,12 @@ async function ProductContent({
 	const descriptionHtml = parseDescription(product.description);
 	const images = getGalleryImages(product, selectedVariant);
 	const productAttributes = extractProductAttributes(product);
+	const purityAttr = productAttributes.find((a) => a.name.toLowerCase() === "purity");
+	const purity = purityAttr
+		? Array.isArray(purityAttr.value)
+			? purityAttr.value[0] ?? null
+			: purityAttr.value || null
+		: null;
 	const careInstructions = extractCareInstructions(product);
 	const faqItems = extractFaqItems(product);
 	const references = extractReferences(product);
@@ -204,7 +210,7 @@ async function ProductContent({
 
 				<div className="grid gap-8 lg:grid-cols-2 lg:gap-16">
 					<div className="lg:sticky lg:top-24 lg:self-start">
-						<ProductGallery images={images} productName={product.name} />
+						<ProductGallery images={images} productName={product.name} purity={purity} />
 					</div>
 
 					<div className="flex flex-col gap-3">
@@ -222,7 +228,7 @@ async function ProductContent({
 							</Suspense>
 						</ErrorBoundary>
 
-						<div className="order-4 mt-6">
+						<div className="order-6 mt-6">
 							<ProductAttributes
 								descriptionHtml={descriptionHtml}
 								attributes={productAttributes}

@@ -34,6 +34,8 @@ interface ImageCarouselProps {
 	onImageClick?: (index: number) => void;
 	/** Additional class name for the container */
 	className?: string;
+	/** Optional content overlaid on the main image frame (e.g. a purity badge) */
+	overlay?: React.ReactNode;
 }
 
 /**
@@ -58,6 +60,7 @@ export function ImageCarousel({
 	onIndexChange,
 	onImageClick,
 	className,
+	overlay,
 }: ImageCarouselProps) {
 	const [api, setApi] = React.useState<CarouselApi>();
 	const [selectedIndex, setSelectedIndex] = React.useState(0);
@@ -112,8 +115,15 @@ export function ImageCarousel({
 				}}
 				className="group w-full"
 			>
-				<div className="relative aspect-[4/5] w-full overflow-hidden rounded-lg bg-secondary">
-					<CarouselContent className="ml-0">
+				<div className="from-secondary/80 relative aspect-[4/5] w-full overflow-hidden rounded-2xl border border-border bg-gradient-to-b to-background">
+					{/* Subtle brand glow behind the product */}
+					<div
+						className="pointer-events-none absolute inset-0 z-0 bg-[radial-gradient(circle_at_50%_0%,rgba(16,185,129,0.10),transparent_70%)]"
+						aria-hidden="true"
+					/>
+					{/* Optional overlay (e.g. purity badge) */}
+					{overlay && <div className="absolute left-3 top-3 z-20">{overlay}</div>}
+					<CarouselContent className="relative z-10 ml-0">
 						{images.map((image, index) => (
 							<CarouselItem key={image.url} className="pl-0">
 								<div
