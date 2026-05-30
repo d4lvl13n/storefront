@@ -1,5 +1,6 @@
 import { type ReactNode } from "react";
 import { cn } from "@/lib/utils";
+import { Reveal } from "@/ui/components/reveal";
 
 interface PdpSectionProps {
 	id?: string;
@@ -7,22 +8,25 @@ interface PdpSectionProps {
 	title?: string;
 	children: ReactNode;
 	className?: string;
+	/** Surface tone — alternate "muted" against "base" to give the page rhythm. */
+	tone?: "base" | "muted";
 }
 
 /**
  * Consistent full-width PDP section wrapper.
  *
- * Centered brand label + heading over a top divider, with generous vertical
- * padding, so every below-the-fold section reads as one editorial system.
+ * Centered brand label + heading over a top divider, generous vertical
+ * padding, an optional contrasted surface, and a scroll-reveal on its content,
+ * so every below-the-fold section reads as one editorial system.
  */
-export function PdpSection({ id, label, title, children, className }: PdpSectionProps) {
+export function PdpSection({ id, label, title, children, className, tone = "base" }: PdpSectionProps) {
 	return (
 		<section
 			id={id}
 			aria-label={title ?? label}
-			className={cn("border-t border-border bg-background", className)}
+			className={cn("border-t border-border", tone === "muted" ? "bg-card" : "bg-background", className)}
 		>
-			<div className="mx-auto max-w-7xl px-4 py-16 sm:px-6 sm:py-24 lg:px-8">
+			<Reveal className="mx-auto max-w-7xl px-4 py-16 sm:px-6 sm:py-24 lg:px-8">
 				{(label || title) && (
 					<div className="mx-auto mb-10 max-w-3xl text-center sm:mb-14">
 						{label && (
@@ -32,7 +36,7 @@ export function PdpSection({ id, label, title, children, className }: PdpSection
 					</div>
 				)}
 				{children}
-			</div>
+			</Reveal>
 		</section>
 	);
 }

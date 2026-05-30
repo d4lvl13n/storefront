@@ -1,4 +1,5 @@
 import { LinkWithChannel } from "@/ui/atoms/link-with-channel";
+import { Reveal } from "@/ui/components/reveal";
 
 /**
  * "Need help choosing?" concierge band.
@@ -43,7 +44,7 @@ export function TalkToExpertBand({
 				aria-hidden="true"
 			/>
 
-			<div className="mx-auto flex max-w-3xl flex-col items-center px-4 py-24 text-center sm:py-32">
+			<Reveal className="mx-auto flex max-w-3xl flex-col items-center px-4 py-24 text-center sm:py-32">
 				<p className="text-sm font-medium uppercase tracking-[0.25em] text-emerald-400">Concierge</p>
 				<h2 className="mt-3 text-3xl font-bold tracking-tight text-white sm:text-4xl lg:text-5xl">
 					Need help choosing?
@@ -65,7 +66,7 @@ export function TalkToExpertBand({
 						Browse all compounds
 					</LinkWithChannel>
 				</div>
-			</div>
+			</Reveal>
 		</section>
 	);
 }

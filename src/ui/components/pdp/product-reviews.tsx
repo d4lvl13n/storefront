@@ -1,5 +1,6 @@
 import { Star, BadgeCheck, MessageSquareText } from "lucide-react";
 import { LinkWithChannel } from "@/ui/atoms/link-with-channel";
+import { Reveal } from "@/ui/components/reveal";
 import { cn } from "@/lib/utils";
 
 export interface ProductReview {
@@ -153,8 +154,8 @@ export function ProductReviews({ data, productName }: { data: ReviewsData; produ
 	const hasReviews = Boolean(count && count > 0);
 
 	return (
-		<section id="reviews" aria-label="Customer reviews" className="border-t border-border bg-background">
-			<div className="mx-auto max-w-7xl px-4 py-12 sm:px-6 sm:py-16 lg:px-8">
+		<section id="reviews" aria-label="Customer reviews" className="border-t border-border bg-card">
+			<Reveal className="mx-auto max-w-7xl px-4 py-16 sm:px-6 sm:py-24 lg:px-8">
 				<div className="mb-8 flex items-center justify-between gap-4">
 					<h2 className="text-xl font-semibold tracking-tight sm:text-2xl">Researcher reviews</h2>
 				</div>
@@ -210,7 +211,7 @@ export function ProductReviews({ data, productName }: { data: ReviewsData; produ
 						</LinkWithChannel>
 					</div>
 				)}
-			</div>
+			</Reveal>
 		</section>
 	);
 }

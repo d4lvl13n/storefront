@@ -10,11 +10,13 @@ import { executePublicGraphQL } from "@/lib/graphql";
 import {
 	ProductDetailsDocument,
 	ProductListByCategoryDocument,
+	ProductListDocument,
 	type ProductDetailsQuery,
 } from "@/gql/graphql";
 import { buildPageMetadata, buildProductJsonLd, buildFaqJsonLd, buildBreadcrumbJsonLd } from "@/lib/seo";
 import { formatMoney } from "@/lib/utils";
 import { Breadcrumbs } from "@/ui/components/breadcrumbs";
+import { Reveal } from "@/ui/components/reveal";
 import { WhatScienceSays } from "@/ui/components/pdp/what-science-says";
 import { transformToProductCard } from "@/ui/components/plp";
 import { ProductCard } from "@/ui/components/plp/product-card";
@@ -213,17 +215,37 @@ async function ProductContent({
 	const faqJsonLd = faqItems ? buildFaqJsonLd(faqItems) : null;
 	const breadcrumbJsonLd = buildBreadcrumbJsonLd(breadcrumbs);
 
+	const RELATED_TARGET = 4;
 	let relatedProducts: ReturnType<typeof transformToProductCard>[] = [];
 	if (product.category) {
 		const relResult = await executePublicGraphQL(ProductListByCategoryDocument, {
-			variables: { slug: product.category.slug, channel: params.channel, first: 5 },
+			variables: { slug: product.category.slug, channel: params.channel, first: 8 },
 			revalidate: 300,
 		});
 		if (relResult.ok && relResult.data.category?.products) {
 			relatedProducts = relResult.data.category.products.edges
 				.map((e) => transformToProductCard(e.node, params.channel))
 				.filter((p) => p.id !== product.id)
-				.slice(0, 4);
+				.slice(0, RELATED_TARGET);
+		}
+	}
+
+	// Backfill from the broader catalogue so the upsell always shows — many
+	// categories hold a single compound, which would otherwise leave it empty.
+	if (relatedProducts.length < RELATED_TARGET) {
+		const fillResult = await executePublicGraphQL(ProductListDocument, {
+			variables: { first: 16, channel: params.channel },
+			revalidate: 300,
+		});
+		if (fillResult.ok && fillResult.data.products) {
+			const seen = new Set<string>([product.id, ...relatedProducts.map((p) => p.id)]);
+			for (const edge of fillResult.data.products.edges) {
+				if (relatedProducts.length >= RELATED_TARGET) break;
+				const card = transformToProductCard(edge.node, params.channel);
+				if (seen.has(card.id)) continue;
+				relatedProducts.push(card);
+				seen.add(card.id);
+			}
 		}
 	}
 
@@ -307,7 +329,7 @@ async function ProductContent({
 			</main>
 
 			{descriptionHtml && descriptionHtml.length > 0 && (
-				<PdpSection id="overview" label="Overview" title={`About ${product.name}`}>
+				<PdpSection id="overview" label="Overview" title={`About ${product.name}`} tone="muted">
 					<div className="prose prose-lg mx-auto max-w-3xl text-center leading-relaxed text-muted-foreground prose-headings:text-foreground prose-p:text-muted-foreground prose-a:text-emerald-400 prose-strong:text-foreground">
 						{descriptionHtml.map((html, i) => (
 							<div key={i} dangerouslySetInnerHTML={{ __html: html }} />
@@ -323,7 +345,7 @@ async function ProductContent({
 			)}
 
 			{(purity || coaUrl) && (
-				<PdpSection id="quality" label="Verified" title="Quality & Verification">
+				<PdpSection id="quality" label="Verified" title="Quality & Verification" tone="muted">
 					<QualityVerification
 						purity={purity}
 						storage={storage}
@@ -339,7 +361,7 @@ async function ProductContent({
 			</Suspense>
 
 			{protocolItems.length > 0 && (
-				<PdpSection id="protocol" label="Pairs with" title="Complete your protocol">
+				<PdpSection id="protocol" label="Pairs with" title="Complete your protocol" tone="muted">
 					<CompleteYourProtocol items={protocolItems} channel={params.channel} />
 				</PdpSection>
 			)}
@@ -352,13 +374,17 @@ async function ProductContent({
 
 			<ProductReviews data={reviews} productName={product.name} />
 
-			{relatedProducts.length > 0 && product.category && (
-				<section className="border-t border-border bg-background" aria-label="Related products">
-					<div className="mx-auto max-w-7xl px-4 py-12 sm:px-6 sm:py-16 lg:px-8">
-						<div className="mb-8 flex items-center justify-between">
-							<h2 className="text-xl font-semibold tracking-tight sm:text-2xl">Related Compounds</h2>
+			{relatedProducts.length > 0 && (
+				<section className="border-t border-border bg-background" aria-label="You may also like">
+					<Reveal className="mx-auto max-w-7xl px-4 py-16 sm:px-6 sm:py-24 lg:px-8">
+						<div className="mb-8 flex items-center justify-between gap-4">
+							<h2 className="text-xl font-semibold tracking-tight sm:text-2xl">You may also like</h2>
 							<Link
-								href={`/${params.channel}/categories/${product.category.slug}`}
+								href={
+									product.category
+										? `/${params.channel}/categories/${product.category.slug}`
+										: `/${params.channel}/products`
+								}
 								className="text-sm font-medium text-muted-foreground transition-colors hover:text-foreground"
 							>
 								View all
@@ -369,7 +395,7 @@ async function ProductContent({
 								<ProductCard key={rp.id} product={rp} priority={i < 2} />
 							))}
 						</div>
-					</div>
+					</Reveal>
 				</section>
 			)}
 		</div>
