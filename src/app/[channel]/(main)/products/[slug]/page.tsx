@@ -13,16 +13,24 @@ import {
 	type ProductDetailsQuery,
 } from "@/gql/graphql";
 import { buildPageMetadata, buildProductJsonLd, buildFaqJsonLd, buildBreadcrumbJsonLd } from "@/lib/seo";
+import { formatMoney } from "@/lib/utils";
 import { Breadcrumbs } from "@/ui/components/breadcrumbs";
 import { transformToProductCard } from "@/ui/components/plp";
 import { ProductCard } from "@/ui/components/plp/product-card";
 import {
 	ProductGallery,
 	ProductAttributes,
+	ProductSpecsDatasheet,
+	CompleteYourProtocol,
+	ProductReviews,
+	extractReviews,
+	type ProtocolItem,
 	VariantSectionDynamic,
 	VariantSectionSkeleton,
 	VariantSectionError,
 } from "@/ui/components/pdp";
+
+const SUPPLIES_CATEGORY_SLUG = "supplies";
 
 // ============================================================================
 // Cached Data Fetching
@@ -136,6 +144,7 @@ async function ProductContent({
 	const careInstructions = extractCareInstructions(product);
 	const faqItems = extractFaqItems(product);
 	const references = extractReferences(product);
+	const reviews = extractReviews(product.metadata);
 
 	const breadcrumbs = [
 		{ label: "Home", href: `/${params.channel}` },
@@ -162,6 +171,10 @@ async function ProductContent({
 			: null,
 		inStock: product.variants?.some((v) => v.quantityAvailable) ?? false,
 		variantCount: product.variants?.length ?? 0,
+		rating:
+			reviews.avg && reviews.count
+				? { ratingValue: Number(reviews.avg.toFixed(1)), reviewCount: reviews.count }
+				: null,
 	});
 
 	const faqJsonLd = faqItems ? buildFaqJsonLd(faqItems) : null;
@@ -178,6 +191,35 @@ async function ProductContent({
 				.map((e) => transformToProductCard(e.node, params.channel))
 				.filter((p) => p.id !== product.id)
 				.slice(0, 4);
+		}
+	}
+
+	// Cross-sell: surface reconstitution/storage essentials from the Supplies
+	// category on every non-supplies product.
+	let protocolItems: ProtocolItem[] = [];
+	if (product.category?.slug !== SUPPLIES_CATEGORY_SLUG) {
+		const suppliesResult = await executePublicGraphQL(ProductListByCategoryDocument, {
+			variables: { slug: SUPPLIES_CATEGORY_SLUG, channel: params.channel, first: 4 },
+			revalidate: 300,
+		});
+		if (suppliesResult.ok && suppliesResult.data.category?.products) {
+			protocolItems = suppliesResult.data.category.products.edges
+				.map((e) => e.node)
+				.filter((n) => n.id !== product.id)
+				.map((n): ProtocolItem => {
+					const gross = n.pricing?.priceRange?.start?.gross;
+					const nodeVariants = n.variants ?? [];
+					return {
+						id: n.id,
+						name: n.name,
+						slug: n.slug,
+						price: gross ? formatMoney(gross.amount, gross.currency) : "",
+						thumbnailUrl: n.thumbnail?.url ?? null,
+						thumbnailAlt: n.thumbnail?.alt ?? null,
+						variantId: nodeVariants.length === 1 ? nodeVariants[0].id : null,
+					};
+				})
+				.slice(0, 3);
 		}
 	}
 
@@ -228,10 +270,19 @@ async function ProductContent({
 							</Suspense>
 						</ErrorBoundary>
 
-						<div className="order-6 mt-6">
+						{protocolItems.length > 0 && (
+							<div className="order-5 mt-4">
+								<CompleteYourProtocol items={protocolItems} channel={params.channel} />
+							</div>
+						)}
+
+						<div className="order-6 mt-4">
+							<ProductSpecsDatasheet attributes={productAttributes} />
+						</div>
+
+						<div className="order-7 mt-6">
 							<ProductAttributes
 								descriptionHtml={descriptionHtml}
-								attributes={productAttributes}
 								careInstructions={careInstructions}
 								faqItems={faqItems}
 								references={references}
@@ -240,6 +291,8 @@ async function ProductContent({
 					</div>
 				</div>
 			</main>
+
+			<ProductReviews data={reviews} productName={product.name} />
 
 			{relatedProducts.length > 0 && product.category && (
 				<section className="border-t border-border bg-background" aria-label="Related products">

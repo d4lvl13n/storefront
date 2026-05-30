@@ -1,33 +1,12 @@
 "use client";
 
-import {
-	FlaskConical,
-	Thermometer,
-	Scale,
-	Hash,
-	Dna,
-	Beaker,
-	TestTube,
-	Tag,
-	Droplets,
-	BookOpen,
-	HelpCircle,
-	Truck,
-	AlertTriangle,
-} from "lucide-react";
+import { BookOpen, HelpCircle, Truck, AlertTriangle } from "lucide-react";
 import {
 	Accordion,
 	AccordionItemWithContext,
 	AccordionTrigger,
 	AccordionContent,
 } from "@/ui/components/ui/accordion";
-import { Badge } from "@/ui/components/ui/badge";
-import { type ReactNode } from "react";
-
-interface Attribute {
-	name: string;
-	value: string | boolean | string[];
-}
 
 interface FaqItem {
 	question: string;
@@ -36,52 +15,24 @@ interface FaqItem {
 
 interface ProductAttributesProps {
 	descriptionHtml?: string[] | null;
-	attributes?: Attribute[];
 	careInstructions?: string | null;
 	faqItems?: FaqItem[] | null;
 	references?: string[] | null;
 }
 
-const attributeIcons: Record<string, ReactNode> = {
-	Purity: <FlaskConical className="h-4 w-4" />,
-	Form: <TestTube className="h-4 w-4" />,
-	Storage: <Thermometer className="h-4 w-4" />,
-	"Molecular Weight": <Scale className="h-4 w-4" />,
-	"CAS Number": <Hash className="h-4 w-4" />,
-	Sequence: <Dna className="h-4 w-4" />,
-	Origin: <Tag className="h-4 w-4" />,
-	Solubility: <Droplets className="h-4 w-4" />,
-	"Research Category": <Beaker className="h-4 w-4" />,
-};
-
-function formatValue(value: string | boolean | string[]): ReactNode {
-	if (typeof value === "boolean") return value ? "Yes" : "No";
-	if (Array.isArray(value)) {
-		return (
-			<div className="flex flex-wrap justify-end gap-1">
-				{value.map((v) => (
-					<Badge key={v} variant="secondary" className="font-normal">
-						{v}
-					</Badge>
-				))}
-			</div>
-		);
-	}
-	return value;
-}
-
+/**
+ * Secondary product information accordion.
+ *
+ * The high-signal specs now live in the always-visible
+ * <ProductSpecsDatasheet />; this component keeps the longer-form content
+ * (description, care, FAQ, references, shipping) plus the RUO disclaimer.
+ */
 export function ProductAttributes({
 	descriptionHtml,
-	attributes = [],
 	careInstructions,
 	faqItems,
 	references,
 }: ProductAttributesProps) {
-	const displayAttributes = attributes.filter((attr) => !["Size", "Color"].includes(attr.name));
-
-	const defaultOpen = ["description"];
-	if (displayAttributes.length > 0) defaultOpen.push("details");
-
 	return (
 		<div className="flex flex-col gap-6">
 			{/* Research Use Only disclaimer */}
@@ -93,7 +44,7 @@ export function ProductAttributes({
 				</p>
 			</div>
 
-			<Accordion type="multiple" defaultValue={defaultOpen} className="w-full">
+			<Accordion type="multiple" defaultValue={["description"]} className="w-full">
 				{descriptionHtml && descriptionHtml.length > 0 && (
 					<AccordionItemWithContext value="description" className="border-border">
 						<h2>
@@ -105,29 +56,6 @@ export function ProductAttributes({
 							<div className="prose prose-sm max-w-none text-muted-foreground prose-headings:text-foreground prose-p:text-muted-foreground prose-a:text-foreground prose-strong:text-foreground">
 								{descriptionHtml.map((html, i) => (
 									<div key={i} dangerouslySetInnerHTML={{ __html: html }} />
-								))}
-							</div>
-						</AccordionContent>
-					</AccordionItemWithContext>
-				)}
-
-				{displayAttributes.length > 0 && (
-					<AccordionItemWithContext value="details" className="border-border">
-						<h2>
-							<AccordionTrigger className="py-4 text-sm font-medium hover:no-underline">
-								Product Details
-							</AccordionTrigger>
-						</h2>
-						<AccordionContent>
-							<div className="grid gap-3">
-								{displayAttributes.map((attr) => (
-									<div key={attr.name} className="flex items-start justify-between gap-4 text-sm">
-										<span className="flex items-center gap-2 text-muted-foreground">
-											{attributeIcons[attr.name]}
-											{attr.name}
-										</span>
-										<span className="text-right font-medium">{formatValue(attr.value)}</span>
-									</div>
 								))}
 							</div>
 						</AccordionContent>

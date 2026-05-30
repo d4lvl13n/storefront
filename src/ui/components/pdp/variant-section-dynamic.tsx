@@ -9,6 +9,7 @@ import * as Checkout from "@/lib/checkout";
 
 import { AddToCart } from "./add-to-cart";
 import { AddToCartSync } from "./add-to-cart-sync";
+import { extractReviews, RatingSummary } from "./product-reviews";
 import { PdpTrustRow } from "./trust-row";
 import { VariantSelectionSection } from "./variant-selection";
 import { StickyBar } from "./sticky-bar";
@@ -130,6 +131,9 @@ export async function VariantSectionDynamic({ product, channel, searchParams }: 
 	const showStock = Boolean(selectedVariant) && stockQty > 0;
 	const isLowStock = stockQty > 0 && stockQty <= LOW_STOCK_THRESHOLD;
 
+	// Review summary (from product metadata) for the inline rating
+	const reviews = extractReviews(product.metadata);
+
 	// Server action for adding to cart
 	async function addToCart(formData: FormData) {
 		"use server";
@@ -202,6 +206,8 @@ export async function VariantSectionDynamic({ product, channel, searchParams }: 
 
 			{/* Key-spec chips + price - order:3 so it appears BELOW the h1, above the buy form */}
 			<div className="order-3 mt-1 flex flex-col gap-4">
+				<RatingSummary avg={reviews.avg} count={reviews.count} />
+
 				{hasSpecChips && (
 					<div className="flex flex-wrap gap-2">
 						{dose && <SpecChip accent>{dose}</SpecChip>}

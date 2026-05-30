@@ -44,6 +44,11 @@ export function buildProductJsonLd(options: {
 	} | null;
 	inStock?: boolean;
 	variantCount?: number;
+	/** Aggregate rating — only emit when backed by real reviews */
+	rating?: {
+		ratingValue: number;
+		reviewCount: number;
+	} | null;
 }): WithContext<Product> | null {
 	if (!seoConfig.enableJsonLd) {
 		return null;
@@ -60,6 +65,7 @@ export function buildProductJsonLd(options: {
 		priceRange,
 		inStock = true,
 		variantCount,
+		rating,
 	} = options;
 
 	const baseUrl = getBaseUrl();
@@ -76,6 +82,15 @@ export function buildProductJsonLd(options: {
 			"@type": "Brand",
 			name: brand || seoConfig.defaultBrand,
 		},
+		...(rating && rating.reviewCount > 0
+			? {
+					aggregateRating: {
+						"@type": "AggregateRating" as const,
+						ratingValue: rating.ratingValue,
+						reviewCount: rating.reviewCount,
+					},
+				}
+			: {}),
 		offers: price
 			? {
 					"@type": "Offer",
