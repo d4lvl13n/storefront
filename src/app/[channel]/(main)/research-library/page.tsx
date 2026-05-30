@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 
 import { buildPageMetadata, buildBreadcrumbJsonLd } from "@/lib/seo";
 import { LinkWithChannel } from "@/ui/atoms/link-with-channel";
-import { ResearchSearch } from "./research-search";
+import { ResearchSearch } from "@/ui/components/research-search";
 
 export async function generateMetadata(props: { params: Promise<{ channel: string }> }): Promise<Metadata> {
 	const { channel } = await props.params;

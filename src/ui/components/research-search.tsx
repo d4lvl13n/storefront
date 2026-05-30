@@ -37,18 +37,31 @@ const initialState: SearchState = {
 	errorMessage: "",
 };
 
-export function ResearchSearch() {
-	const [input, setInput] = useState("");
+export function ResearchSearch({ initialQuery }: { initialQuery?: string } = {}) {
+	const [input, setInput] = useState(initialQuery ?? "");
 	const [recent, setRecent] = useState(false);
 	const [state, setState] = useState<SearchState>(initialState);
 	const [, startTransition] = useTransition();
 	const inputRef = useRef<HTMLInputElement>(null);
 	const abortRef = useRef<AbortController | null>(null);
+	const didInit = useRef(false);
 
 	useEffect(() => {
 		return () => {
 			abortRef.current?.abort();
 		};
+	}, []);
+
+	// When seeded (e.g. from a PDP), run the search once on mount so relevant
+	// literature is shown immediately for the compound.
+	useEffect(() => {
+		if (didInit.current) return;
+		didInit.current = true;
+		const seed = initialQuery?.trim();
+		if (seed && seed.length >= 2) {
+			void runSearch(seed, false);
+		}
+		// eslint-disable-next-line react-hooks/exhaustive-deps
 	}, []);
 
 	async function runSearch(query: string, recentFlag: boolean) {

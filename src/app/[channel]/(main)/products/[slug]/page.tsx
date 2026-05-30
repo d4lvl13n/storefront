@@ -15,6 +15,7 @@ import {
 import { buildPageMetadata, buildProductJsonLd, buildFaqJsonLd, buildBreadcrumbJsonLd } from "@/lib/seo";
 import { formatMoney } from "@/lib/utils";
 import { Breadcrumbs } from "@/ui/components/breadcrumbs";
+import { ResearchSearch } from "@/ui/components/research-search";
 import { transformToProductCard } from "@/ui/components/plp";
 import { ProductCard } from "@/ui/components/plp/product-card";
 import {
@@ -307,7 +308,7 @@ async function ProductContent({
 
 			{descriptionHtml && descriptionHtml.length > 0 && (
 				<PdpSection id="overview" label="Overview" title={`About ${product.name}`}>
-					<div className="prose prose-sm max-w-3xl text-muted-foreground prose-headings:text-foreground prose-p:text-muted-foreground prose-a:text-emerald-400 prose-strong:text-foreground">
+					<div className="prose prose-lg mx-auto max-w-3xl text-center leading-relaxed text-muted-foreground prose-headings:text-foreground prose-p:text-muted-foreground prose-a:text-emerald-400 prose-strong:text-foreground">
 						{descriptionHtml.map((html, i) => (
 							<div key={i} dangerouslySetInnerHTML={{ __html: html }} />
 						))}
@@ -332,6 +333,12 @@ async function ProductContent({
 					/>
 				</PdpSection>
 			)}
+
+			<PdpSection id="research" label="The science" title="Explore the research">
+				<div className="mx-auto max-w-3xl">
+					<ResearchSearch initialQuery={product.name} />
+				</div>
+			</PdpSection>
 
 			{protocolItems.length > 0 && (
 				<PdpSection id="protocol" label="Pairs with" title="Complete your protocol">

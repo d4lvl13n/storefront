@@ -25,7 +25,7 @@ export function ProductSpecsDatasheet({ attributes }: { attributes: Attribute[] 
 	if (specs.length === 0 && !sequence) return null;
 
 	return (
-		<div className="flex flex-col gap-8">
+		<div className="mx-auto flex max-w-5xl flex-col gap-8">
 			{specs.length > 0 && (
 				<dl className="grid grid-cols-1 gap-x-12 gap-y-5 sm:grid-cols-2 lg:grid-cols-3">
 					{specs.map((spec) => (
@@ -40,7 +40,7 @@ export function ProductSpecsDatasheet({ attributes }: { attributes: Attribute[] 
 			)}
 
 			{sequence && (
-				<div className="rounded-xl border border-emerald-500/15 bg-emerald-500/[0.04] p-4 sm:max-w-2xl">
+				<div className="mx-auto w-full rounded-xl border border-emerald-500/15 bg-emerald-500/[0.04] p-4 sm:max-w-2xl">
 					<div className="mb-2 flex items-center justify-between gap-3">
 						<span className="inline-flex items-center gap-1.5 font-mono text-[10px] uppercase tracking-[0.16em] text-emerald-300/80">
 							<Dna className="h-3.5 w-3.5" />
