@@ -29,7 +29,7 @@ function DesktopNav() {
 					<LinkWithChannel
 						href={item.href}
 						prefetch={false}
-						className="text-[13px] font-medium text-muted-foreground transition-colors hover:text-foreground"
+						className="text-[15px] font-medium text-muted-foreground transition-colors hover:text-foreground"
 					>
 						{item.label}
 					</LinkWithChannel>
@@ -63,8 +63,8 @@ export async function Header({ channel }: { channel: string }) {
 	return (
 		<ScrollHeader>
 			<div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-				<div className="flex h-16 items-center justify-between gap-4">
-					<Logo className="-my-1 h-12 w-auto sm:h-14 lg:h-16" />
+				<div className="flex h-20 items-center justify-between gap-4">
+					<Logo className="-my-1 h-14 w-auto sm:h-16 lg:h-[4.5rem]" />
 
 					<nav className="hidden flex-1 justify-center lg:flex" aria-label="Primary navigation">
 						<DesktopNav />

@@ -290,7 +290,7 @@ const institutions: string[] = [];
 
 function HeroSection() {
 	return (
-		<section className="relative -mt-16 min-h-[92svh] overflow-hidden bg-background pt-16 text-foreground">
+		<section className="relative -mt-20 min-h-[92svh] overflow-hidden bg-background pt-20 text-foreground">
 			<video
 				className="absolute inset-0 h-full w-full object-cover object-[58%_center]"
 				autoPlay
@@ -298,7 +298,6 @@ function HeroSection() {
 				muted
 				playsInline
 				preload="metadata"
-				poster="/hero-2.webp"
 				aria-hidden="true"
 				tabIndex={-1}
 			>
@@ -319,7 +318,7 @@ function HeroSection() {
 				}}
 			/>
 
-			<div className="relative z-10 mx-auto flex min-h-[calc(92svh-4rem)] w-full max-w-7xl items-end px-6 pb-16 pt-24 sm:pb-24 lg:pb-28">
+			<div className="relative z-10 mx-auto flex min-h-[calc(92svh-5rem)] w-full max-w-7xl items-end px-6 pb-16 pt-24 sm:pb-24 lg:pb-28">
 				<div className="max-w-4xl">
 					<p className="animate-fade-in text-xs font-semibold uppercase tracking-[0.28em] text-emerald-200 opacity-0">
 						Research supply platform
@@ -390,7 +389,6 @@ function InfinityStandardSection() {
 							muted
 							playsInline
 							preload="metadata"
-							poster="/screenshot.png"
 							aria-hidden="true"
 							tabIndex={-1}
 						>

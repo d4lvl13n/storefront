@@ -14,9 +14,9 @@ function HeaderSkeleton() {
 	return (
 		<header className="bg-background/95 sticky top-0 z-40 border-b border-border backdrop-blur-md">
 			<div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-				<div className="flex h-16 items-center justify-between gap-4">
+				<div className="flex h-20 items-center justify-between gap-4">
 					<div className="flex shrink-0 items-center">
-						<Logo className="h-10 w-auto sm:h-14 lg:h-16" inverted />
+						<Logo className="h-14 w-auto sm:h-16 lg:h-[4.5rem]" inverted />
 					</div>
 					<div className="hidden flex-1 justify-center md:flex">
 						<div className="h-10 w-full max-w-md animate-pulse rounded-lg bg-secondary" />
@@ -85,7 +85,7 @@ export default async function RootLayout(props: {
 			<Suspense fallback={<HeaderSkeleton />}>
 				<Header channel={channel} />
 			</Suspense>
-			<div className="flex min-h-[calc(100dvh-64px)] flex-col">
+			<div className="flex min-h-[calc(100dvh-80px)] flex-col">
 				<main className="flex-1">
 					<Suspense fallback={null}>{props.children}</Suspense>
 				</main>
