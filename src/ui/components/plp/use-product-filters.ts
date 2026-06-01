@@ -21,6 +21,8 @@ interface UseProductFiltersOptions {
 	resolvedCategories?: Array<{ slug: string; id: string; name: string }>;
 	/** Whether to include category filter (only for /products page) */
 	enableCategoryFilter?: boolean;
+	/** Sort applied when no `?sort=` param is present. Defaults to "featured". */
+	defaultSort?: SortOption;
 }
 
 interface UseProductFiltersResult {
@@ -64,6 +66,7 @@ export function useProductFilters({
 	products,
 	resolvedCategories = [],
 	enableCategoryFilter = false,
+	defaultSort = "featured",
 }: UseProductFiltersOptions): UseProductFiltersResult {
 	const router = useRouter();
 	const pathname = usePathname();
@@ -83,7 +86,7 @@ export function useProductFilters({
 		[searchParams],
 	);
 	const selectedPriceRange = searchParams.get("price") || null;
-	const sortValue = (searchParams.get("sort") as SortOption) || "featured";
+	const sortValue = (searchParams.get("sort") as SortOption) || defaultSort;
 
 	// Update URL with new filters (triggers server re-fetch for server-side filters)
 	const updateFilters = useCallback(
@@ -129,7 +132,7 @@ export function useProductFilters({
 			}
 
 			if (updates.sort !== undefined) {
-				if (updates.sort && updates.sort !== "featured") {
+				if (updates.sort && updates.sort !== defaultSort) {
 					params.set("sort", updates.sort);
 				} else {
 					params.delete("sort");
@@ -139,7 +142,7 @@ export function useProductFilters({
 			const queryString = params.toString();
 			router.push(queryString ? `${pathname}?${queryString}` : pathname, { scroll: false });
 		},
-		[router, pathname, searchParams],
+		[router, pathname, searchParams, defaultSort],
 	);
 
 	// Filter handlers
@@ -234,7 +237,7 @@ export function useProductFilters({
 		[products, selectedColors, selectedSizes],
 	);
 
-	// Sort (server-side primary, client-side fallback)
+	// Sort (server-side primary; client-side fallback for the current page)
 	const filteredProducts = useMemo(
 		() => sortProductsClientSide(clientFilteredProducts, sortValue),
 		[clientFilteredProducts, sortValue],

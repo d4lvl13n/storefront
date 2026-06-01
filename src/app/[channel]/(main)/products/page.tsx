@@ -1,5 +1,6 @@
 import { Suspense } from "react";
 import { notFound } from "next/navigation";
+import { ShieldCheck, FlaskConical, FileCheck2, Truck } from "lucide-react";
 import { ProductListPaginatedDocument } from "@/gql/graphql";
 import { executePublicGraphQL } from "@/lib/graphql";
 import { getPaginatedListVariables } from "@/lib/utils";
@@ -47,6 +48,12 @@ export default async function Page(props: PageProps) {
 				title="Research Compounds"
 				description="Pharmaceutical-grade peptides and biotech compounds. HPLC-verified ≥98% purity, independently tested, with COA on every order."
 				breadcrumbs={breadcrumbs}
+				badges={[
+					{ icon: ShieldCheck, title: "≥ 98% Purity", subtitle: "HPLC-verified" },
+					{ icon: FlaskConical, title: "Independently Tested", subtitle: "Third-party labs" },
+					{ icon: FileCheck2, title: "COA Every Batch", subtitle: "Full documentation" },
+					{ icon: Truck, title: "Fast Dispatch", subtitle: "24–48h, tracked" },
+				]}
 			/>
 			{/* Dynamic content - streams in via Suspense */}
 			<Suspense fallback={<ProductsGridSkeleton />}>
@@ -69,7 +76,8 @@ async function ProductsContent({
 	const [params, searchParams] = await Promise.all([paramsPromise, searchParamsPromise]);
 
 	const paginationVariables = getPaginatedListVariables({ params: searchParams });
-	const sortBy = buildSortVariables(searchParams.sort);
+	// Default to best-selling order (backend-driven) when no explicit sort is chosen.
+	const sortBy = buildSortVariables(searchParams.sort ?? "bestselling");
 
 	// Parse category slugs from URL and resolve to IDs for server-side filtering
 	const categorySlugs = searchParams.categories?.split(",").filter(Boolean) || [];

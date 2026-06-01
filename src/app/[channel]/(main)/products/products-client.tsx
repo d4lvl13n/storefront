@@ -50,6 +50,7 @@ export function ProductsPageClient({ products, pageInfo, resolvedCategories = []
 		products,
 		resolvedCategories,
 		enableCategoryFilter: true,
+		defaultSort: "bestselling",
 	});
 
 	return (
