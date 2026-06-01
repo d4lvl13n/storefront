@@ -63,7 +63,10 @@ function ProductCard({ product, index }: { product: ProductListItemFragment; ind
 
 const tabs = [
 	{ key: "featured", label: "Featured" },
-	{ key: "best-sellers", label: "Best Sellers" },
+	// Best Sellers hidden until the catalog has enough products to rank.
+	// Re-enable by uncommenting this line (the `best-sellers` collection
+	// is still fetched and passed in via the `bestSellers` prop).
+	// { key: "best-sellers", label: "Best Sellers" },
 ] as const;
 
 type TabKey = (typeof tabs)[number]["key"];
@@ -88,24 +91,26 @@ export function ProductTabs({
 					<h2 className="text-3xl font-bold tracking-tight sm:text-4xl lg:text-5xl">
 						Research-Grade Peptides
 					</h2>
-					{/* Tabs */}
-					<div className="mt-6 flex gap-4 sm:gap-6">
-						{tabs.map((tab) => (
-							<button
-								key={tab.key}
-								type="button"
-								onClick={() => setActiveTab(tab.key)}
-								className={cn(
-									"min-h-11 border-b-2 px-1 pb-2 text-sm font-medium transition-colors",
-									activeTab === tab.key
-										? "border-emerald-500 text-foreground"
-										: "border-transparent text-muted-foreground hover:text-foreground",
-								)}
-							>
-								{tab.label}
-							</button>
-						))}
-					</div>
+					{/* Tabs — hidden while only a single tab remains */}
+					{tabs.length > 1 && (
+						<div className="mt-6 flex gap-4 sm:gap-6">
+							{tabs.map((tab) => (
+								<button
+									key={tab.key}
+									type="button"
+									onClick={() => setActiveTab(tab.key)}
+									className={cn(
+										"min-h-11 border-b-2 px-1 pb-2 text-sm font-medium transition-colors",
+										activeTab === tab.key
+											? "border-emerald-500 text-foreground"
+											: "border-transparent text-muted-foreground hover:text-foreground",
+									)}
+								>
+									{tab.label}
+								</button>
+							))}
+						</div>
+					)}
 				</div>
 				<LinkWithChannel
 					href="/products"
