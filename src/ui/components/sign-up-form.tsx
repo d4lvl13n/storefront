@@ -8,14 +8,7 @@ import { Mail, Lock, Eye, EyeOff, User } from "lucide-react";
 import { Input } from "@/ui/components/ui/input";
 import { Label } from "@/ui/components/ui/label";
 import { cn } from "@/lib/utils";
-
-/** Only accept same-origin relative paths as a post-auth return target. */
-function isSafeNextPath(value: string | null): value is string {
-	if (!value) return false;
-	if (!value.startsWith("/")) return false;
-	if (value.startsWith("//")) return false;
-	return true;
-}
+import { isSafeNextPath } from "@/lib/auth/safe-next";
 
 export function SignUpForm() {
 	const params = useParams<{ channel: string }>();
@@ -63,6 +56,14 @@ export function SignUpForm() {
 		setIsSubmitting(true);
 
 		try {
+			// Account-confirmation link target. `mode=confirm` routes the emailed
+			// link to ConfirmMode (confirmAccount), NOT the password-reset screen.
+			// `next` is preserved so first sign-in lands back at checkout when the
+			// user arrived via the checkout-auth redirect.
+			const confirmParams = new URLSearchParams({ mode: "confirm" });
+			if (isSafeNextPath(nextParam)) confirmParams.set("next", nextParam);
+			const redirectUrl = `${window.location.origin}/${params.channel}/login?${confirmParams.toString()}`;
+
 			const response = await fetch("/api/auth/register", {
 				method: "POST",
 				headers: { "Content-Type": "application/json" },
@@ -72,7 +73,7 @@ export function SignUpForm() {
 					firstName,
 					lastName,
 					channel: params.channel,
-					redirectUrl: `${window.location.origin}/${params.channel}/login`,
+					redirectUrl,
 				}),
 			});
 

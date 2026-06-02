@@ -13,6 +13,10 @@ export async function getIdFromCookies(channel: string) {
 	}
 }
 
+// Persist the cart for 30 days so it survives the account-confirmation email
+// round-trip (and browser restarts) instead of dying as a session cookie.
+const CHECKOUT_COOKIE_MAX_AGE = 60 * 60 * 24 * 30;
+
 export async function saveIdToCookie(channel: string, checkoutId: string) {
 	const shouldUseHttps =
 		process.env.NEXT_PUBLIC_STOREFRONT_URL?.startsWith("https") || !!process.env.NEXT_PUBLIC_VERCEL_URL;
@@ -20,6 +24,8 @@ export async function saveIdToCookie(channel: string, checkoutId: string) {
 	(await cookies()).set(cookieName, checkoutId, {
 		sameSite: "lax",
 		secure: shouldUseHttps,
+		path: "/",
+		maxAge: CHECKOUT_COOKIE_MAX_AGE,
 	});
 }
 

@@ -1,5 +1,4 @@
 import { NextRequest, NextResponse } from "next/server";
-import { cookies } from "next/headers";
 import { executeRawGraphQL, asValidationError, getUserMessage } from "@/lib/graphql";
 
 const SET_PASSWORD_MUTATION = `
@@ -71,30 +70,15 @@ export async function POST(request: NextRequest) {
 		return NextResponse.json({ errors: validationResult.error.validationErrors }, { status: 400 });
 	}
 
-	if (setPassword?.token && setPassword?.refreshToken) {
-		// Set auth cookies
-		const cookieStore = await cookies();
-
-		cookieStore.set("token", setPassword.token, {
-			httpOnly: true,
-			secure: process.env.NODE_ENV === "production",
-			sameSite: "lax",
-			path: "/",
-			maxAge: 60 * 60, // 1 hour
-		});
-
-		cookieStore.set("refreshToken", setPassword.refreshToken, {
-			httpOnly: true,
-			secure: process.env.NODE_ENV === "production",
-			sameSite: "lax",
-			path: "/",
-			maxAge: 60 * 60 * 24 * 30, // 30 days
-		});
-
+	// Saleor returns a token when the password was set successfully. We do NOT
+	// persist it here: the app recognises a session only via the auth-sdk's
+	// own cookies (encoded names — see src/lib/auth/*), so writing bare
+	// "token"/"refreshToken" cookies did nothing and produced a false
+	// "you're signed in" state. Confirm success and route the user to sign in.
+	if (setPassword?.token) {
 		return NextResponse.json({
 			success: true,
-			token: setPassword.token,
-			message: "Password updated successfully",
+			message: "Password updated successfully. Please sign in.",
 		});
 	}
 

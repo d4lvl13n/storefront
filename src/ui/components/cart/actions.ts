@@ -6,8 +6,37 @@ import {
 	CheckoutAddLineDocument,
 	CheckoutDeleteLinesDocument,
 	CheckoutLinesUpdateDocument,
+	TypedDocumentString,
 } from "@/gql/graphql";
 import * as Checkout from "@/lib/checkout";
+
+// Hand-authored document (codegen can't run without a live Saleor API). It is
+// the same TypedDocumentString class codegen emits, so it flows through the
+// authenticated executor and carries the user's bearer token.
+type CheckoutCustomerAttachResult = {
+	checkoutCustomerAttach?: {
+		errors?: Array<{ field?: string | null; message?: string | null; code?: string | null }>;
+		checkout?: { id: string } | null;
+	} | null;
+};
+
+const CheckoutCustomerAttachDocument = new TypedDocumentString<
+	CheckoutCustomerAttachResult,
+	{ checkoutId: string }
+>(`
+	mutation CheckoutCustomerAttach($checkoutId: ID!) {
+		checkoutCustomerAttach(id: $checkoutId) {
+			errors {
+				field
+				message
+				code
+			}
+			checkout {
+				id
+			}
+		}
+	}
+`);
 
 /**
  * Reusable quick-add server action.
@@ -95,4 +124,36 @@ export async function updateCartLineQuantity(
 
 	revalidatePath(`/${channel}/cart`);
 	revalidatePath(`/${channel}`);
+}
+
+/**
+ * Binds the current anonymous cart to the now-authenticated user.
+ *
+ * Call right after sign-in so the cart the shopper built before logging in or
+ * registering becomes *their* checkout — it isn't orphaned, and the order lands
+ * in their history. Best-effort: it never throws and never blocks the redirect.
+ * Runs server-side, so it reads the SDK auth cookie the client wrote during
+ * sign-in and sends an authenticated request.
+ */
+export async function attachCheckoutToCustomer(channel: string) {
+	const checkoutId = await Checkout.getIdFromCookies(channel);
+	if (!checkoutId) return;
+
+	const result = await executeAuthenticatedGraphQL(CheckoutCustomerAttachDocument, {
+		variables: { checkoutId },
+		cache: "no-cache",
+	});
+
+	if (!result.ok) {
+		console.error("attachCheckoutToCustomer failed:", result.error.message);
+		return;
+	}
+
+	// A non-empty errors array here is non-fatal: "cannot reassign" means the
+	// checkout is already attached (typically to this same user). The cart cookie
+	// stays valid either way, so we only log.
+	const errors = result.data.checkoutCustomerAttach?.errors;
+	if (errors?.length) {
+		console.warn("attachCheckoutToCustomer:", errors.map((e) => e.message).join("; "));
+	}
 }

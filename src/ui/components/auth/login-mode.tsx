@@ -7,20 +7,10 @@ import { Mail, Lock, Eye, EyeOff } from "lucide-react";
 import { useSaleorAuthContext } from "@saleor/auth-sdk/react";
 import { Input } from "@/ui/components/ui/input";
 import { Label } from "@/ui/components/ui/label";
+import { attachCheckoutToCustomer } from "@/ui/components/cart/actions";
+import { isSafeNextPath } from "@/lib/auth/safe-next";
 
 const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-
-/**
- * Accept only same-origin relative paths in the `?next=` redirect param.
- * Rejects protocol-relative (`//evil.com/...`), absolute URLs, and anything
- * that doesn't start with a single `/`. Prevents open-redirect attacks.
- */
-function isSafeNextPath(value: string | null): value is string {
-	if (!value) return false;
-	if (!value.startsWith("/")) return false;
-	if (value.startsWith("//")) return false;
-	return true;
-}
 
 export function LoginMode() {
 	const router = useRouter();
@@ -34,7 +24,11 @@ export function LoginMode() {
 	const nextParam = searchParams.get("next");
 	const postLoginDestination = isSafeNextPath(nextParam) ? nextParam : `/${params.channel}`;
 
-	const [email, setEmail] = useState("");
+	// Arriving from a just-completed email verification (?confirmed=1&email=…):
+	// greet them and pre-fill the email so they only type their password.
+	const justConfirmed = searchParams.get("confirmed") === "1";
+
+	const [email, setEmail] = useState(() => searchParams.get("email") ?? "");
 	const [password, setPassword] = useState("");
 	const [showPassword, setShowPassword] = useState(false);
 	const [isSubmitting, setIsSubmitting] = useState(false);
@@ -75,6 +69,13 @@ export function LoginMode() {
 			}
 
 			if (result.data?.tokenCreate?.token) {
+				// Bind the anonymous cart built before login to this account, so it
+				// isn't orphaned. Best-effort — never block the redirect on it.
+				try {
+					await attachCheckoutToCustomer(params.channel);
+				} catch {
+					// no-op: the cart cookie is still valid for this session
+				}
 				router.push(postLoginDestination);
 				router.refresh();
 			}
@@ -157,6 +158,15 @@ export function LoginMode() {
 					</div>
 
 					<form onSubmit={handleLogin} className="space-y-5">
+						{justConfirmed && !error && (
+							<div
+								aria-live="polite"
+								className="rounded-xl border border-emerald-500/20 bg-emerald-500/10 p-3 text-sm text-emerald-300"
+							>
+								Your email is verified. Sign in to continue.
+							</div>
+						)}
+
 						{error && (
 							<div
 								role="alert"
