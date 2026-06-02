@@ -145,15 +145,24 @@ export async function attachCheckoutToCustomer(channel: string) {
 	});
 
 	if (!result.ok) {
+		// "...already attached to a user" is the success state, not a failure: the
+		// cart cookie already points to an owned checkout (this user re-signing in,
+		// since the cookie persists), so attaching again is a no-op. Saleor raises
+		// it as a top-level error. Swallow it quietly — matches the checkout app's
+		// use-customer-attach handling — and only surface genuine failures.
+		if (isAlreadyAttached(result.error.message)) return;
 		console.error("attachCheckoutToCustomer failed:", result.error.message);
 		return;
 	}
 
-	// A non-empty errors array here is non-fatal: "cannot reassign" means the
-	// checkout is already attached (typically to this same user). The cart cookie
-	// stays valid either way, so we only log.
+	// Typed CheckoutError path (same benign case can surface here too).
 	const errors = result.data.checkoutCustomerAttach?.errors;
-	if (errors?.length) {
+	if (errors?.length && !errors.some((e) => isAlreadyAttached(e.message))) {
 		console.warn("attachCheckoutToCustomer:", errors.map((e) => e.message).join("; "));
 	}
+}
+
+/** Saleor's "already attached / cannot reassign" guard — benign for our flow. */
+function isAlreadyAttached(message?: string | null): boolean {
+	return /already attached to a user|cannot reassign/i.test(message ?? "");
 }
