@@ -7,7 +7,6 @@ import { Mail, Lock, Eye, EyeOff } from "lucide-react";
 import { useSaleorAuthContext } from "@saleor/auth-sdk/react";
 import { Input } from "@/ui/components/ui/input";
 import { Label } from "@/ui/components/ui/label";
-import { attachCheckoutToCustomer } from "@/ui/components/cart/actions";
 import { isSafeNextPath } from "@/lib/auth/safe-next";
 
 const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
@@ -69,13 +68,12 @@ export function LoginMode() {
 			}
 
 			if (result.data?.tokenCreate?.token) {
-				// Bind the anonymous cart built before login to this account, so it
-				// isn't orphaned. Best-effort — never block the redirect on it.
-				try {
-					await attachCheckoutToCustomer(params.channel);
-				} catch {
-					// no-op: the cart cookie is still valid for this session
-				}
+				// Redirect immediately. The anonymous cart stays bound via its
+				// persistent cookie (Saleor still serves it to the now-authenticated
+				// user), and the checkout app attaches it to the account on arrival
+				// (use-customer-attach). We deliberately do NOT make a server-side
+				// authenticated call here — a second SaleorAuthClient touching tokens
+				// right after sign-in risks a refresh-token desync.
 				router.push(postLoginDestination);
 				router.refresh();
 			}
