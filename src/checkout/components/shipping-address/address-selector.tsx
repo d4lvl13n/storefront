@@ -6,6 +6,7 @@ import {
 	type AddressTypeEnum,
 	useUserSetDefaultAddressMutation,
 } from "@/checkout/graphql";
+import { Plus } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Checkbox } from "@/ui/components/ui/checkbox";
 import { Label } from "@/ui/components/ui/label";
@@ -30,6 +31,8 @@ export interface AddressSelectorProps {
 	onDefaultChange?: (newDefaultId: string) => void;
 	/** Called when edit is clicked on an address */
 	onEdit?: (id: string) => void;
+	/** Called when "use a different address" is clicked (reveals the address form) */
+	onAddNew?: () => void;
 	/** Whether to show the "set as default" checkbox (default: true) */
 	showSetAsDefault?: boolean;
 }
@@ -45,6 +48,7 @@ export const AddressSelector: FC<AddressSelectorProps> = ({
 	addressType = "SHIPPING",
 	onDefaultChange,
 	onEdit,
+	onAddNew,
 	showSetAsDefault = true,
 }) => {
 	const [, setDefaultAddress] = useUserSetDefaultAddressMutation();
@@ -166,6 +170,18 @@ export const AddressSelector: FC<AddressSelectorProps> = ({
 					</label>
 				);
 			})}
+
+			{/* Enter a one-off shipping address instead of a saved one */}
+			{onAddNew && (
+				<button
+					type="button"
+					onClick={onAddNew}
+					className="border-muted-foreground/40 flex w-full items-center justify-center gap-2 rounded-lg border border-dashed p-3 text-sm font-medium text-muted-foreground transition-colors hover:border-foreground hover:text-foreground"
+				>
+					<Plus className="h-4 w-4" />
+					Use a different address
+				</button>
+			)}
 
 			{/* Set as default checkbox - shown when a non-default address is selected */}
 			{shouldShowSetAsDefault && (

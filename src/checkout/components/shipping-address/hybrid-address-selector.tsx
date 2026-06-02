@@ -123,6 +123,7 @@ export const HybridAddressSelector: FC<HybridAddressSelectorProps> = ({
 				addressType={addressType}
 				onDefaultChange={onDefaultChange}
 				onEdit={onEdit}
+				onAddNew={onAddNew}
 			/>
 		);
 	}
