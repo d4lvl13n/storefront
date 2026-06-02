@@ -59,7 +59,11 @@ async function SearchContent({
 	}
 
 	const cursor = Array.isArray(searchParams.cursor) ? searchParams.cursor[0] : searchParams.cursor;
-	const direction = searchParams.direction === "backward" ? "backward" : "forward";
+	const directionParam = Array.isArray(searchParams.direction)
+		? searchParams.direction[0]
+		: searchParams.direction;
+	// Pagination emits "next"/"prev"; the provider expects "forward"/"backward".
+	const direction = directionParam === "prev" || directionParam === "backward" ? "backward" : "forward";
 
 	const sortParam = Array.isArray(searchParams.sort) ? searchParams.sort[0] : searchParams.sort;
 	const sortBy = ["relevance", "price-asc", "price-desc", "name", "newest"].includes(sortParam || "")
@@ -75,7 +79,7 @@ async function SearchContent({
 		sortBy,
 	});
 
-	const { products, pagination } = result;
+	const { products, pagination, correction } = result;
 
 	if (pagination.totalCount === 0) {
 		return <EmptyState query={query} channel={params.channel} />;
@@ -83,6 +87,19 @@ async function SearchContent({
 
 	return (
 		<div>
+			{correction?.didYouMean ? (
+				<p className="mb-6 text-sm text-muted-foreground">
+					No results for <span className="text-foreground">&quot;{correction.original}&quot;</span>. Showing
+					results for{" "}
+					<span className="font-medium text-emerald-400">&quot;{correction.didYouMean}&quot;</span> instead.
+				</p>
+			) : correction?.searchedFor ? (
+				<p className="mb-6 text-sm text-muted-foreground">
+					Showing results for{" "}
+					<span className="font-medium text-emerald-400">&quot;{correction.searchedFor}&quot;</span>
+				</p>
+			) : null}
+
 			<div className="mb-8 flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
 				<div>
 					<h1 className="text-2xl font-semibold text-foreground">Results for &quot;{query}&quot;</h1>

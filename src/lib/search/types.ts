@@ -73,6 +73,19 @@ export interface SearchFacet {
 }
 
 /**
+ * Describes any rewriting we did to the user's query (synonyms or typo fixes),
+ * so the UI can show "Showing results for …" / "did you mean" notices.
+ */
+export interface SearchCorrection {
+	/** The user's raw query. */
+	original: string;
+	/** The term we actually searched, when rewritten via a synonym/alias. */
+	searchedFor?: string;
+	/** A spelling fix we auto-applied because the original returned no results. */
+	didYouMean?: string;
+}
+
+/**
  * Search result container.
  * The structure is flexible - use what your provider returns.
  */
@@ -81,6 +94,8 @@ export interface SearchResult<T = SearchProduct> {
 	pagination: SearchPagination;
 	/** Facets/filters if your provider supports them */
 	facets?: SearchFacet[];
+	/** Query rewriting applied (synonym/typo correction), if any */
+	correction?: SearchCorrection;
 	/** Query timing */
 	queryTimeMs?: number;
 	/** Provider-specific metadata */
