@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect, useCallback, type FC } from "react";
+import { useState, useEffect, useCallback, useRef, type FC } from "react";
 import { useMutation, gql } from "urql";
 import { useRouter, useSearchParams } from "next/navigation";
 import { Button } from "@/ui/components/ui/button";
@@ -42,7 +42,7 @@ import { getStepNumber } from "./flow";
 
 // Extracted components
 import { SignInForm, ResetPasswordForm } from "@/checkout/components/contact";
-import { ContactSection, ShippingAddressSection } from "./sections";
+import { ContactSection, ShippingAddressSection, ShippingMethodSection } from "./sections";
 import { MobileStickyAction } from "./mobile-sticky-action";
 
 // =============================================================================
@@ -193,6 +193,83 @@ export const InformationStep: FC<InformationStepProps> = ({ checkout, onNext }) 
 			}
 		}
 	}, [user, selectedAddressId, showNewAddressForm, shippingAddress]);
+
+	// ----- Shipping method (folded in from the removed shipping step) -----
+	const currentDelivery = checkout.deliveryMethod;
+	const currentDeliveryId = currentDelivery?.__typename === "ShippingMethod" ? currentDelivery.id : undefined;
+	const shippingMethods = checkout.shippingMethods ?? [];
+	const firstMethodId = shippingMethods[0]?.id;
+	const [methodBusy, setMethodBusy] = useState(false);
+
+	const handleSelectMethod = useCallback(
+		async (id: string) => {
+			if (id === currentDeliveryId) return;
+			setMethodBusy(true);
+			try {
+				await updateDeliveryMethod({
+					checkoutId: checkout.id,
+					deliveryMethodId: id,
+					languageCode: localeConfig.graphqlLanguageCode,
+				});
+			} finally {
+				setMethodBusy(false);
+			}
+		},
+		[currentDeliveryId, updateDeliveryMethod, checkout.id],
+	);
+
+	// For logged-in users, push the chosen saved address to the checkout up front
+	// so shipping methods load and can be shown/selected here (the dedicated
+	// shipping step is gone). Runs once per selected address.
+	const appliedAddressRef = useRef<string | null>(null);
+	useEffect(() => {
+		if (!authenticated || showNewAddressForm || !selectedAddressId) return;
+		if (appliedAddressRef.current === selectedAddressId) return;
+		const selected = user?.addresses?.find((a) => a.id === selectedAddressId);
+		if (!selected) return;
+		// Already applied with methods loaded — nothing to do.
+		if (
+			shippingAddress &&
+			isMatchingAddressData(selected, shippingAddress) &&
+			(checkout.shippingMethods?.length ?? 0) > 0
+		) {
+			appliedAddressRef.current = selectedAddressId;
+			return;
+		}
+		appliedAddressRef.current = selectedAddressId;
+		void updateShippingAddress({
+			checkoutId: checkout.id,
+			shippingAddress: getAddressInputDataFromAddress(selected),
+			languageCode: localeConfig.graphqlLanguageCode,
+		});
+	}, [
+		authenticated,
+		showNewAddressForm,
+		selectedAddressId,
+		user?.addresses,
+		shippingAddress,
+		checkout.shippingMethods,
+		checkout.id,
+		updateShippingAddress,
+	]);
+
+	// Auto-select the first method when none is set yet, so it's selected by
+	// default and the order summary reflects the shipping fee. The latch is keyed
+	// on the method set (firstMethodId), so switching to an address in another
+	// shipping zone — where Saleor clears the now-invalid method — re-selects
+	// correctly. currentDeliveryId gates re-firing (no spam) and preserves a
+	// manual non-first pick.
+	const autoMethodRef = useRef<string | undefined>(undefined);
+	useEffect(() => {
+		if (!checkout.isShippingRequired || currentDeliveryId || !firstMethodId) return;
+		if (autoMethodRef.current === firstMethodId) return;
+		autoMethodRef.current = firstMethodId;
+		void updateDeliveryMethod({
+			checkoutId: checkout.id,
+			deliveryMethodId: firstMethodId,
+			languageCode: localeConfig.graphqlLanguageCode,
+		});
+	}, [checkout.isShippingRequired, currentDeliveryId, firstMethodId, checkout.id, updateDeliveryMethod]);
 
 	// ----- Validation & Errors -----
 	const [errors, setErrors] = useState<Record<string, string>>({});
@@ -542,6 +619,15 @@ export const InformationStep: FC<InformationStepProps> = ({ checkout, onNext }) 
 					getFieldLabel={getFieldLabel}
 					isRequiredField={isRequiredField}
 					countryAreaChoices={countryAreaChoices}
+				/>
+			)}
+
+			{checkout.isShippingRequired && shippingMethods.length > 0 && (
+				<ShippingMethodSection
+					methods={shippingMethods}
+					selectedMethodId={currentDeliveryId}
+					onSelect={handleSelectMethod}
+					busy={methodBusy}
 				/>
 			)}
 
