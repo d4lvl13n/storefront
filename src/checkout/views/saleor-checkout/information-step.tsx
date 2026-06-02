@@ -9,6 +9,7 @@ import {
 	type CountryCode,
 	useCheckoutEmailUpdateMutation,
 	useCheckoutShippingAddressUpdateMutation,
+	useCheckoutDeliveryMethodUpdateMutation,
 	useUserRegisterMutation,
 } from "@/checkout/graphql";
 import { BUYER_TYPE_METADATA_KEY, type BuyerTypeValue } from "@/checkout/components/contact";
@@ -73,6 +74,7 @@ export const InformationStep: FC<InformationStepProps> = ({ checkout, onNext }) 
 	// Mutations
 	const [, updateEmail] = useCheckoutEmailUpdateMutation();
 	const [, updateShippingAddress] = useCheckoutShippingAddressUpdateMutation();
+	const [, updateDeliveryMethod] = useCheckoutDeliveryMethodUpdateMutation();
 	const [, userRegister] = useUserRegisterMutation();
 	const [, updateCheckoutMetadata] = useMutation<
 		unknown,
@@ -363,7 +365,12 @@ export const InformationStep: FC<InformationStepProps> = ({ checkout, onNext }) 
 					}
 				}
 
-				// Update shipping address
+				// Update shipping address, then auto-select a shipping method so the
+				// customer goes straight from Information to Payment (the dedicated
+				// shipping step was removed). With a single free method this is
+				// invisible; if several existed we take the first.
+				let latestCheckout: CheckoutFragment = checkout;
+
 				if (checkout.isShippingRequired) {
 					let addressInput;
 					if (authenticated && user?.addresses?.length && selectedAddressId && !showNewAddressForm) {
@@ -396,6 +403,36 @@ export const InformationStep: FC<InformationStepProps> = ({ checkout, onNext }) 
 							setErrors(errorMap);
 							return;
 						}
+
+						latestCheckout = addressResult.data?.checkoutShippingAddressUpdate?.checkout ?? checkout;
+					}
+
+					// Select a delivery method now if the checkout doesn't have one yet.
+					const currentDelivery = latestCheckout.deliveryMethod;
+					const currentDeliveryId =
+						currentDelivery?.__typename === "ShippingMethod" ? currentDelivery.id : undefined;
+					const availableMethods = latestCheckout.shippingMethods ?? [];
+
+					// No method available for this address. Since the dedicated shipping
+					// step (which used to surface this) is gone, keep the user here with
+					// a recoverable error instead of dead-ending them on Payment.
+					if (!currentDeliveryId && availableMethods.length === 0) {
+						setErrors({
+							address: "We can't ship to this address. Please try a different shipping address.",
+						});
+						return;
+					}
+
+					if (!currentDeliveryId && availableMethods.length > 0) {
+						const deliveryResult = await updateDeliveryMethod({
+							checkoutId: checkout.id,
+							deliveryMethodId: availableMethods[0].id,
+							languageCode: localeConfig.graphqlLanguageCode,
+						});
+						if (deliveryResult.error || deliveryResult.data?.checkoutDeliveryMethodUpdate?.errors?.length) {
+							setErrors({ address: "We couldn't set a shipping method. Please check your address." });
+							return;
+						}
 					}
 				}
 
@@ -409,9 +446,7 @@ export const InformationStep: FC<InformationStepProps> = ({ checkout, onNext }) 
 			email,
 			createAccount,
 			accountPassword,
-			checkout.isShippingRequired,
-			checkout.id,
-			checkout.channel.slug,
+			checkout,
 			user?.addresses,
 			showNewAddressForm,
 			selectedAddressId,
@@ -424,6 +459,7 @@ export const InformationStep: FC<InformationStepProps> = ({ checkout, onNext }) 
 			updateEmail,
 			userRegister,
 			updateShippingAddress,
+			updateDeliveryMethod,
 			updateCheckoutMetadata,
 			onNext,
 		],
@@ -463,11 +499,7 @@ export const InformationStep: FC<InformationStepProps> = ({ checkout, onNext }) 
 	}
 
 	// ----- Render: Main Form -----
-	const buttonText = isSubmitting
-		? "Saving..."
-		: checkout.isShippingRequired
-			? "Continue to shipping"
-			: "Continue to payment";
+	const buttonText = isSubmitting ? "Saving..." : "Continue to payment";
 
 	return (
 		<form className="space-y-8" onSubmit={handleSubmit} noValidate>

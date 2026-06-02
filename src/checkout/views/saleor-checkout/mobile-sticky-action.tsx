@@ -44,22 +44,14 @@ export const MobileStickyAction: FC<MobileStickyActionProps> = ({
 		if (isLoading && loadingText) return loadingText;
 
 		const paymentStep = getStepNumber("PAYMENT", isShippingRequired);
-		const shippingStep = getStepNumber("SHIPPING", isShippingRequired);
-		const infoStep = getStepNumber("INFO", isShippingRequired);
 
 		if (step === paymentStep) {
 			return total ? `Pay ${total}` : "Pay now";
 		}
 
-		if (step === infoStep) {
-			return isShippingRequired ? "Continue to shipping" : "Continue to payment";
-		}
-
-		if (step === shippingStep) {
-			return "Continue to payment";
-		}
-
-		return "Continue";
+		// Shipping-method selection is folded into the Information step, so the
+		// only forward action before Payment is "Continue to payment".
+		return "Continue to payment";
 	};
 
 	return (

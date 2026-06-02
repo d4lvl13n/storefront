@@ -6,7 +6,12 @@ import { Tag, ShieldCheck, RotateCcw, Truck, ChevronDown, ShoppingBag } from "lu
 import { Button } from "@/ui/components/ui/button";
 import { Input } from "@/ui/components/ui/input";
 import { cn } from "@/lib/utils";
-import { type CheckoutFragment, type OrderFragment } from "@/checkout/graphql";
+import {
+	type CheckoutFragment,
+	type OrderFragment,
+	useCheckoutAddPromoCodeMutation,
+	useCheckoutRemovePromoCodeMutation,
+} from "@/checkout/graphql";
 import { localeConfig } from "@/config/locale";
 
 // ============================================================================
@@ -115,7 +120,9 @@ function extractOrderData(order: OrderFragment): OrderSummaryData {
 
 export const OrderSummary: FC<OrderSummaryProps> = ({ checkout, order, editable }) => {
 	const [promoCode, setPromoCode] = useState("");
-	const [promoApplied, setPromoApplied] = useState(false);
+	const [promoError, setPromoError] = useState("");
+	const [{ fetching: applyingPromo }, addPromoCode] = useCheckoutAddPromoCodeMutation();
+	const [{ fetching: removingPromo }, removePromoCode] = useCheckoutRemovePromoCodeMutation();
 	// Collapsed by default on mobile
 	const [isExpanded, setIsExpanded] = useState(false);
 
@@ -137,11 +144,34 @@ export const OrderSummary: FC<OrderSummaryProps> = ({ checkout, order, editable 
 		}).format(amount);
 	};
 
-	const handleApplyPromo = () => {
-		// TODO: Call Saleor mutation to apply promo code
-		if (promoCode.toLowerCase() === "saleor10") {
-			setPromoApplied(true);
+	const isPromoBusy = applyingPromo || removingPromo;
+	const appliedCode = checkout?.voucherCode ?? null;
+
+	const handleApplyPromo = async () => {
+		const code = promoCode.trim();
+		if (!checkout?.id || !code) return;
+		setPromoError("");
+		const result = await addPromoCode({
+			checkoutId: checkout.id,
+			promoCode: code,
+			languageCode: localeConfig.graphqlLanguageCode,
+		});
+		const errors = result.data?.checkoutAddPromoCode?.errors;
+		if (result.error || errors?.length) {
+			setPromoError(errors?.[0]?.message || "That code isn't valid or can't be applied to this order.");
+			return;
 		}
+		setPromoCode("");
+	};
+
+	const handleRemovePromo = async () => {
+		if (!checkout?.id || !appliedCode) return;
+		setPromoError("");
+		await removePromoCode({
+			checkoutId: checkout.id,
+			promoCode: appliedCode,
+			languageCode: localeConfig.graphqlLanguageCode,
+		});
 	};
 
 	// Product thumbnails for collapsed state (show max 2 for cleaner look)
@@ -278,35 +308,53 @@ export const OrderSummary: FC<OrderSummaryProps> = ({ checkout, order, editable 
 					{/* Discounts - only for editable checkout */}
 					{isEditable && (
 						<section className="border-t border-border px-5 py-4">
-							<form
-								className="flex gap-2"
-								onSubmit={(e) => {
-									e.preventDefault();
-									handleApplyPromo();
-								}}
-							>
-								<div className="relative flex-1">
-									<Tag className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
-									<Input
-										placeholder="Discount code"
-										value={promoCode}
-										onChange={(e) => setPromoCode(e.target.value)}
-										className="h-10 bg-white pl-10 text-sm"
-										disabled={promoApplied}
-									/>
+							{appliedCode ? (
+								<div className="flex items-center justify-between gap-3">
+									<div className="flex min-w-0 items-center gap-2 text-sm">
+										<Tag className="h-4 w-4 shrink-0 text-emerald-400" />
+										<span className="truncate font-medium text-foreground">{appliedCode}</span>
+										<span className="shrink-0 text-green-600">applied</span>
+									</div>
+									<button
+										type="button"
+										onClick={handleRemovePromo}
+										disabled={isPromoBusy}
+										className="shrink-0 text-sm text-muted-foreground underline underline-offset-2 transition-colors hover:text-foreground disabled:opacity-50"
+									>
+										{removingPromo ? "Removing…" : "Remove"}
+									</button>
 								</div>
-								<Button
-									type="submit"
-									variant="outline-solid"
-									disabled={!promoCode || promoApplied}
-									className="h-10 bg-white px-4 text-sm"
+							) : (
+								<form
+									className="flex gap-2"
+									onSubmit={(e) => {
+										e.preventDefault();
+										void handleApplyPromo();
+									}}
 								>
-									{promoApplied ? "Applied" : "Apply"}
-								</Button>
-							</form>
-							{promoApplied && (
-								<p className="mt-2 text-sm font-medium text-green-600">SALEOR10 - 10% discount applied</p>
+									<div className="relative flex-1">
+										<Tag className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
+										<Input
+											placeholder="Discount code"
+											value={promoCode}
+											onChange={(e) => {
+												setPromoCode(e.target.value);
+												if (promoError) setPromoError("");
+											}}
+											className="h-10 bg-white pl-10 text-sm text-neutral-900 placeholder:text-neutral-500"
+											disabled={isPromoBusy}
+										/>
+									</div>
+									<Button
+										type="submit"
+										disabled={!promoCode || isPromoBusy}
+										className="h-10 bg-neutral-900 px-4 text-sm font-medium text-white transition-colors hover:bg-emerald-500 disabled:opacity-50"
+									>
+										{applyingPromo ? "Applying…" : "Apply"}
+									</Button>
+								</form>
 							)}
+							{promoError && <p className="mt-2 text-sm text-red-500">{promoError}</p>}
 						</section>
 					)}
 

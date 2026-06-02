@@ -5,7 +5,6 @@ import { useRouter, useSearchParams } from "next/navigation";
 import { CheckoutHeader } from "./checkout-header";
 import { OrderSummary } from "./order-summary";
 import { InformationStep } from "./information-step";
-import { ShippingStep } from "./shipping-step";
 import { PaymentStep } from "./payment-step";
 import { ConfirmationStep } from "./confirmation-step";
 import { useCheckout } from "@/checkout/hooks/use-checkout";
@@ -119,7 +118,7 @@ export const SaleorCheckout: FC = () => {
 					<div ref={stepRef} tabIndex={-1} className="outline-none">
 						<PaymentStep
 							checkout={checkout}
-							onBack={() => goToStep(isShippingRequired ? "SHIPPING" : "INFO")}
+							onBack={() => goToStep("INFO")}
 							onComplete={() => goToStep("CONFIRMATION")}
 							onGoToInformation={() => goToStep("INFO")}
 						/>
@@ -135,22 +134,12 @@ export const SaleorCheckout: FC = () => {
 							<div className="rounded-lg border border-border bg-card p-6 md:p-8">
 								<div ref={stepRef} tabIndex={-1} className="outline-none">
 									{currentStep.id === "INFO" && (
-										<InformationStep
-											checkout={checkout}
-											onNext={() => goToStep(isShippingRequired ? "SHIPPING" : "PAYMENT")}
-										/>
-									)}
-									{currentStep.id === "SHIPPING" && (
-										<ShippingStep
-											checkout={checkout}
-											onBack={() => goToStep("INFO")}
-											onNext={() => goToStep("PAYMENT")}
-										/>
+										<InformationStep checkout={checkout} onNext={() => goToStep("PAYMENT")} />
 									)}
 									{currentStep.id === "PAYMENT" && (
 										<PaymentStep
 											checkout={checkout}
-											onBack={() => goToStep(isShippingRequired ? "SHIPPING" : "INFO")}
+											onBack={() => goToStep("INFO")}
 											onComplete={() => goToStep("CONFIRMATION")}
 											onGoToInformation={() => goToStep("INFO")}
 										/>

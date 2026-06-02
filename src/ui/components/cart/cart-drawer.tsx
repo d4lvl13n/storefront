@@ -1,13 +1,15 @@
 "use client";
 
 import { useTransition } from "react";
+import { useFormStatus } from "react-dom";
 import Image from "next/image";
 import Link from "next/link";
-import { Minus, Plus, Trash2, ShoppingBag, ArrowRight, Truck, RotateCcw } from "lucide-react";
+import { Minus, Plus, Trash2, ShoppingBag, ArrowRight, Truck, RotateCcw, Loader2 } from "lucide-react";
 import { Button } from "@/ui/components/ui/button";
 import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetCloseButton } from "@/ui/components/ui/sheet";
 import { useCart } from "./cart-context";
-import { deleteCartLine, updateCartLineQuantity } from "./actions";
+import { addLineToCart, deleteCartLine, updateCartLineQuantity } from "./actions";
+import { AddToCartSync } from "@/ui/components/pdp/add-to-cart-sync";
 import { cn } from "@/lib/utils";
 import { formatMoney } from "@/lib/utils";
 import { localeConfig } from "@/config/locale";
@@ -99,6 +101,17 @@ function getVariantDetails(variant: CartLine["variant"]): VariantAttribute[] {
 	});
 }
 
+export interface RecommendedProduct {
+	id: string;
+	name: string;
+	slug: string;
+	variantId: string | null;
+	thumbnailUrl: string | null;
+	thumbnailAlt: string | null;
+	price: number;
+	currency: string;
+}
+
 interface CartDrawerProps {
 	checkoutId: string | null;
 	lines: CartLine[];
@@ -109,9 +122,10 @@ interface CartDrawerProps {
 		};
 	} | null;
 	channel: string;
+	recommendations: RecommendedProduct[];
 }
 
-export function CartDrawer({ checkoutId, lines, totalPrice, channel }: CartDrawerProps) {
+export function CartDrawer({ checkoutId, lines, totalPrice, channel, recommendations }: CartDrawerProps) {
 	const { isOpen, closeCart } = useCart();
 	const [isPending, startTransition] = useTransition();
 
@@ -313,6 +327,63 @@ export function CartDrawer({ checkoutId, lines, totalPrice, channel }: CartDrawe
 							})}
 						</ul>
 					)}
+
+					{/* Recommended upsell */}
+					{lines.length > 0 && recommendations.length > 0 && (
+						<div className="border-t border-border px-6 py-5">
+							<p className="mb-3 text-xs font-medium uppercase tracking-[0.18em] text-muted-foreground">
+								You may also like
+							</p>
+							<ul className="space-y-3">
+								{recommendations.map((rec) => (
+									<li key={rec.id} className="flex items-center gap-3">
+										<Link
+											href={`/${channel}/products/${rec.slug}`}
+											onClick={closeCart}
+											className="relative h-12 w-12 shrink-0 overflow-hidden rounded-md border border-border bg-secondary"
+										>
+											{rec.thumbnailUrl && (
+												<Image
+													src={rec.thumbnailUrl}
+													alt={rec.thumbnailAlt || rec.name}
+													fill
+													sizes="48px"
+													className="object-cover"
+												/>
+											)}
+										</Link>
+										<div className="min-w-0 flex-1">
+											<Link
+												href={`/${channel}/products/${rec.slug}`}
+												onClick={closeCart}
+												className="line-clamp-1 text-sm font-medium hover:underline"
+											>
+												{rec.name}
+											</Link>
+											<p className="text-sm text-muted-foreground">{formatMoney(rec.price, rec.currency)}</p>
+										</div>
+										{rec.variantId ? (
+											<form action={addLineToCart}>
+												<input type="hidden" name="channel" value={channel} />
+												<input type="hidden" name="variantId" value={rec.variantId} />
+												<input type="hidden" name="quantity" value="1" />
+												<UpsellAddButton productName={rec.name} />
+												<AddToCartSync />
+											</form>
+										) : (
+											<Link
+												href={`/${channel}/products/${rec.slug}`}
+												onClick={closeCart}
+												className="inline-flex h-9 shrink-0 items-center rounded-lg border border-border px-3 text-xs font-medium text-foreground transition-colors hover:border-emerald-500/40 hover:text-emerald-400"
+											>
+												View
+											</Link>
+										)}
+									</li>
+								))}
+							</ul>
+						</div>
+					)}
 				</div>
 
 				{/* Footer */}
@@ -368,5 +439,21 @@ export function CartDrawer({ checkoutId, lines, totalPrice, channel }: CartDrawe
 				)}
 			</SheetContent>
 		</Sheet>
+	);
+}
+
+/** Compact add-to-cart button for the drawer upsell rows. */
+function UpsellAddButton({ productName }: { productName: string }) {
+	const { pending } = useFormStatus();
+	return (
+		<button
+			type="submit"
+			disabled={pending}
+			className="inline-flex h-9 shrink-0 items-center gap-1.5 rounded-lg border border-border px-3 text-xs font-medium text-foreground transition-colors hover:border-emerald-500/40 hover:text-emerald-400 disabled:cursor-not-allowed disabled:opacity-50"
+		>
+			{pending ? <Loader2 className="h-3.5 w-3.5 animate-spin" /> : <Plus className="h-3.5 w-3.5" />}
+			Add
+			<span className="sr-only">{productName} to bag</span>
+		</button>
 	);
 }

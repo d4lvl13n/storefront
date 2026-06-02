@@ -466,7 +466,7 @@ export const PaymentStep: FC<PaymentStepProps> = ({
 								className="mt-4 flex items-center gap-1 text-sm text-zinc-500 hover:text-zinc-900"
 							>
 								<ChevronLeft className="h-4 w-4" />
-								Return to shipping
+								Return to information
 							</button>
 						</div>
 					)}
@@ -507,7 +507,7 @@ export const PaymentStep: FC<PaymentStepProps> = ({
 											className="flex items-center gap-1 text-sm text-zinc-400 transition-colors hover:text-zinc-700"
 										>
 											<ChevronLeft className="h-4 w-4" />
-											{isShippingRequired ? "Return to shipping" : "Return to information"}
+											Return to information
 										</button>
 										<div className="flex items-center gap-1.5 text-xs text-zinc-300">
 											<Lock className="h-3 w-3" />
@@ -694,7 +694,7 @@ export const PaymentStep: FC<PaymentStepProps> = ({
 					className="flex items-center gap-1 text-sm text-muted-foreground transition-colors hover:text-foreground"
 				>
 					<ChevronLeft className="h-4 w-4" />
-					{isShippingRequired ? "Return to shipping" : "Return to information"}
+					Return to information
 				</button>
 				<Button type="submit" disabled={isDisabled} className="hidden h-12 min-w-[200px] px-8 md:flex">
 					{isLoading ? (

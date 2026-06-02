@@ -27,7 +27,7 @@ export function ResearchGateForm() {
 				disabled={isPending}
 				className="h-12 w-full rounded-xl bg-emerald-500 text-sm font-semibold text-white transition-colors hover:bg-emerald-400 disabled:cursor-not-allowed disabled:opacity-70"
 			>
-				{isPending ? "Confirming…" : "I affirm — continue to research catalog"}
+				{isPending ? "Confirming…" : "I confirm — continue to research catalog"}
 			</button>
 			<button
 				type="button"
@@ -35,7 +35,7 @@ export function ResearchGateForm() {
 				disabled={isPending}
 				className="h-10 w-full rounded-xl border border-border text-sm text-muted-foreground transition-colors hover:text-foreground disabled:cursor-not-allowed disabled:opacity-70"
 			>
-				I do not affirm — exit
+				I do not confirm — exit
 			</button>
 		</div>
 	);

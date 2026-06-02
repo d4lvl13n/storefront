@@ -1,6 +1,7 @@
 import { type ReactNode, Suspense } from "react";
 import { cookies } from "next/headers";
 import { LoginForm } from "@/ui/components/login-form";
+import { AuthProvider } from "@/lib/auth";
 import { AccountNav } from "@/ui/components/account/account-nav";
 import { AccountSkeleton } from "@/ui/components/account/account-skeleton";
 import { AccountProvider } from "@/ui/components/account/account-context";
@@ -37,7 +38,9 @@ async function AccountShell({ children }: { children: ReactNode }) {
 					<div className="absolute -right-40 bottom-1/4 h-80 w-80 rounded-full bg-teal-500/[0.03] blur-[100px]" />
 				</div>
 				<div className="relative flex items-center justify-center px-6 py-16 sm:py-24">
-					<LoginForm />
+					<AuthProvider>
+						<LoginForm />
+					</AuthProvider>
 				</div>
 			</div>
 		);
@@ -53,7 +56,9 @@ async function AccountShell({ children }: { children: ReactNode }) {
 					<div className="absolute -right-40 bottom-1/4 h-80 w-80 rounded-full bg-teal-500/[0.03] blur-[100px]" />
 				</div>
 				<div className="relative flex items-center justify-center px-6 py-16 sm:py-24">
-					<LoginForm />
+					<AuthProvider>
+						<LoginForm />
+					</AuthProvider>
 				</div>
 			</div>
 		);

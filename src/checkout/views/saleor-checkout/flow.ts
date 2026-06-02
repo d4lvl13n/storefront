@@ -13,19 +13,18 @@ interface CheckoutStep {
 
 /**
  * Single source of truth for SaleorCheckout flow steps.
- * Handles conditional steps (like shipping) based on checkout state.
+ *
+ * Shipping-method selection is folded into the Information step (a single free
+ * method is auto-selected there once the address is known), so the customer-
+ * facing flow is the streamlined Information → Payment. The `isShippingRequired`
+ * argument is retained for call-site compatibility but no longer adds a step.
  */
-export const getCheckoutSteps = (isShippingRequired: boolean): CheckoutStep[] => {
-	const steps: Omit<CheckoutStep, "index">[] = [{ id: "INFO", label: "Information", slug: "contact" }];
-
-	if (isShippingRequired) {
-		steps.push({ id: "SHIPPING", label: "Shipping", slug: "shipping" });
-	}
-
-	steps.push(
+export const getCheckoutSteps = (_isShippingRequired = true): CheckoutStep[] => {
+	const steps: Omit<CheckoutStep, "index">[] = [
+		{ id: "INFO", label: "Information", slug: "contact" },
 		{ id: "PAYMENT", label: "Payment", slug: "payment" },
 		{ id: "CONFIRMATION", label: "Confirmation", slug: "confirmation" },
-	);
+	];
 
 	// Add 1-based indices
 	return steps.map((step, i) => ({

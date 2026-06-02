@@ -66,10 +66,16 @@ export async function ResearchGate() {
 				</p>
 
 				<p className="mt-4 text-sm leading-relaxed text-muted-foreground">
-					Before continuing, please affirm the following:
+					Before continuing, please confirm the following:
 				</p>
 
 				<ul className="mt-3 space-y-2 text-sm leading-relaxed text-foreground">
+					<li className="flex gap-2">
+						<span aria-hidden="true" className="mt-1 text-emerald-400">
+							&bull;
+						</span>
+						<span>I am 18 years of age or older.</span>
+					</li>
 					<li className="flex gap-2">
 						<span aria-hidden="true" className="mt-1 text-emerald-400">
 							&bull;
