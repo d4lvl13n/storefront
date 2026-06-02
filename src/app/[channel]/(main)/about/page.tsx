@@ -37,7 +37,7 @@ const milestones = [
 		year: "2026",
 		title: "73+ Compounds",
 		description:
-			"Continuing to expand our portfolio while maintaining ≥98% purity standards across every batch.",
+			"Continuing to expand our portfolio while maintaining ≥99% purity standards across every batch.",
 	},
 ];
 
@@ -70,7 +70,7 @@ const values = [
 
 const stats = [
 	{ value: "73+", label: "Research Compounds" },
-	{ value: "≥98%", label: "Minimum Purity" },
+	{ value: "≥99%", label: "Minimum Purity" },
 	{ value: "30+", label: "Countries Served" },
 	{ value: "48h", label: "Processing Time" },
 ];

@@ -12,7 +12,7 @@ import { ProductsPageClient } from "./products-client";
 export const metadata = {
 	title: "Research Compounds | InfinityBio Labs",
 	description:
-		"Browse our full catalog of pharmaceutical-grade research peptides and biotech compounds. HPLC-verified ≥98% purity, third-party tested, with Certificate of Analysis for every batch.",
+		"Browse our full catalog of pharmaceutical-grade research peptides and biotech compounds. HPLC-verified ≥99% purity, third-party tested, with Certificate of Analysis for every batch.",
 	alternates: { canonical: "/us-us/products" },
 };
 
@@ -46,10 +46,10 @@ export default async function Page(props: PageProps) {
 			{/* Static shell - renders immediately */}
 			<CategoryHero
 				title="Research Compounds"
-				description="Pharmaceutical-grade peptides and biotech compounds. HPLC-verified ≥98% purity, independently tested, with COA on every order."
+				description="Pharmaceutical-grade peptides and biotech compounds. HPLC-verified ≥99% purity, independently tested, with COA on every order."
 				breadcrumbs={breadcrumbs}
 				badges={[
-					{ icon: ShieldCheck, title: "≥ 98% Purity", subtitle: "HPLC-verified" },
+					{ icon: ShieldCheck, title: "≥ 99% Purity", subtitle: "HPLC-verified" },
 					{ icon: FlaskConical, title: "Independently Tested", subtitle: "Third-party labs" },
 					{ icon: FileCheck2, title: "COA Every Batch", subtitle: "Full documentation" },
 					{ icon: Truck, title: "Fast Dispatch", subtitle: "24–48h, tracked" },
