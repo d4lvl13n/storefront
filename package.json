@@ -20,6 +20,8 @@
 		"generate:verify": "pnpm run generate:all",
 		"test": "vitest",
 		"test:run": "vitest run",
+		"test:e2e": "playwright test",
+		"test:e2e:ui": "playwright test --ui",
 		"quality:gate": "pnpm exec tsc --noEmit && pnpm run test:run && pnpm run build",
 		"knip": "knip",
 		"prepare": "husky install"
@@ -62,6 +64,7 @@
 		"@graphql-codegen/typescript-urql": "4.0.1",
 		"@next/env": "16.0.7",
 		"@parcel/watcher": "2.3.0",
+		"@playwright/test": "1.60.0",
 		"@tailwindcss/container-queries": "0.1.1",
 		"@tailwindcss/forms": "0.5.7",
 		"@tailwindcss/typography": "0.5.10",

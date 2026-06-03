@@ -48,3 +48,7 @@ next-env.d.ts
 
 # QA / audit artifacts (screenshots, audit JSON, specs, DB dumps)
 /output/
+
+# Playwright
+/playwright-report/
+/test-results/
