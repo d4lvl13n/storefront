@@ -36,3 +36,36 @@ export function isSafeNextPath(value: string | null): value is string {
 		return false;
 	}
 }
+
+function originOf(value: string | null | undefined): string | null {
+	if (!value) return null;
+	try {
+		return new URL(value).origin;
+	} catch {
+		return null;
+	}
+}
+
+/**
+ * Validate an ABSOLUTE `redirectUrl` that gets embedded in a Saleor
+ * confirmation / password-reset email link. The register & reset-password API
+ * routes are public, so an attacker could POST a redirectUrl pointing at their
+ * own origin and have Saleor email the victim a link carrying the single-use
+ * token to that origin. Require the URL's origin to match the storefront's own
+ * origin — the request's `Origin` header (works across prod/preview/dev) or the
+ * configured `NEXT_PUBLIC_STOREFRONT_URL`. Defense-in-depth on top of Saleor's
+ * own ALLOWED_CLIENT_HOSTS.
+ */
+export function isAllowedRedirectUrl(
+	redirectUrl: string | null | undefined,
+	requestOrigin: string | null,
+): boolean {
+	const target = originOf(redirectUrl);
+	if (!target) return false;
+	const allowed = new Set<string>();
+	const fromHeader = originOf(requestOrigin);
+	if (fromHeader) allowed.add(fromHeader);
+	const fromEnv = originOf(process.env.NEXT_PUBLIC_STOREFRONT_URL);
+	if (fromEnv) allowed.add(fromEnv);
+	return allowed.has(target);
+}

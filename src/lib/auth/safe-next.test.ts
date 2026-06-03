@@ -1,6 +1,6 @@
 import { describe, it, expect } from "vitest";
 
-import { isSafeNextPath } from "./safe-next";
+import { isSafeNextPath, isAllowedRedirectUrl } from "./safe-next";
 
 describe("isSafeNextPath", () => {
 	it("accepts same-origin root-relative paths", () => {
@@ -37,5 +37,31 @@ describe("isSafeNextPath", () => {
 		expect(isSafeNextPath("/\n/evil.com")).toBe(false);
 		expect(isSafeNextPath("/\r/evil.com")).toBe(false);
 		expect(isSafeNextPath("/\x00evil")).toBe(false);
+	});
+});
+
+describe("isAllowedRedirectUrl", () => {
+	const origin = "https://www.infinitybiolabs.com";
+
+	it("accepts an absolute URL on the same origin as the request", () => {
+		expect(isAllowedRedirectUrl(`${origin}/us-us/login?mode=confirm`, origin)).toBe(true);
+		expect(isAllowedRedirectUrl(`${origin}/us-us/login`, origin)).toBe(true);
+	});
+
+	it("rejects a URL on a different origin", () => {
+		expect(isAllowedRedirectUrl("https://evil.example/steal", origin)).toBe(false);
+		// host-confusion attempt
+		expect(isAllowedRedirectUrl(`https://evil.example/${origin}`, origin)).toBe(false);
+	});
+
+	it("rejects non-absolute / malformed values", () => {
+		expect(isAllowedRedirectUrl("/us-us/login", origin)).toBe(false);
+		expect(isAllowedRedirectUrl("//evil.example", origin)).toBe(false);
+		expect(isAllowedRedirectUrl("not a url", origin)).toBe(false);
+		expect(isAllowedRedirectUrl(null, origin)).toBe(false);
+	});
+
+	it("rejects a foreign origin when there is no request origin to match against", () => {
+		expect(isAllowedRedirectUrl("https://some-random-origin.test/x", null)).toBe(false);
 	});
 });

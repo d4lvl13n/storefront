@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { executeRawGraphQL, asValidationError, getUserMessage } from "@/lib/graphql";
+import { isAllowedRedirectUrl } from "@/lib/auth/safe-next";
 
 const REGISTER_MUTATION = `
   mutation AccountRegister($input: AccountRegisterInput!) {
@@ -40,6 +41,15 @@ export async function POST(request: NextRequest) {
 	if (!email || !password) {
 		return NextResponse.json(
 			{ errors: [{ message: "Email and password are required", code: "REQUIRED" }] },
+			{ status: 400 },
+		);
+	}
+
+	// redirectUrl is embedded in Saleor's confirmation email link; reject any
+	// origin that isn't this storefront so it can't be used to harvest the token.
+	if (!isAllowedRedirectUrl(redirectUrl, request.headers.get("origin"))) {
+		return NextResponse.json(
+			{ errors: [{ message: "Invalid redirect URL", code: "INVALID" }] },
 			{ status: 400 },
 		);
 	}

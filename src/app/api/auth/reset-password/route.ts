@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { executeRawGraphQL, getUserMessage } from "@/lib/graphql";
+import { isAllowedRedirectUrl } from "@/lib/auth/safe-next";
 
 const REQUEST_PASSWORD_RESET_MUTATION = `
   mutation RequestPasswordReset($email: String!, $channel: String!, $redirectUrl: String!) {
@@ -32,6 +33,15 @@ export async function POST(request: NextRequest) {
 	if (!email || !channel || !redirectUrl) {
 		return NextResponse.json(
 			{ errors: [{ message: "Email, channel, and redirectUrl are required", code: "REQUIRED" }] },
+			{ status: 400 },
+		);
+	}
+
+	// redirectUrl is embedded in Saleor's reset email link; reject any origin that
+	// isn't this storefront so it can't be used to harvest the reset token.
+	if (!isAllowedRedirectUrl(redirectUrl, request.headers.get("origin"))) {
+		return NextResponse.json(
+			{ errors: [{ message: "Invalid redirect URL", code: "INVALID" }] },
 			{ status: 400 },
 		);
 	}
