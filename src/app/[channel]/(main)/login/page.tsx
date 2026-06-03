@@ -68,7 +68,7 @@ async function LoginContent({
 }) {
 	const { channel } = await paramsPromise;
 	const { next } = await searchParamsPromise;
-	const nextParam = Array.isArray(next) ? next[0] : next;
+	const nextParam = (Array.isArray(next) ? next[0] : next) ?? null;
 	// Honor a validated ?next= so an already-/just-authenticated user is returned
 	// to where they were headed (e.g. checkout) instead of being dropped on home.
 	const postAuthDestination = isSafeNextPath(nextParam) ? nextParam : `/${channel}`;
