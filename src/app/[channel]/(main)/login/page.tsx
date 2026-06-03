@@ -5,6 +5,7 @@ import { LoginForm } from "@/ui/components/login-form";
 import { executeAuthenticatedGraphQL } from "@/lib/graphql";
 import { CurrentUserDocument } from "@/gql/graphql";
 import { AuthProvider } from "@/lib/auth";
+import { isSafeNextPath } from "@/lib/auth/safe-next";
 import { noIndexRobots } from "@/lib/seo";
 
 export const metadata = {
@@ -13,10 +14,13 @@ export const metadata = {
 	robots: noIndexRobots,
 };
 
-export default function LoginPage(props: { params: Promise<{ channel: string }> }) {
+export default function LoginPage(props: {
+	params: Promise<{ channel: string }>;
+	searchParams: Promise<{ next?: string | string[] }>;
+}) {
 	return (
 		<Suspense fallback={<LoginSkeleton />}>
-			<LoginContent params={props.params} />
+			<LoginContent params={props.params} searchParams={props.searchParams} />
 		</Suspense>
 	);
 }
@@ -55,8 +59,19 @@ function LoginSkeleton() {
 	);
 }
 
-async function LoginContent({ params: paramsPromise }: { params: Promise<{ channel: string }> }) {
+async function LoginContent({
+	params: paramsPromise,
+	searchParams: searchParamsPromise,
+}: {
+	params: Promise<{ channel: string }>;
+	searchParams: Promise<{ next?: string | string[] }>;
+}) {
 	const { channel } = await paramsPromise;
+	const { next } = await searchParamsPromise;
+	const nextParam = Array.isArray(next) ? next[0] : next;
+	// Honor a validated ?next= so an already-/just-authenticated user is returned
+	// to where they were headed (e.g. checkout) instead of being dropped on home.
+	const postAuthDestination = isSafeNextPath(nextParam) ? nextParam : `/${channel}`;
 
 	let hasCookies = false;
 	try {
@@ -72,7 +87,7 @@ async function LoginContent({ params: paramsPromise }: { params: Promise<{ chann
 		});
 
 		if (result.ok && result.data.me) {
-			redirect(`/${channel}`);
+			redirect(postAuthDestination);
 		}
 	}
 
