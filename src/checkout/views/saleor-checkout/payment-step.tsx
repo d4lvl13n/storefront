@@ -154,6 +154,14 @@ export const PaymentStep: FC<PaymentStepProps> = ({
 	const hasDummyGateway = availableGateways.some((g) => g.id === dummyGatewayId);
 	const hasSupportedGateway = hasHostedGateway || hasDummyGateway;
 
+	// A physical order must have a shipping address + a delivery method before
+	// payment, or the total excludes shipping and the order is un-fulfillable.
+	// The Information step enforces this — but the Payment step is reachable
+	// directly via a stale/bookmarked `?step=payment` URL or browser back, which
+	// bypasses it. Guard here and bounce back to Information.
+	const shippingIncomplete =
+		checkout.isShippingRequired && (!checkout.shippingAddress || !checkout.deliveryMethod);
+
 	const syncBillingAddress = useCallback(async () => {
 		if (sameAsBilling && shippingAddress) {
 			// Already in sync — skip the redundant mutation so it's not a serial
@@ -256,10 +264,16 @@ export const PaymentStep: FC<PaymentStepProps> = ({
 	]);
 
 	useEffect(() => {
+		// Don't initialize a transaction for an order that skipped shipping —
+		// send the user back to complete it first.
+		if (shippingIncomplete) {
+			onGoToInformation?.();
+			return;
+		}
 		if (hasHostedGateway && !hostedPaymentData && !widgetInitialized.current) {
 			initializeHostedPayment();
 		}
-	}, [hasHostedGateway, hostedPaymentData, initializeHostedPayment]);
+	}, [shippingIncomplete, onGoToInformation, hasHostedGateway, hostedPaymentData, initializeHostedPayment]);
 
 	const handleBillingDataChange = useCallback((data: BillingAddressData) => {
 		setBillingData(data);
@@ -379,6 +393,12 @@ export const PaymentStep: FC<PaymentStepProps> = ({
 
 	const isPaymentProcessing = transactionState.fetching || completeState.fetching;
 	const isLoading = isProcessing || isPaymentProcessing;
+
+	// Shipping not completed (reached Payment out-of-band) — the effect above is
+	// redirecting to Information; render nothing rather than the payment UI.
+	if (shippingIncomplete) {
+		return null;
+	}
 
 	if (hasHostedGateway) {
 		const lines = checkout.lines ?? [];
