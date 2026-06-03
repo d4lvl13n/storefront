@@ -16,15 +16,19 @@ export default function RootLayout(props: { children: ReactNode }) {
 			 * connection would otherwise be cold when it's injected; preconnecting
 			 * here shaves the handshake off the critical path.
 			 */}
-			<link rel="preconnect" href="https://app.sellabroad.com" crossOrigin="anonymous" />
-			<link rel="dns-prefetch" href="https://app.sellabroad.com" />
 			{/*
-			 * The widget creates its cart + payment session via POST to the OMS host
-			 * (oms.sellabroad.com/carts/from-api) right after it mounts — that call is
-			 * the bulk of the skeleton→card-fields wait, so warm it too.
+			 * Warm DNS + TLS to the SellAbroad widget + OMS hosts up front. After the
+			 * widget mounts it runs a sequential chain against the OMS host
+			 * (/carts/from-api → /checkout-settings → /payments/links) plus Stripe
+			 * Elements, which is the skeleton→card-fields wait. Both prod and staging
+			 * hosts are listed because the active one depends on the PSP app's env.
 			 */}
+			<link rel="preconnect" href="https://app.sellabroad.com" crossOrigin="anonymous" />
 			<link rel="preconnect" href="https://oms.sellabroad.com" crossOrigin="anonymous" />
+			<link rel="preconnect" href="https://app-staging.sellabroad.com" crossOrigin="anonymous" />
+			<link rel="preconnect" href="https://oms-staging.sellabroad.com" crossOrigin="anonymous" />
 			<link rel="dns-prefetch" href="https://oms.sellabroad.com" />
+			<link rel="dns-prefetch" href="https://oms-staging.sellabroad.com" />
 			<main className="min-h-screen bg-background">
 				<AuthProvider>{props.children}</AuthProvider>
 			</main>
