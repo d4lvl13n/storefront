@@ -18,6 +18,13 @@ export default function RootLayout(props: { children: ReactNode }) {
 			 */}
 			<link rel="preconnect" href="https://app.sellabroad.com" crossOrigin="anonymous" />
 			<link rel="dns-prefetch" href="https://app.sellabroad.com" />
+			{/*
+			 * The widget creates its cart + payment session via POST to the OMS host
+			 * (oms.sellabroad.com/carts/from-api) right after it mounts — that call is
+			 * the bulk of the skeleton→card-fields wait, so warm it too.
+			 */}
+			<link rel="preconnect" href="https://oms.sellabroad.com" crossOrigin="anonymous" />
+			<link rel="dns-prefetch" href="https://oms.sellabroad.com" />
 			<main className="min-h-screen bg-background">
 				<AuthProvider>{props.children}</AuthProvider>
 			</main>
