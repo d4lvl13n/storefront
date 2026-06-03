@@ -1,3 +1,54 @@
+// ── Security headers ─────────────────────────────────────────────────────────
+// Auth tokens are JS-readable by design (@saleor/auth-sdk attaches them to
+// Authorization headers), so a CSP is the real XSS mitigation. We ENFORCE the
+// zero-breakage headers now (incl. frame-ancestors for clickjacking) and ship
+// the full content policy as Report-Only so we can validate it against the live
+// third parties (Stripe, SellAbroad, Klaviyo, GA, Vercel) before flipping it to
+// enforced — a blind enforced CSP could break checkout.
+const SALEOR_ORIGIN = (() => {
+	try {
+		return new URL(process.env.NEXT_PUBLIC_SALEOR_API_URL).origin;
+	} catch {
+		return "";
+	}
+})();
+
+const SELLABROAD =
+	"https://app.sellabroad.com https://oms.sellabroad.com https://app-staging.sellabroad.com https://oms-staging.sellabroad.com";
+const STRIPE =
+	"https://js.stripe.com https://api.stripe.com https://m.stripe.com https://r.stripe.com https://hooks.stripe.com";
+const KLAVIYO = "https://static.klaviyo.com https://a.klaviyo.com";
+const GA = "https://www.googletagmanager.com https://*.google-analytics.com https://*.analytics.google.com";
+const VERCEL = "https://va.vercel-scripts.com https://*.vercel-insights.com";
+
+const REPORT_ONLY_CSP = [
+	"default-src 'self'",
+	"base-uri 'self'",
+	"object-src 'none'",
+	"frame-ancestors 'self'",
+	`script-src 'self' 'unsafe-inline' 'unsafe-eval' https://js.stripe.com https://www.googletagmanager.com https://static.klaviyo.com ${VERCEL}`,
+	"style-src 'self' 'unsafe-inline'",
+	"img-src 'self' data: blob: https:",
+	"font-src 'self' data:",
+	`connect-src 'self' ${SALEOR_ORIGIN} ${SELLABROAD} ${STRIPE} ${KLAVIYO} ${GA} ${VERCEL}`,
+	`frame-src 'self' https://js.stripe.com https://hooks.stripe.com ${SELLABROAD}`,
+	`form-action 'self' ${SELLABROAD}`,
+]
+	.join("; ")
+	.replace(/\s+/g, " ")
+	.trim();
+
+const SECURITY_HEADERS = [
+	{ key: "X-Frame-Options", value: "SAMEORIGIN" },
+	{ key: "X-Content-Type-Options", value: "nosniff" },
+	{ key: "Referrer-Policy", value: "strict-origin-when-cross-origin" },
+	// Enforced: only the directive that cannot break our own resource loading.
+	{ key: "Content-Security-Policy", value: "frame-ancestors 'self'" },
+	// Observe-only: flip the key to "Content-Security-Policy" once preview shows no
+	// legitimate violations from Stripe/SellAbroad/Klaviyo/GA.
+	{ key: "Content-Security-Policy-Report-Only", value: REPORT_ONLY_CSP },
+];
+
 /** @type {import('next').NextConfig} */
 const config = {
 	// Native modules that must not be bundled by webpack/turbopack
@@ -50,6 +101,12 @@ const config = {
 	async headers() {
 		const isDev = process.env.NODE_ENV === "development";
 		return [
+			{
+				// Security headers on every route (clickjacking + hardening enforced,
+				// full content CSP shipped Report-Only — see SECURITY_HEADERS above).
+				source: "/(.*)",
+				headers: SECURITY_HEADERS,
+			},
 			// In development, prevent aggressive caching of dynamic chunks
 			...(isDev
 				? [
