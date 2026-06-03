@@ -53,8 +53,9 @@ async function getProductData(slug: string, channel: string) {
 	});
 
 	if (!result.ok) {
-		console.error(`[getProductData] Failed to fetch product ${slug} for ${channel}:`, result.error.message);
-		return null;
+		// Backend failure ≠ product removed — throw so the error boundary shows a
+		// retryable error rather than a 404 on a live, high-intent product URL.
+		throw new Error(`Product query failed for ${slug}: ${result.error.message}`);
 	}
 
 	return result.data.product;

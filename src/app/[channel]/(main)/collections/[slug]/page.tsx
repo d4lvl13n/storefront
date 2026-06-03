@@ -16,8 +16,9 @@ async function getCollectionData(slug: string, channel: string) {
 	});
 
 	if (!result.ok) {
-		console.error(`[getCollectionData] Failed to fetch collection ${slug}:`, result.error.message);
-		return null;
+		// Backend failure ≠ collection absent — throw so the error boundary renders a
+		// retryable error rather than a 404 on a real, indexed collection URL.
+		throw new Error(`Collection query failed for ${slug}: ${result.error.message}`);
 	}
 
 	return result.data.collection;

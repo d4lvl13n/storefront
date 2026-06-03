@@ -16,8 +16,9 @@ async function getCategoryData(slug: string, channel: string) {
 	});
 
 	if (!result.ok) {
-		console.error(`[getCategoryData] Failed to fetch category ${slug}:`, result.error.message);
-		return null;
+		// Backend failure ≠ category absent — throw so the error boundary renders a
+		// retryable error rather than a 404 on a real, indexed category URL.
+		throw new Error(`Category query failed for ${slug}: ${result.error.message}`);
 	}
 
 	return result.data.category;

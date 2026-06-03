@@ -99,7 +99,13 @@ async function ProductsContent({
 		revalidate: 300,
 	});
 
-	if (!result.ok || !result.data.products) {
+	if (!result.ok) {
+		// Transient/backend failure is NOT "page doesn't exist" — throw so the error
+		// boundary shows a retryable error instead of turning an indexed catalog URL
+		// into a hard 404 during a Saleor blip.
+		throw new Error(`Products query failed: ${result.error.message}`);
+	}
+	if (!result.data.products) {
 		notFound();
 	}
 
