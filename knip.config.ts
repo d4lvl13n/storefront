@@ -1,9 +1,10 @@
 import type { KnipConfig } from "knip";
 
 const config: KnipConfig = {
-	// Entry points
+	// Entry points — includes ALL Next.js file conventions (sitemap/robots/
+	// opengraph-image etc. are auto-discovered routes, not dead code).
 	entry: [
-		"src/app/**/{page,layout,loading,error,not-found,route}.{ts,tsx}",
+		"src/app/**/{page,layout,loading,error,global-error,not-found,default,template,route,sitemap,robots,manifest,opengraph-image,twitter-image,icon,apple-icon}.{ts,tsx}",
 		"src/app/api/**/route.ts",
 		"src/checkout/root.tsx",
 	],

@@ -3,6 +3,7 @@ import { GeistMono } from "geist/font/mono";
 import "./globals.css";
 import { type ReactNode } from "react";
 import { Analytics } from "@vercel/analytics/react";
+import { SpeedInsights } from "@vercel/speed-insights/next";
 import { DraftModeNotification } from "@/ui/components/draft-mode-notification";
 import { GoogleAnalytics } from "@/ui/components/google-analytics";
 import { Klaviyo } from "@/ui/components/klaviyo";
@@ -35,6 +36,8 @@ export default function RootLayout(props: { children: ReactNode }) {
 				<GoogleAnalytics />
 				<Klaviyo />
 				<Analytics />
+				{/* Web Vitals collection — the dependency was installed but never rendered */}
+				<SpeedInsights />
 			</body>
 		</html>
 	);
