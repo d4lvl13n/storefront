@@ -16,7 +16,7 @@ import {
 } from "@/checkout/graphql";
 import { useCheckout } from "@/checkout/hooks/use-checkout";
 import { useUser } from "@/checkout/hooks/use-user";
-import { getAddressInputData } from "@/checkout/components/address-form/utils";
+import { getAddressInputData, isMatchingAddressData } from "@/checkout/components/address-form/utils";
 import { createQueryString } from "@/checkout/lib/utils/url";
 import { localeConfig } from "@/config/locale";
 import { MobileStickyAction } from "./mobile-sticky-action";
@@ -156,6 +156,11 @@ export const PaymentStep: FC<PaymentStepProps> = ({
 
 	const syncBillingAddress = useCallback(async () => {
 		if (sameAsBilling && shippingAddress) {
+			// Already in sync — skip the redundant mutation so it's not a serial
+			// round-trip in front of transactionInitialize on the widget-load path.
+			if (checkout.billingAddress && isMatchingAddressData(checkout.billingAddress, shippingAddress)) {
+				return;
+			}
 			const addressInput = getAddressInputData({
 				firstName: shippingAddress.firstName || "",
 				lastName: shippingAddress.lastName || "",
@@ -174,7 +179,7 @@ export const PaymentStep: FC<PaymentStepProps> = ({
 				languageCode: localeConfig.graphqlLanguageCode,
 			});
 		}
-	}, [sameAsBilling, shippingAddress, checkout.id, updateBillingAddress]);
+	}, [sameAsBilling, shippingAddress, checkout.id, checkout.billingAddress, updateBillingAddress]);
 
 	const initializeHostedPayment = useCallback(async () => {
 		if (!hostedGateway || widgetInitialized.current) return;
