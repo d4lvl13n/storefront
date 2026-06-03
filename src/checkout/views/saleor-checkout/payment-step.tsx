@@ -264,16 +264,19 @@ export const PaymentStep: FC<PaymentStepProps> = ({
 	]);
 
 	useEffect(() => {
-		// Don't initialize a transaction for an order that skipped shipping —
-		// send the user back to complete it first.
-		if (shippingIncomplete) {
-			onGoToInformation?.();
-			return;
-		}
+		// Wait — don't initialize a transaction until shipping is complete. We do
+		// NOT auto-redirect: right after the Information step, urql refetches the
+		// checkout after the address/delivery-method mutations (document cache), so
+		// the live checkout briefly still shows no deliveryMethod. Redirecting on
+		// that transient state bounces the user back out of Payment. Once the
+		// refetch lands, shippingIncomplete clears and this effect initializes. The
+		// render below offers a manual "return to information" for the genuine
+		// reached-via-stale-URL case.
+		if (shippingIncomplete) return;
 		if (hasHostedGateway && !hostedPaymentData && !widgetInitialized.current) {
 			initializeHostedPayment();
 		}
-	}, [shippingIncomplete, onGoToInformation, hasHostedGateway, hostedPaymentData, initializeHostedPayment]);
+	}, [shippingIncomplete, hasHostedGateway, hostedPaymentData, initializeHostedPayment]);
 
 	const handleBillingDataChange = useCallback((data: BillingAddressData) => {
 		setBillingData(data);
@@ -394,10 +397,24 @@ export const PaymentStep: FC<PaymentStepProps> = ({
 	const isPaymentProcessing = transactionState.fetching || completeState.fetching;
 	const isLoading = isProcessing || isPaymentProcessing;
 
-	// Shipping not completed (reached Payment out-of-band) — the effect above is
-	// redirecting to Information; render nothing rather than the payment UI.
+	// Shipping not yet complete. Usually a brief post-Information lag while the
+	// checkout refetches (show a spinner — the init effect fires once it lands).
+	// If the user genuinely reached Payment without shipping (stale URL), the
+	// link lets them recover without an auto-redirect loop.
 	if (shippingIncomplete) {
-		return null;
+		return (
+			<div className="flex min-h-[50vh] flex-col items-center justify-center gap-5 p-8 text-center">
+				<LoadingSpinner />
+				<p className="text-sm text-zinc-500">Loading your shipping details…</p>
+				<button
+					type="button"
+					onClick={() => onGoToInformation?.()}
+					className="text-sm text-zinc-500 underline underline-offset-4 hover:text-zinc-900"
+				>
+					Return to information
+				</button>
+			</div>
+		);
 	}
 
 	if (hasHostedGateway) {
