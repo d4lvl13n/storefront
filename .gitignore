@@ -45,3 +45,6 @@ next-env.d.ts
 
 # Affiliate system SQLite database
 /data/
+
+# QA / audit artifacts (screenshots, audit JSON, specs, DB dumps)
+/output/
