@@ -77,8 +77,27 @@ export async function addFirstProductToCart(page: Page, channel: string): Promis
 		if (await addToCart.isEnabled({ timeout: 8_000 }).catch(() => false)) {
 			const name = (await page.getByRole("heading", { level: 1 }).first().textContent())?.trim() ?? "";
 			await addToCart.click();
-			// AddToCartSync opens the drawer after the server action completes.
-			await expect(page.getByText("Your Bag")).toBeVisible({ timeout: 20_000 });
+
+			// AddToCartSync auto-opens the drawer once the server action (guest
+			// checkoutCreate + addLine) finishes; on a cold prod backend that can lag.
+			// Open the drawer AT MOST ONCE — the header cart button is a TOGGLE, so
+			// re-clicking an already-open drawer closes it (and unmounts its content).
+			// Then wait for the Checkout CTA, which only renders once the cart has a
+			// line (lines.length > 0), so this also proves the add succeeded.
+			const drawerTitle = page.getByText("Your Bag");
+			const checkoutCta = page.getByRole("link", { name: /Checkout/ }).first();
+			// Properly WAIT (retrying) for the auto-open — isVisible() is instant and
+			// would race the lagging server action. Only if it never opens do we click
+			// the cart nav once; it's a TOGGLE, so we must not click an open drawer.
+			const opened = await drawerTitle
+				.waitFor({ state: "visible", timeout: 20_000 })
+				.then(() => true)
+				.catch(() => false);
+			if (!opened) {
+				await page.locator('[data-testid="CartNavItem"]:visible').first().click();
+				await expect(drawerTitle).toBeVisible({ timeout: 10_000 });
+			}
+			await expect(checkoutCta).toBeVisible({ timeout: 30_000 });
 			return name;
 		}
 		await page.goBack();

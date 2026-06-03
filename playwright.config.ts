@@ -10,10 +10,14 @@ import { defineConfig, devices } from "@playwright/test";
  */
 export default defineConfig({
 	testDir: "./e2e",
-	// The PSP/widget legs are slow (transactionInitialize + widget boot).
-	timeout: 90_000,
+	// Live + staging-PSP legs are slow (cold prod add, transactionInitialize, the
+	// SellAbroad widget's sequential cart→settings→links→Stripe chain).
+	timeout: 150_000,
 	expect: { timeout: 15_000 },
 	fullyParallel: false,
+	// One worker: these run against a single live backend, so concurrent workers
+	// just contend (rate limits, shared cart/session) and cause flakiness.
+	workers: 1,
 	retries: process.env.CI ? 1 : 0,
 	reporter: process.env.CI ? [["github"], ["html", { open: "never" }]] : [["list"]],
 	use: {
