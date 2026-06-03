@@ -6,10 +6,14 @@ import { SearchResults } from "@/ui/components/search-results";
 import { Pagination } from "@/ui/components/pagination";
 import { SearchSort } from "./search-sort";
 import { SearchIcon } from "lucide-react";
+import { noIndexRobots } from "@/lib/seo";
 
 export const metadata = {
 	title: "Search | InfinityBio Labs",
 	description: "Search our catalog of pharmaceutical-grade research peptides and biotech compounds.",
+	// Internal search results are thin, infinitely-faceted (?query/?sort/?cursor)
+	// near-duplicates — keep them out of the index.
+	robots: noIndexRobots,
 };
 
 type SearchParams = {

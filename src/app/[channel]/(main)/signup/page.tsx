@@ -1,11 +1,14 @@
 import { Suspense } from "react";
 import { AlertTriangle } from "lucide-react";
 import { SignUpForm } from "@/ui/components/sign-up-form";
+import { noIndexRobots } from "@/lib/seo";
 
 export const metadata = {
 	title: "Create Research Account",
 	description:
 		"Register a research account to purchase reference compounds for in-vitro laboratory research. Accounts are for qualified research use only.",
+	// Transactional auth page — exclude from the index (matches /login, /cart, etc.).
+	robots: noIndexRobots,
 };
 
 export default function SignUpPage() {

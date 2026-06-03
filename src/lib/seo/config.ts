@@ -38,7 +38,7 @@ export const seoConfig = {
 	titleSeparator: " | ",
 
 	/** Pages to exclude from search engine indexing */
-	noIndexPaths: ["/checkout", "/cart", "/api/", "/login", "/orders"],
+	noIndexPaths: ["/checkout", "/cart", "/api/", "/login", "/signup", "/orders", "/search"],
 
 	/** Enable/disable JSON-LD structured data */
 	enableJsonLd: true,
