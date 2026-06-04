@@ -34,7 +34,7 @@ const VALID_CHANNELS = new Set(
 	[process.env.NEXT_PUBLIC_DEFAULT_CHANNEL, "default-channel"].filter(Boolean) as string[],
 );
 
-const NON_CHANNEL_ROOTS = new Set(["checkout", "access-restricted"]);
+const NON_CHANNEL_ROOTS = new Set(["checkout", "access-restricted", "maintenance"]);
 
 /**
  * Authenticated-only checkout guard.
@@ -55,6 +55,19 @@ const NON_CHANNEL_ROOTS = new Set(["checkout", "access-restricted"]);
 const SALEOR_API_URL = process.env.NEXT_PUBLIC_SALEOR_API_URL ?? "";
 const DEFAULT_CHANNEL = process.env.NEXT_PUBLIC_DEFAULT_CHANNEL ?? "default-channel";
 
+/**
+ * Site-wide maintenance takedown.
+ *
+ * When MAINTENANCE_MODE === "1", every page request is rewritten to the
+ * standalone /maintenance screen (URL preserved, no storefront chrome). OFF by
+ * default — set the env var (and redeploy, so edge middleware picks it up) to
+ * take the whole storefront down, and unset it to bring it back. Static assets,
+ * _next/*, and /api are already excluded by the `matcher` below, so the page's
+ * own CSS/JS and the logo keep loading behind the screen.
+ */
+const MAINTENANCE_MODE = process.env.MAINTENANCE_MODE === "1";
+const MAINTENANCE_PATH = "/maintenance";
+
 function encodeCookieName(key: string): string {
 	return key.replace(/[^a-zA-Z0-9_-]/g, "_");
 }
@@ -69,6 +82,16 @@ function requiresAuth(pathname: string): boolean {
 
 export function middleware(request: NextRequest) {
 	const url = request.nextUrl;
+
+	// ── 0. Maintenance takedown (OFF unless MAINTENANCE_MODE=1) ──
+	// Rewrite every page to /maintenance, keeping the requested URL. Let the
+	// maintenance route itself pass through so we don't loop.
+	if (MAINTENANCE_MODE && url.pathname !== MAINTENANCE_PATH) {
+		const rewritten = url.clone();
+		rewritten.pathname = MAINTENANCE_PATH;
+		rewritten.search = "";
+		return NextResponse.rewrite(rewritten);
+	}
 
 	// ── Detect crawler UA (used by checkout auth gate to avoid redirect loops) ──
 	const ua = request.headers.get("user-agent") ?? "";

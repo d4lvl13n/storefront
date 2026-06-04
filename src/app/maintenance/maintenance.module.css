@@ -1,0 +1,445 @@
+/*
+ * Maintenance screen — self-contained, JS-free animations.
+ *
+ * Deliberately uses explicit hex (not the OKLCH brand vars) so the page renders
+ * identically regardless of theme state, and so it survives even if the site's
+ * CSS variables / theme provider are unavailable during a takedown. All motion
+ * is disabled under prefers-reduced-motion at the bottom of this file.
+ *
+ * Palette pulled from the logo's DNA-helix gradient: emerald #34d399 → teal #2dd4bf.
+ */
+
+.screen {
+	position: fixed;
+	inset: 0;
+	overflow: hidden;
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+	justify-content: center;
+	gap: 2.25rem;
+	padding: 2rem;
+	text-align: center;
+	color: #fafafa;
+	background: radial-gradient(120% 120% at 50% 0%, #0c1513 0%, #070908 55%, #050606 100%);
+	font-family: var(--font-geist-sans), ui-sans-serif, system-ui, sans-serif;
+}
+
+/* faint moving scanlines / lab grid for texture */
+.screen::before {
+	content: "";
+	position: absolute;
+	inset: -50%;
+	background-image: linear-gradient(rgba(45, 212, 191, 0.04) 1px, transparent 1px),
+		linear-gradient(90deg, rgba(52, 211, 153, 0.04) 1px, transparent 1px);
+	background-size: 44px 44px;
+	mask-image: radial-gradient(60% 60% at 50% 45%, #000 30%, transparent 75%);
+	animation: ib-grid-drift 24s linear infinite;
+	pointer-events: none;
+}
+
+/* ── Drifting background orbs (homepage-hero style) ──────────────────────── */
+.orb {
+	position: absolute;
+	border-radius: 9999px;
+	filter: blur(70px);
+	opacity: 0.5;
+	pointer-events: none;
+}
+.orbA {
+	width: 38rem;
+	height: 38rem;
+	top: -12rem;
+	left: -10rem;
+	background: radial-gradient(circle, #10b981 0%, transparent 70%);
+	animation: ib-orb-a 18s ease-in-out infinite;
+}
+.orbB {
+	width: 34rem;
+	height: 34rem;
+	bottom: -14rem;
+	right: -8rem;
+	background: radial-gradient(circle, #14b8a6 0%, transparent 70%);
+	animation: ib-orb-b 22s ease-in-out infinite;
+}
+
+/* ── Floating molecule particles ─────────────────────────────────────────── */
+.molecules {
+	position: absolute;
+	inset: 0;
+	pointer-events: none;
+}
+.molecule {
+	position: absolute;
+	width: 10px;
+	height: 10px;
+	border-radius: 9999px;
+	background: radial-gradient(circle at 35% 30%, #6ee7b7, #14b8a6);
+	box-shadow: 0 0 12px rgba(45, 212, 191, 0.7);
+	opacity: 0.65;
+	animation: ib-molecule-float 9s ease-in-out infinite;
+}
+.molecule::after {
+	/* little bond line trailing the dot */
+	content: "";
+	position: absolute;
+	top: 50%;
+	left: 50%;
+	width: 26px;
+	height: 1px;
+	background: linear-gradient(90deg, rgba(110, 231, 183, 0.6), transparent);
+	transform-origin: left center;
+	transform: rotate(35deg);
+}
+.m1 {
+	top: 18%;
+	left: 14%;
+	animation-delay: 0s;
+}
+.m2 {
+	top: 28%;
+	right: 16%;
+	animation-delay: -2.2s;
+	transform: scale(0.7);
+}
+.m3 {
+	bottom: 22%;
+	left: 22%;
+	animation-delay: -4.5s;
+	transform: scale(1.3);
+}
+.m4 {
+	bottom: 30%;
+	right: 12%;
+	animation-delay: -1.1s;
+	transform: scale(0.85);
+}
+.m5 {
+	top: 12%;
+	left: 52%;
+	animation-delay: -3.7s;
+	transform: scale(0.6);
+}
+.m6 {
+	bottom: 14%;
+	left: 60%;
+	animation-delay: -5.6s;
+}
+
+/* ── Logo + orbiting electron ────────────────────────────────────────────── */
+.stage {
+	position: relative;
+	display: grid;
+	place-items: center;
+	width: min(78vw, 30rem);
+	z-index: 2;
+}
+
+/* soft pulsing glow behind the logo */
+.stage::before {
+	content: "";
+	position: absolute;
+	width: 120%;
+	height: 160%;
+	background: radial-gradient(circle, rgba(45, 212, 191, 0.35) 0%, transparent 65%);
+	filter: blur(20px);
+	animation: ib-glow 4.5s ease-in-out infinite;
+	z-index: -1;
+}
+
+.logo {
+	width: 100%;
+	height: auto;
+	animation: ib-logo-float 6s ease-in-out infinite;
+	filter: drop-shadow(0 18px 40px rgba(20, 184, 166, 0.35));
+}
+
+/* electron orbiting the infinity mark — never stops (that's the joke) */
+.orbit {
+	position: absolute;
+	inset: -8%;
+	animation: ib-orbit 3.6s linear infinite;
+	pointer-events: none;
+}
+.electron {
+	position: absolute;
+	top: 50%;
+	left: -4px;
+	width: 12px;
+	height: 12px;
+	margin-top: -6px;
+	border-radius: 9999px;
+	background: #6ee7b7;
+	box-shadow:
+		0 0 10px 2px rgba(110, 231, 183, 0.9),
+		0 0 22px 6px rgba(45, 212, 191, 0.5);
+}
+
+/* ── Copy ────────────────────────────────────────────────────────────────── */
+.copy {
+	position: relative;
+	z-index: 2;
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+	gap: 0.85rem;
+	max-width: 40rem;
+}
+.badge {
+	display: inline-flex;
+	align-items: center;
+	gap: 0.55rem;
+	padding: 0.4rem 0.9rem;
+	border-radius: 9999px;
+	border: 1px solid rgba(45, 212, 191, 0.35);
+	background: rgba(20, 184, 166, 0.08);
+	font-size: 0.72rem;
+	font-weight: 600;
+	letter-spacing: 0.22em;
+	text-transform: uppercase;
+	color: #5eead4;
+}
+.dot {
+	width: 8px;
+	height: 8px;
+	border-radius: 9999px;
+	background: #34d399;
+	box-shadow: 0 0 0 0 rgba(52, 211, 153, 0.7);
+	animation: ib-blink 1.6s ease-in-out infinite;
+}
+.title {
+	margin: 0;
+	font-size: clamp(1.9rem, 5vw, 3.25rem);
+	font-weight: 800;
+	letter-spacing: -0.02em;
+	line-height: 1.05;
+	background: linear-gradient(100deg, #ffffff 0%, #a7f3d0 55%, #5eead4 100%);
+	-webkit-background-clip: text;
+	background-clip: text;
+	color: transparent;
+}
+.subtitle {
+	margin: 0;
+	font-size: clamp(0.95rem, 2.2vw, 1.15rem);
+	color: #a3a3a3;
+}
+
+/* ── Rotating status ticker ──────────────────────────────────────────────── */
+.ticker {
+	height: 2rem;
+	overflow: hidden;
+	margin-top: 0.35rem;
+}
+.tickerList {
+	display: flex;
+	flex-direction: column;
+	animation: ib-ticker 18s cubic-bezier(0.6, 0, 0.4, 1) infinite;
+}
+.tickerItem {
+	height: 2rem;
+	line-height: 2rem;
+	font-family: var(--font-geist-mono), ui-monospace, monospace;
+	font-size: 0.92rem;
+	color: #5eead4;
+	white-space: nowrap;
+}
+
+/* ── Progress bar (fills to 99% then snaps back — infinity gag) ──────────── */
+.progressWrap {
+	position: relative;
+	z-index: 2;
+	width: min(80vw, 26rem);
+	display: flex;
+	flex-direction: column;
+	gap: 0.5rem;
+}
+.progressMeta {
+	display: flex;
+	justify-content: space-between;
+	font-family: var(--font-geist-mono), ui-monospace, monospace;
+	font-size: 0.72rem;
+	color: #737373;
+	letter-spacing: 0.04em;
+}
+.progressMeta strong {
+	color: #5eead4;
+	font-weight: 600;
+}
+.track {
+	height: 7px;
+	border-radius: 9999px;
+	background: rgba(255, 255, 255, 0.07);
+	overflow: hidden;
+}
+.fill {
+	height: 100%;
+	width: 4%;
+	border-radius: 9999px;
+	background: linear-gradient(90deg, #10b981, #2dd4bf);
+	box-shadow: 0 0 14px rgba(45, 212, 191, 0.6);
+	animation: ib-progress 7.5s cubic-bezier(0.5, 0, 0.2, 1) infinite;
+}
+
+.footnote {
+	position: relative;
+	z-index: 2;
+	font-size: 0.8rem;
+	color: #525252;
+}
+.footnote span {
+	color: #34d399;
+}
+
+/* ── Keyframes ───────────────────────────────────────────────────────────── */
+@keyframes ib-logo-float {
+	0%,
+	100% {
+		transform: translateY(0) rotate(-0.4deg);
+	}
+	50% {
+		transform: translateY(-14px) rotate(0.4deg);
+	}
+}
+@keyframes ib-orbit {
+	from {
+		transform: rotate(0deg);
+	}
+	to {
+		transform: rotate(360deg);
+	}
+}
+@keyframes ib-glow {
+	0%,
+	100% {
+		opacity: 0.55;
+		transform: scale(0.96);
+	}
+	50% {
+		opacity: 1;
+		transform: scale(1.06);
+	}
+}
+@keyframes ib-orb-a {
+	0%,
+	100% {
+		transform: translate(0, 0) scale(1);
+	}
+	50% {
+		transform: translate(40px, 30px) scale(1.12);
+	}
+}
+@keyframes ib-orb-b {
+	0%,
+	100% {
+		transform: translate(0, 0) scale(1.05);
+	}
+	50% {
+		transform: translate(-50px, -24px) scale(0.92);
+	}
+}
+@keyframes ib-grid-drift {
+	from {
+		transform: translate(0, 0);
+	}
+	to {
+		transform: translate(44px, 44px);
+	}
+}
+@keyframes ib-molecule-float {
+	0%,
+	100% {
+		transform: translateY(0) translateX(0);
+	}
+	33% {
+		transform: translateY(-22px) translateX(10px);
+	}
+	66% {
+		transform: translateY(10px) translateX(-12px);
+	}
+}
+@keyframes ib-blink {
+	0%,
+	100% {
+		box-shadow: 0 0 0 0 rgba(52, 211, 153, 0.7);
+	}
+	50% {
+		box-shadow: 0 0 0 6px rgba(52, 211, 153, 0);
+	}
+}
+@keyframes ib-ticker {
+	0%,
+	14% {
+		transform: translateY(0);
+	}
+	16.6%,
+	31% {
+		transform: translateY(-2rem);
+	}
+	33.3%,
+	48% {
+		transform: translateY(-4rem);
+	}
+	50%,
+	64.6% {
+		transform: translateY(-6rem);
+	}
+	66.6%,
+	81% {
+		transform: translateY(-8rem);
+	}
+	83.3%,
+	98% {
+		transform: translateY(-10rem);
+	}
+	100% {
+		transform: translateY(-12rem);
+	}
+}
+@keyframes ib-progress {
+	0% {
+		width: 4%;
+	}
+	30% {
+		width: 64%;
+	}
+	42% {
+		width: 66%;
+	} /* the classic mid-load stall */
+	68% {
+		width: 94%;
+	}
+	80% {
+		width: 99%;
+	} /* so close... */
+	82% {
+		width: 99%;
+	}
+	84% {
+		width: 13%;
+	} /* ...and back to the start. it's infinity, baby */
+	100% {
+		width: 41%;
+	}
+}
+
+/* Respect users who asked for less motion: freeze everything, keep it legible. */
+@media (prefers-reduced-motion: reduce) {
+	.screen::before,
+	.orbA,
+	.orbB,
+	.molecule,
+	.logo,
+	.orbit,
+	.stage::before,
+	.dot,
+	.tickerList,
+	.fill {
+		animation: none !important;
+	}
+	.fill {
+		width: 66%;
+	}
+	.tickerList {
+		transform: translateY(0);
+	}
+}

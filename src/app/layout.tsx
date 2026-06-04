@@ -21,6 +21,12 @@ export const metadata = rootMetadata;
 export default function RootLayout(props: { children: ReactNode }) {
 	const { children } = props;
 
+	// During a site-wide takedown (see src/middleware.ts) every route renders the
+	// standalone /maintenance screen, so suppress the storefront overlays — the
+	// research-use gate and the Klaviyo newsletter popup — that would otherwise
+	// cover it. Read from env (not headers()) so normal pages aren't forced dynamic.
+	const maintenanceMode = process.env.MAINTENANCE_MODE === "1";
+
 	return (
 		<html
 			lang={localeConfig.htmlLang}
@@ -30,11 +36,11 @@ export default function RootLayout(props: { children: ReactNode }) {
 			<body className="min-h-dvh font-sans" suppressHydrationWarning>
 				<ThemeProvider>
 					{children}
-					<ResearchGate />
+					{!maintenanceMode && <ResearchGate />}
 				</ThemeProvider>
 				<DraftModeNotification />
 				<GoogleAnalytics />
-				<Klaviyo />
+				{!maintenanceMode && <Klaviyo />}
 				<Analytics />
 				{/* Web Vitals collection — the dependency was installed but never rendered */}
 				<SpeedInsights />
