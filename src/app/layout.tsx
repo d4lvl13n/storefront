@@ -6,6 +6,7 @@ import { Analytics } from "@vercel/analytics/react";
 import { SpeedInsights } from "@vercel/speed-insights/next";
 import { DraftModeNotification } from "@/ui/components/draft-mode-notification";
 import { GoogleAnalytics } from "@/ui/components/google-analytics";
+import { GoogleTagManager, GoogleTagManagerNoscript } from "@/ui/components/google-tag-manager";
 import { Klaviyo } from "@/ui/components/klaviyo";
 import { ThemeProvider } from "@/ui/providers/theme-provider";
 import { ResearchGate } from "@/ui/components/research-gate";
@@ -34,6 +35,10 @@ export default function RootLayout(props: { children: ReactNode }) {
 			suppressHydrationWarning
 		>
 			<body className="min-h-dvh font-sans" suppressHydrationWarning>
+				{/* First in <body>: parser-executed GTM bootstrap (+ preload hoisted to
+				    <head>), then the noscript iframe — per Google's placement rules. */}
+				<GoogleTagManager />
+				<GoogleTagManagerNoscript />
 				<ThemeProvider>
 					{children}
 					{!maintenanceMode && <ResearchGate />}

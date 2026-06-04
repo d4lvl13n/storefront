@@ -31,7 +31,8 @@ const REPORT_ONLY_CSP = [
 	"img-src 'self' data: blob: https:",
 	"font-src 'self' data:",
 	`connect-src 'self' ${SALEOR_ORIGIN} ${SELLABROAD} ${STRIPE} ${KLAVIYO} ${GA} ${VERCEL}`,
-	`frame-src 'self' https://js.stripe.com https://hooks.stripe.com ${SELLABROAD}`,
+	// www.googletagmanager.com in frame-src is for the GTM <noscript> iframe
+	`frame-src 'self' https://js.stripe.com https://hooks.stripe.com https://www.googletagmanager.com ${SELLABROAD}`,
 	`form-action 'self' ${SELLABROAD}`,
 ]
 	.join("; ")
