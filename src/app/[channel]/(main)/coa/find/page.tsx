@@ -2,8 +2,8 @@ import type { Metadata } from "next";
 
 import { buildPageMetadata, noIndexRobots } from "@/lib/seo";
 import { fetchCoaIndex } from "@/lib/coa/registry";
-import { type CoaIndexEntry } from "@/lib/coa/schema";
 import { LinkWithChannel } from "@/ui/atoms/link-with-channel";
+import { CoaProductPicker } from "./coa-product-picker";
 
 export const dynamic = "force-dynamic"; // recall flips must reach the picker immediately
 
@@ -37,7 +37,7 @@ export default async function CoaFindPage(props: { params: Promise<Params> }) {
 	await props.params;
 
 	const result = await fetchCoaIndex();
-	const groups = result.ok ? groupByPeptide(result.index.entries) : null;
+	const entries = result.ok ? result.index.entries : null;
 
 	return (
 		<section className="relative overflow-hidden bg-background text-foreground">
@@ -47,88 +47,65 @@ export default async function CoaFindPage(props: { params: Promise<Params> }) {
 				<div className="bg-teal-500/6 absolute bottom-0 right-1/4 h-[500px] w-[500px] rounded-full blur-[150px]" />
 			</div>
 
-			<div className="relative mx-auto max-w-3xl px-6 py-16 sm:py-20">
-				<div className="mb-8 text-center">
+			<div className="relative mx-auto max-w-xl px-6 py-16 sm:py-24">
+				{/* Header */}
+				<div className="animate-[ib-card-enter_0.5s_ease-out_both] text-center">
 					<p className="mb-4 text-sm font-medium uppercase tracking-[0.25em] text-emerald-400">
 						Certificates of Analysis
 					</p>
-					<h1 className="text-3xl font-bold tracking-tight sm:text-4xl lg:text-5xl">
-						Find your Certificate of Analysis
-					</h1>
-					<p className="mx-auto mt-5 max-w-lg text-base leading-relaxed text-muted-foreground">
+					<h1 className="text-3xl font-bold tracking-tight sm:text-4xl">Find your Certificate</h1>
+					<p className="mx-auto mt-4 max-w-md text-sm leading-relaxed text-muted-foreground sm:text-base">
 						Select the product named on your vial label to view the lab report for its production batch.
 					</p>
 				</div>
 
-				{/* Honest disclosure — why this QR shows a list instead of one COA. */}
-				<div className="mb-8 rounded-2xl border border-amber-500/30 bg-amber-500/10 p-5">
-					<div className="flex items-start gap-3">
-						<svg
-							className="mt-0.5 h-5 w-5 shrink-0 text-amber-400"
-							viewBox="0 0 20 20"
-							fill="currentColor"
-							aria-hidden="true"
-						>
-							<path
-								fillRule="evenodd"
-								d="M10 1a9 9 0 100 18 9 9 0 000-18zm0 4a1 1 0 011 1v4a1 1 0 11-2 0V6a1 1 0 011-1zm0 8a1 1 0 100 2 1 1 0 000-2z"
-								clipRule="evenodd"
-							/>
-						</svg>
-						<div className="flex-1 text-sm leading-relaxed">
-							<p className="font-semibold text-amber-300">Why am I seeing a list?</p>
-							<p className="mt-1 text-amber-100/90">
-								A printing error on a recent production run placed the same QR code and batch number on
-								several different products. The <span className="font-semibold">product name</span> printed on
-								your vial is the correct reference — select it below to view the Certificate of Analysis for
-								its actual production batch.
-							</p>
+				{/* Picker terminal card — gradient ring, glass body */}
+				<div className="mt-10 animate-[ib-card-enter_0.55s_ease-out_both] [animation-delay:120ms]">
+					<div className="rounded-2xl bg-gradient-to-b from-emerald-500/40 via-teal-500/10 to-transparent p-px shadow-[0_18px_60px_-30px_rgba(16,185,129,0.45)]">
+						<div className="noise-overlay relative rounded-[calc(1rem-1px)] bg-neutral-950/95 p-6 backdrop-blur-sm sm:p-8">
+							{/* Card heading */}
+							<div className="mb-6 flex items-center gap-3">
+								<span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl border border-emerald-500/25 bg-emerald-500/10 text-emerald-400">
+									<svg
+										className="h-5 w-5"
+										viewBox="0 0 24 24"
+										fill="none"
+										stroke="currentColor"
+										strokeWidth={1.7}
+									>
+										<path
+											strokeLinecap="round"
+											strokeLinejoin="round"
+											d="M9.75 3.104v5.714a2.25 2.25 0 01-.659 1.591L5 14.5M9.75 3.104c-.251.023-.501.05-.75.082m.75-.082a24.301 24.301 0 014.5 0m0 0v5.714c0 .597.237 1.17.659 1.591L19.8 15.3M14.25 3.104c.251.023.501.05.75.082M19.8 15.3l-1.57.393A9.065 9.065 0 0112 15a9.065 9.065 0 00-6.23-.693L5 14.5m14.8.8l1.402 1.402c1.232 1.232.65 3.318-1.067 3.611A48.309 48.309 0 0112 21c-2.773 0-5.491-.235-8.135-.687-1.718-.293-2.3-2.379-1.067-3.61L5 14.5"
+										/>
+									</svg>
+								</span>
+								<div className="min-w-0">
+									<h2 className="text-base font-semibold tracking-tight">Certificate lookup</h2>
+									<p className="text-xs text-muted-foreground">
+										{entries ? `${entries.length} certificates on file` : "Registry connection"}
+									</p>
+								</div>
+							</div>
+
+							{entries && entries.length > 0 ? <CoaProductPicker entries={entries} /> : <UnavailableNotice />}
 						</div>
 					</div>
 				</div>
 
-				{/* Product / batch picker */}
-				{groups && groups.length > 0 ? (
-					<ul className="space-y-4">
-						{groups.map(([product, entries]) => (
-							<li key={product} className="bg-card/40 rounded-2xl border border-border p-5 sm:p-6">
-								<h2 className="text-lg font-semibold tracking-tight text-foreground">{product}</h2>
-								<ul className="divide-border/60 mt-3 divide-y">
-									{entries.map((entry) => (
-										<li key={entry.token}>
-											{/* `via`, not `ref` — the middleware reserves ?ref= for affiliate
-											    capture and strips it with a redirect. */}
-											<LinkWithChannel
-												href={`/coa/${entry.token}?via=label-misprint`}
-												className="group flex flex-wrap items-center gap-x-4 gap-y-1 py-3 transition-colors"
-											>
-												<span className="font-mono text-sm text-foreground">
-													{entry.batch ? `Batch ${entry.batch}` : "Current batch"}
-												</span>
-												{entry.issuedAt && (
-													<span className="text-xs text-muted-foreground">
-														Issued {formatIssuedAt(entry.issuedAt)}
-													</span>
-												)}
-												<StatusChip status={entry.status} />
-												<span className="ml-auto text-sm font-medium text-emerald-400 transition-colors group-hover:text-emerald-300">
-													View COA →
-												</span>
-											</LinkWithChannel>
-										</li>
-									))}
-								</ul>
-							</li>
-						))}
-					</ul>
-				) : (
-					<UnavailableNotice />
-				)}
+				{/* Honest disclosure — why a list instead of one COA */}
+				<div className="mt-6 animate-[ib-card-enter_0.55s_ease-out_both] rounded-xl border border-amber-500/20 bg-amber-500/[0.06] px-4 py-3.5 [animation-delay:220ms]">
+					<p className="text-xs leading-relaxed text-amber-100/80">
+						<span className="font-semibold text-amber-300">Why am I choosing from a list?</span> A printing
+						error on a recent production run placed the same QR code and batch number on several different
+						products. The product name printed on your vial is the correct reference.
+					</p>
+				</div>
 
 				{/* Footer */}
-				<div className="mt-10 space-y-3 border-t border-border pt-6 text-xs leading-relaxed text-muted-foreground">
+				<div className="mt-10 animate-[ib-card-enter_0.55s_ease-out_both] space-y-3 border-t border-border pt-6 text-xs leading-relaxed text-muted-foreground [animation-delay:320ms]">
 					<p>
-						Don&rsquo;t see your product, or unsure which batch you have?{" "}
+						Don&rsquo;t see your product, or unsure which one you have?{" "}
 						<LinkWithChannel
 							href="/contact"
 							className="text-emerald-400 underline underline-offset-2 hover:text-emerald-300"
@@ -154,28 +131,9 @@ export default async function CoaFindPage(props: { params: Promise<Params> }) {
 	);
 }
 
-// ─── Pieces ────────────────────────────────────────────────────
-
-function StatusChip({ status }: { status: CoaIndexEntry["status"] }) {
-	const styles: Record<CoaIndexEntry["status"], { label: string; className: string }> = {
-		active: { label: "Verified", className: "border-emerald-500/30 bg-emerald-500/10 text-emerald-400" },
-		pending: { label: "Pending", className: "border-amber-500/30 bg-amber-500/10 text-amber-400" },
-		superseded: { label: "Updated", className: "border-amber-500/30 bg-amber-500/10 text-amber-400" },
-		recalled: { label: "Recalled", className: "border-red-500/30 bg-red-500/10 text-red-400" },
-	};
-	const { label, className } = styles[status];
-	return (
-		<span
-			className={`inline-flex items-center rounded-full border px-2 py-0.5 text-[10px] font-semibold uppercase tracking-[0.15em] ${className}`}
-		>
-			{label}
-		</span>
-	);
-}
-
 function UnavailableNotice() {
 	return (
-		<div className="bg-card/40 rounded-2xl border border-border p-6 text-center sm:p-8">
+		<div className="rounded-xl border border-border bg-neutral-900/40 p-5 text-center">
 			<p className="text-sm font-semibold text-foreground">
 				The COA directory isn&rsquo;t available right now.
 			</p>
@@ -191,33 +149,4 @@ function UnavailableNotice() {
 			</p>
 		</div>
 	);
-}
-
-// ─── Helpers ───────────────────────────────────────────────────
-
-/** Group entries by product (alphabetical), newest batch first within each. */
-function groupByPeptide(entries: CoaIndexEntry[]): Array<[string, CoaIndexEntry[]]> {
-	const map = new Map<string, CoaIndexEntry[]>();
-	for (const entry of entries) {
-		const group = map.get(entry.product);
-		if (group) {
-			group.push(entry);
-		} else {
-			map.set(entry.product, [entry]);
-		}
-	}
-	for (const group of map.values()) {
-		group.sort((a, b) => (b.issuedAt ?? "").localeCompare(a.issuedAt ?? ""));
-	}
-	return [...map.entries()].sort(([a], [b]) => a.localeCompare(b));
-}
-
-function formatIssuedAt(iso: string): string {
-	try {
-		const date = new Date(iso);
-		if (Number.isNaN(date.getTime())) return iso;
-		return new Intl.DateTimeFormat("en-US", { dateStyle: "long" }).format(date);
-	} catch {
-		return iso;
-	}
 }
