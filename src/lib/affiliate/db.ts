@@ -43,6 +43,10 @@ const SCHEMA_STATEMENTS = [
 		updated_at TIMESTAMPTZ NOT NULL DEFAULT now()
 	)`,
 	`CREATE UNIQUE INDEX IF NOT EXISTS idx_affiliates_code_lower ON affiliates (lower(code))`,
+	// Saleor voucher GID minted at approval — needed to deactivate/delete the
+	// voucher if the affiliate is ever removed. Nullable: legacy rows and
+	// manually-provisioned vouchers don't have it.
+	`ALTER TABLE affiliates ADD COLUMN IF NOT EXISTS voucher_id TEXT`,
 	`CREATE TABLE IF NOT EXISTS commissions (
 		id SERIAL PRIMARY KEY,
 		affiliate_id INTEGER NOT NULL REFERENCES affiliates(id),
@@ -111,13 +115,14 @@ export async function createAffiliate(data: {
 	name: string;
 	email: string;
 	commission_rate: number;
+	voucher_id?: string | null;
 }): Promise<Affiliate> {
 	const sql = await db();
 	const rows = (await sql.query(
-		`INSERT INTO affiliates (code, name, email, commission_rate)
-		 VALUES ($1, $2, $3, $4)
+		`INSERT INTO affiliates (code, name, email, commission_rate, voucher_id)
+		 VALUES ($1, $2, $3, $4, $5)
 		 RETURNING *`,
-		[data.code, data.name, data.email, data.commission_rate],
+		[data.code, data.name, data.email, data.commission_rate, data.voucher_id ?? null],
 	)) as Affiliate[];
 	return rows[0]!;
 }

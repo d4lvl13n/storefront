@@ -145,8 +145,14 @@ export function middleware(request: NextRequest) {
 	const ref = url.searchParams.get("ref");
 	if (!ref) return NextResponse.next();
 
-	// Sanitize: only allow alphanumeric, hyphens, underscores (max 50 chars)
-	const sanitized = ref.replace(/[^a-zA-Z0-9_-]/g, "").slice(0, 50);
+	// Sanitize: only allow alphanumeric, hyphens, underscores (max 50 chars).
+	// Canonical UPPERCASE end-to-end: Saleor's checkout promo-code match is
+	// case-sensitive, and affiliate codes are minted uppercase — `?ref=sarah`
+	// must still apply voucher SARAH.
+	const sanitized = ref
+		.replace(/[^a-zA-Z0-9_-]/g, "")
+		.slice(0, 50)
+		.toUpperCase();
 	if (!sanitized) return NextResponse.next();
 
 	// Strip the ref param from the URL for clean URLs

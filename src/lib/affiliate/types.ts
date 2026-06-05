@@ -5,6 +5,8 @@ export interface Affiliate {
 	email: string;
 	commission_rate: number; // 0.0–1.0 (e.g. 0.15 = 15%)
 	active: boolean;
+	/** Saleor voucher GID minted at approval (null for legacy/manual vouchers). */
+	voucher_id: string | null;
 	created_at: string;
 	updated_at: string;
 }

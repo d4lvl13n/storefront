@@ -32,7 +32,11 @@ export async function approveApplicationAction(formData: FormData): Promise<void
 
 	const channel = String(formData.get("channel") ?? "");
 	const applicationId = Number(formData.get("application_id"));
-	const code = String(formData.get("code") ?? "").trim();
+	// Canonical UPPERCASE end-to-end: the voucher match at checkout is
+	// case-sensitive, and the ?ref= middleware capture uppercases too.
+	const code = String(formData.get("code") ?? "")
+		.trim()
+		.toUpperCase();
 	const ratePct = Number(String(formData.get("rate_pct") ?? "").replace(",", "."));
 	const discountPct = Number(String(formData.get("discount_pct") ?? "").replace(",", "."));
 
@@ -53,6 +57,20 @@ export async function approveApplicationAction(formData: FormData): Promise<void
 		backTo(channel, { err: `Code "${code}" is already in use — pick another.` });
 	}
 
+	// Provision the Saleor voucher FIRST. If it fails, the approval aborts:
+	// the application stays pending, no affiliate is activated, and no email
+	// goes out advertising a code that wouldn't work at checkout. Retrying
+	// after a fix is safe — an already-existing voucher counts as provisioned.
+	const voucher = await createAffiliateVoucher({ code, discountPct, channelSlug: channel });
+	if (!voucher.ok) {
+		backTo(channel, {
+			err:
+				`Approval NOT completed — the Saleor voucher couldn't be created (${voucher.reason}). ` +
+				`Fix the app permission (MANAGE_DISCOUNTS on SALEOR_APP_TOKEN) or create voucher "${code}" ` +
+				`manually in the Dashboard (${discountPct}% entire order), then approve again with the same code.`,
+		});
+	}
+
 	const application = await updateApplicationStatus(applicationId, "approved");
 	if (!application) backTo(channel, { err: "Application not found." });
 
@@ -61,21 +79,20 @@ export async function approveApplicationAction(formData: FormData): Promise<void
 		name: application.name,
 		email: application.email,
 		commission_rate: Math.round(ratePct * 100) / 10000,
+		voucher_id: voucher.voucherId,
 	});
-
-	// Create the matching Saleor voucher automatically (fail-soft: falls back
-	// to manual instructions so a missing permission never blocks approval).
-	const voucher = await createAffiliateVoucher({ code, discountPct, channelSlug: channel });
 
 	const emailed = await notifyApplicationApproved(affiliate);
 
 	backTo(channel, {
 		ok:
 			`Approved ${application.name} as "${affiliate.code}" — ${ratePct}% commission, ${discountPct}% customer discount.` +
-			(emailed ? " They've been emailed their referral link." : " ⚠ Email failed — contact them manually.") +
-			(voucher.ok
-				? ` Voucher "${affiliate.code}" created in Saleor — the program is live for them.`
-				: ` ⚠ Voucher not created automatically (${voucher.reason}) — create "${affiliate.code}" manually in the Saleor Dashboard (Catalog → Vouchers, ${discountPct}% entire order).`),
+			(voucher.alreadyExisted
+				? ` Voucher "${affiliate.code}" already existed in Saleor — reused.`
+				: ` Voucher "${affiliate.code}" created in Saleor.`) +
+			(emailed
+				? " They've been emailed their referral link — the program is live for them."
+				: " ⚠ Email failed — send them their code manually."),
 	});
 }
 
