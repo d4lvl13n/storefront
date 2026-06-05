@@ -504,3 +504,14 @@ only the product name on the label is correct.
 - Remaining unshipped stock from the affected run should be re-stickered with
   correct per-batch labels; the web mitigation only needs to cover units
   already shipped.
+
+### Update (June 5, 2026 — multi-lab reports)
+
+A token can now carry **multiple lab reports** via a `pdfs[]` array on the
+record — one entry per lab: `{ labName, pdfUrl, pdfSha256, issuedAt }`.
+Top-level `pdfUrl`/`pdfSha256` mirror `pdfs[0]` for backward compat. The
+storefront prefers `pdfs[]` and renders one embed + per-lab fingerprint
+panel per entry; it also offers an in-browser fingerprint check (Web Crypto
+over a locally selected file — nothing uploaded). Never hardcode hashes:
+always read `pdfSha256` from the live record (the 2026H1401 dual-lab
+fingerprints were re-issued as per-lab originals).

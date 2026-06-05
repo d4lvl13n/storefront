@@ -74,10 +74,25 @@ const CoaTraceabilityFields = {
 	saleorVariantId: z.string().min(1).max(500).optional(),
 };
 
-const PublishedCoaFields = {
-	token: z.string().regex(COA_TOKEN_REGEX, "Token must match XXXX-XXXX-XXXX format"),
+/**
+ * One lab report. A token may carry several (e.g. dual-lab testing) via the
+ * record's `pdfs[]` array; each entry keeps its own URL + published SHA-256.
+ */
+export const CoaLabPdfSchema = z.object({
+	labName: z.string().min(1).max(200).optional(),
 	pdfUrl: pdfUrlSchema,
 	pdfSha256: z.string().regex(SHA256_HEX_REGEX, "pdfSha256 must be a 64-char hex digest"),
+	issuedAt: z.string().regex(ISO_DATE_LOOSE, "issuedAt must be ISO 8601 (date or datetime)").optional(),
+});
+export type CoaLabPdf = z.infer<typeof CoaLabPdfSchema>;
+
+const PublishedCoaFields = {
+	token: z.string().regex(COA_TOKEN_REGEX, "Token must match XXXX-XXXX-XXXX format"),
+	// Top-level pdfUrl/pdfSha256 mirror pdfs[0] (backward compat). Prefer
+	// `pdfs[]` when present; fall back to these only when it's missing.
+	pdfUrl: pdfUrlSchema,
+	pdfSha256: z.string().regex(SHA256_HEX_REGEX, "pdfSha256 must be a 64-char hex digest"),
+	pdfs: z.array(CoaLabPdfSchema).min(1).optional(),
 	batchNumber: z.string().min(1).max(200),
 	peptideName: z.string().min(1).max(200),
 	issuedAt: z.string().regex(ISO_DATE_LOOSE, "issuedAt must be ISO 8601 (date or datetime)"),

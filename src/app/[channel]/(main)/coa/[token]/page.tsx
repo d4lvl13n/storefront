@@ -4,9 +4,10 @@ import { notFound, redirect } from "next/navigation";
 import { buildPageMetadata, noIndexRobots } from "@/lib/seo";
 import { lookupCoa } from "@/lib/coa/registry";
 import { normalizeToken } from "@/lib/coa/token";
-import { type PublicCoa, toPublicCoa } from "@/lib/coa/schema";
+import { type CoaLabPdf, type PublicCoa, toPublicCoa } from "@/lib/coa/schema";
 import { LinkWithChannel } from "@/ui/atoms/link-with-channel";
 import { CopyTokenButton } from "./copy-token-button";
+import { VerifyPdfFile } from "./verify-pdf-file";
 
 export const dynamic = "force-dynamic"; // never cache the rendered HTML — status flips matter
 
@@ -115,7 +116,7 @@ export default async function CoaVerificationPage(props: {
 				) : (
 					<>
 						{coa.status === "superseded" && <SupersededBanner coa={coa} />}
-						<PdfEmbed coa={coa} />
+						<LabReports coa={coa} />
 					</>
 				)}
 
@@ -286,33 +287,61 @@ function MetaCell({ label, value, mono = false }: { label: string; value: string
 	);
 }
 
-// ─── PDF embed ─────────────────────────────────────────────────
+// ─── PDF embeds (one per lab report) ───────────────────────────
 
-function PdfEmbed({ coa }: { coa: PublishedCoa }) {
+/**
+ * A token can carry several lab reports via `pdfs[]` (e.g. dual-lab testing).
+ * Top-level pdfUrl/pdfSha256 mirror pdfs[0] for backward compat — prefer the
+ * array, fall back to the top-level fields when it's absent.
+ */
+function getLabPdfs(coa: PublishedCoa): CoaLabPdf[] {
+	if (coa.pdfs?.length) return coa.pdfs;
+	return [{ labName: coa.labName, pdfUrl: coa.pdfUrl, pdfSha256: coa.pdfSha256, issuedAt: coa.issuedAt }];
+}
+
+function LabReports({ coa }: { coa: PublishedCoa }) {
+	const pdfs = getLabPdfs(coa);
+	return (
+		<div className="space-y-10">
+			{pdfs.map((pdf) => (
+				<PdfEmbed key={pdf.pdfUrl} coa={coa} pdf={pdf} multiple={pdfs.length > 1} />
+			))}
+		</div>
+	);
+}
+
+function PdfEmbed({ coa, pdf, multiple }: { coa: PublishedCoa; pdf: CoaLabPdf; multiple: boolean }) {
 	return (
 		<div className="space-y-3">
-			<div className="flex items-center justify-between gap-3">
+			<div className="flex flex-wrap items-center justify-between gap-3">
 				<p className="text-sm text-muted-foreground">
-					Original lab document for batch <span className="font-mono text-foreground">{coa.batchNumber}</span>
-					.
+					{pdf.labName ? (
+						<>
+							Lab report by <span className="font-medium text-foreground">{pdf.labName}</span>
+							{pdf.issuedAt && <> — issued {formatIssuedAt(pdf.issuedAt)}</>} for batch{" "}
+							<span className="font-mono text-foreground">{coa.batchNumber}</span>.
+						</>
+					) : (
+						<>
+							Original lab document for batch{" "}
+							<span className="font-mono text-foreground">{coa.batchNumber}</span>.
+						</>
+					)}
 				</p>
 				<a
-					href={coa.pdfUrl}
+					href={pdf.pdfUrl}
 					target="_blank"
 					rel="noopener noreferrer"
-					className="inline-flex items-center gap-2 rounded-full border border-border bg-secondary px-3 py-1.5 text-xs font-medium text-muted-foreground transition-colors hover:border-emerald-500/40 hover:text-foreground"
+					className="rounded-full border border-border bg-secondary px-3 py-1.5 text-xs font-medium text-muted-foreground transition-colors hover:border-emerald-500/40 hover:text-foreground"
 				>
-					<svg className="h-3.5 w-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-						<path strokeLinecap="round" strokeLinejoin="round" d="M12 10v6m0 0l-3-3m3 3l3-3m-9 6h12" />
-					</svg>
 					Download PDF
 				</a>
 			</div>
 			<div className="bg-card/30 overflow-hidden rounded-2xl border border-border">
 				<iframe
-					title={`Certificate of Analysis — ${coa.peptideName}`}
-					src={coa.pdfUrl}
-					className="h-[85vh] w-full"
+					title={`Certificate of Analysis — ${coa.peptideName}${pdf.labName ? ` (${pdf.labName})` : ""}`}
+					src={pdf.pdfUrl}
+					className={multiple ? "h-[70vh] w-full" : "h-[85vh] w-full"}
 					// Most modern browsers honour this; mobile Safari ignores and shows
 					// a preview which still renders fine. The Download PDF link above is
 					// the reliable fallback.
@@ -326,7 +355,7 @@ function PdfEmbed({ coa }: { coa: PublishedCoa }) {
 			    command is reserved for users who'll know what to do with it. */}
 			<details className="bg-card/30 group rounded-xl border border-border p-4">
 				<summary className="flex cursor-pointer items-center justify-between text-xs font-medium uppercase tracking-[0.18em] text-muted-foreground transition-colors hover:text-foreground">
-					<span>Confirm this PDF is the original</span>
+					<span>Confirm this PDF is the original{pdf.labName ? ` (${pdf.labName})` : ""}</span>
 					<svg
 						className="h-3 w-3 transition-transform group-open:rotate-180"
 						viewBox="0 0 12 12"
@@ -344,17 +373,19 @@ function PdfEmbed({ coa }: { coa: PublishedCoa }) {
 				</summary>
 				<div className="mt-3 space-y-3 text-xs leading-relaxed text-muted-foreground">
 					<p>
-						Each COA has a unique &ldquo;digital fingerprint&rdquo; — like a tamper-evident seal. If even one
-						character of the PDF changes, the fingerprint changes too. We published this fingerprint the day
-						the batch was tested:
+						Each lab report has a unique &ldquo;digital fingerprint&rdquo; — like a tamper-evident seal. If
+						even one character of the PDF changes, the fingerprint changes too. We published this fingerprint
+						the day the report was issued:
 					</p>
 					<p className="bg-secondary/60 select-all break-all rounded-md px-3 py-2 font-mono text-foreground">
-						{coa.pdfSha256}
+						{pdf.pdfSha256}
 					</p>
 					<p>
-						If you&rsquo;re archiving the document or auditing your supply chain, you can check that the file
-						you downloaded matches:
+						Download the PDF, then check the file you have matches — right here in your browser (nothing is
+						uploaded):
 					</p>
+					<VerifyPdfFile expectedSha256={pdf.pdfSha256} />
+					<p>Or from a terminal:</p>
 					<ul className="space-y-1.5 pl-4">
 						<li>
 							<span className="text-foreground">Mac or Linux:</span> open Terminal, run{" "}

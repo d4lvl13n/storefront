@@ -50,6 +50,55 @@ describe("CoaRecordSchema — shared status", () => {
 		expect(CoaRecordSchema.safeParse(activeRecord).success).toBe(true);
 	});
 
+	it("accepts a record with a pdfs[] array (multi-lab)", () => {
+		const parsed = CoaRecordSchema.safeParse({
+			...activeRecord,
+			labName: "Freedom Diagnostics & Vanguard Laboratory",
+			pdfs: [
+				{
+					labName: "Freedom Diagnostics",
+					pdfUrl: "https://example.com/media/coa/A-F.pdf",
+					pdfSha256: "b".repeat(64),
+					issuedAt: "2026-05-18",
+				},
+				{
+					labName: "Vanguard Laboratory",
+					pdfUrl: "https://example.com/media/coa/A-V.pdf",
+					pdfSha256: "c".repeat(64),
+					issuedAt: "2026-05-28",
+				},
+			],
+		});
+		expect(parsed.success).toBe(true);
+		if (parsed.success && parsed.data.status === "active") {
+			expect(parsed.data.pdfs).toHaveLength(2);
+		}
+	});
+
+	it("accepts a record without pdfs[] (backward compat)", () => {
+		const parsed = CoaRecordSchema.safeParse(activeRecord);
+		expect(parsed.success).toBe(true);
+		if (parsed.success && parsed.data.status === "active") {
+			expect(parsed.data.pdfs).toBeUndefined();
+		}
+	});
+
+	it("rejects an empty pdfs[] array and malformed entries", () => {
+		expect(CoaRecordSchema.safeParse({ ...activeRecord, pdfs: [] }).success).toBe(false);
+		expect(
+			CoaRecordSchema.safeParse({
+				...activeRecord,
+				pdfs: [{ pdfUrl: "javascript:alert(1)", pdfSha256: "b".repeat(64) }],
+			}).success,
+		).toBe(false);
+		expect(
+			CoaRecordSchema.safeParse({
+				...activeRecord,
+				pdfs: [{ pdfUrl: "https://example.com/media/coa/A.pdf", pdfSha256: "not-a-hash" }],
+			}).success,
+		).toBe(false);
+	});
+
 	it("toPublicCoa strips saleorVariantId from shared records", () => {
 		const parsed = CoaRecordSchema.parse({
 			token: TOKEN_A,
