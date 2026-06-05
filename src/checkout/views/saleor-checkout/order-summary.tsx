@@ -49,6 +49,8 @@ interface OrderSummaryProps {
 // Data Adapters
 // ============================================================================
 
+const roundMoney = (value: number) => Math.round(value * 100) / 100;
+
 function extractCheckoutData(checkout: CheckoutFragment): OrderSummaryData {
 	const lines: LineItem[] = checkout.lines.map((line) => {
 		const variantImage = line.variant?.media?.find((m) => m.type === "IMAGE");
@@ -59,6 +61,13 @@ function extractCheckoutData(checkout: CheckoutFragment): OrderSummaryData {
 				?.map((attr) => attr.values[0]?.name)
 				.filter((name): name is string => Boolean(name)) || [];
 
+		// Saleor distributes voucher discounts into line.totalPrice — display the
+		// pre-discount price instead, and surface savings as a separate Discount row.
+		const undiscountedTotal =
+			line.undiscountedUnitPrice?.amount != null
+				? roundMoney(line.undiscountedUnitPrice.amount * line.quantity)
+				: line.totalPrice?.gross?.amount || 0;
+
 		return {
 			id: line.id,
 			quantity: line.quantity,
@@ -66,17 +75,22 @@ function extractCheckoutData(checkout: CheckoutFragment): OrderSummaryData {
 			attributes,
 			imageUrl: image?.url,
 			imageAlt: image?.alt,
-			totalAmount: line.totalPrice?.gross?.amount || 0,
+			totalAmount: undiscountedTotal,
 		};
 	});
+
+	// Pre-discount subtotal; the Discount row is the difference vs Saleor's
+	// (already discounted) subtotalPrice, so Subtotal − Discount + Shipping = Total.
+	const subtotal = roundMoney(lines.reduce((acc, line) => acc + line.totalAmount, 0));
+	const discount = Math.max(0, roundMoney(subtotal - (checkout.subtotalPrice?.gross?.amount || 0)));
 
 	return {
 		lines,
 		currency: checkout.totalPrice?.gross?.currency || localeConfig.fallbackCurrency,
-		subtotal: checkout.subtotalPrice?.gross?.amount || 0,
+		subtotal,
 		shipping: checkout.shippingPrice?.gross?.amount || 0,
 		tax: checkout.totalPrice?.tax?.amount || 0,
-		discount: checkout.discount?.amount || 0,
+		discount,
 		total: checkout.totalPrice?.gross?.amount || 0,
 		editable: true,
 	};
@@ -89,6 +103,12 @@ function extractOrderData(order: OrderFragment): OrderSummaryData {
 				?.map((attr) => attr.values[0]?.name)
 				.filter((name): name is string => Boolean(name)) || [];
 
+		// Same as checkout: show pre-discount line prices, savings go in the Discount row.
+		const undiscountedTotal =
+			line.undiscountedUnitPrice?.gross?.amount != null
+				? roundMoney(line.undiscountedUnitPrice.gross.amount * line.quantity)
+				: line.totalPrice?.gross?.amount || 0;
+
 		return {
 			id: line.id,
 			quantity: line.quantity,
@@ -96,16 +116,17 @@ function extractOrderData(order: OrderFragment): OrderSummaryData {
 			attributes,
 			imageUrl: line.thumbnail?.url,
 			imageAlt: line.thumbnail?.alt,
-			totalAmount: line.totalPrice?.gross?.amount || 0,
+			totalAmount: undiscountedTotal,
 		};
 	});
 
-	const discount = order.discounts?.reduce((sum, d) => sum + (d.amount?.amount || 0), 0) || 0;
+	const subtotal = roundMoney(lines.reduce((acc, line) => acc + line.totalAmount, 0));
+	const discount = Math.max(0, roundMoney(subtotal - (order.subtotal?.gross?.amount || 0)));
 
 	return {
 		lines,
 		currency: order.total?.gross?.currency || localeConfig.fallbackCurrency,
-		subtotal: order.subtotal?.gross?.amount || 0,
+		subtotal,
 		shipping: order.shippingPrice?.gross?.amount || 0,
 		tax: order.total?.tax?.amount || 0,
 		discount,
