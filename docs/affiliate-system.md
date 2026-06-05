@@ -2,6 +2,17 @@
 
 ## Overview
 
+> **Update (June 5, 2026):** Storage migrated from SQLite to **Neon Postgres**
+> (the SQLite file silently broke when the storefront moved to Vercel's
+> read-only serverless filesystem). `src/lib/affiliate/db.ts` now uses
+> `@neondatabase/serverless` with `DATABASE_URL` injected by the Vercel↔Neon
+> integration. Email notifications via Resend were added: ops alert +
+> applicant confirmation on application, code/link email on approval,
+> courtesy note on rejection (`src/lib/affiliate/notify.ts`, all fail-soft).
+> Re-application after rejection now updates the row in place. Rate limiting
+> is backed by the DB (in-memory counters reset per lambda). The SQLite
+> backup section below is obsolete — Neon handles durability/PITR.
+
 The affiliate system lets partners earn commissions by referring customers to InfinityBio Labs. It uses Saleor's voucher codes for attribution, a SQLite database for commission tracking, and a public application page for onboarding.
 
 ## Architecture

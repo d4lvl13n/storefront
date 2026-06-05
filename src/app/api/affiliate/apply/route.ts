@@ -1,5 +1,12 @@
 import { NextRequest } from "next/server";
-import { createApplication, getApplicationByEmail } from "@/lib/affiliate/db";
+import {
+	countRecentApplicationsByIp,
+	createApplication,
+	getApplicationByEmail,
+	isUniqueViolation,
+	resubmitApplication,
+} from "@/lib/affiliate/db";
+import { notifyApplicationReceived } from "@/lib/affiliate/notify";
 
 // ============================================================================
 // Rate limiting (in-memory, same pattern as revalidate route)
@@ -79,28 +86,61 @@ export async function POST(request: NextRequest) {
 		return Response.json({ error: errors.join(". ") }, { status: 400 });
 	}
 
-	// Check for duplicate email
-	const existing = getApplicationByEmail(email);
-	if (existing) {
-		if (existing.status === "pending") {
-			return Response.json(
-				{ error: "An application with this email is already under review." },
-				{ status: 409 },
-			);
-		}
-		if (existing.status === "approved") {
-			return Response.json(
-				{ error: "This email is already registered in our affiliate program." },
-				{ status: 409 },
-			);
-		}
-		// If rejected, allow re-application (they might have updated their approach)
-	}
-
 	try {
-		const application = createApplication({ name, email, website, social_media, promotion_plan });
+		// Durable rate limit (the in-memory check above resets per lambda
+		// instance on Vercel; this one survives cold starts).
+		if (ip !== "unknown" && (await countRecentApplicationsByIp(ip)) >= RATE_LIMIT_MAX) {
+			return Response.json(
+				{ error: "Too many requests. Please try again later." },
+				{ status: 429, headers: { "Retry-After": "900" } },
+			);
+		}
+
+		// Check for duplicate email
+		const existing = await getApplicationByEmail(email);
+		if (existing) {
+			if (existing.status === "pending") {
+				return Response.json(
+					{ error: "An application with this email is already under review." },
+					{ status: 409 },
+				);
+			}
+			if (existing.status === "approved") {
+				return Response.json(
+					{ error: "This email is already registered in our affiliate program." },
+					{ status: 409 },
+				);
+			}
+			// Rejected → allow re-application (they might have updated their
+			// approach). The email column is unique, so update in place.
+		}
+
+		const application = existing
+			? await resubmitApplication(existing.id, {
+					name,
+					website,
+					social_media,
+					promotion_plan,
+					ip: ip === "unknown" ? undefined : ip,
+				})
+			: await createApplication({
+					name,
+					email,
+					website,
+					social_media,
+					promotion_plan,
+					ip: ip === "unknown" ? undefined : ip,
+				});
+
+		if (!application) {
+			// Rejected row vanished between read and update — treat as conflict.
+			return Response.json({ error: "An application with this email already exists." }, { status: 409 });
+		}
 
 		console.log(`[Affiliate] New application from ${name} (${email})`);
+
+		// Fail-soft: alert ops + confirm to the applicant. Never blocks the 201.
+		await notifyApplicationReceived(application);
 
 		return Response.json(
 			{
@@ -112,8 +152,8 @@ export async function POST(request: NextRequest) {
 			{ status: 201 },
 		);
 	} catch (error) {
-		// Handle unique constraint violation (race condition on duplicate email)
-		if (error instanceof Error && error.message.includes("UNIQUE constraint")) {
+		// Unique-constraint violation = race condition on duplicate email
+		if (isUniqueViolation(error)) {
 			return Response.json({ error: "An application with this email already exists." }, { status: 409 });
 		}
 		console.error("[Affiliate] Application error:", error);

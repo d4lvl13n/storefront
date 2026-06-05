@@ -75,14 +75,14 @@ export async function POST(request: NextRequest) {
 	}
 
 	// Check if we already recorded a commission for this order (idempotency)
-	const existing = getCommissionByOrderId(order.id);
+	const existing = await getCommissionByOrderId(order.id);
 	if (existing) {
 		console.log(`[Affiliate Webhook] Commission already recorded for order ${order.id}`);
 		return Response.json({ ok: true, skipped: true, reason: "duplicate" });
 	}
 
 	// Look up the affiliate by voucher code
-	const affiliate = getAffiliateByCode(voucherCode);
+	const affiliate = await getAffiliateByCode(voucherCode);
 	if (!affiliate) {
 		console.log(`[Affiliate Webhook] Voucher "${voucherCode}" is not an affiliate code, skipping`);
 		return Response.json({ ok: true, skipped: true });
@@ -105,7 +105,7 @@ export async function POST(request: NextRequest) {
 	// Commission is calculated on the order total (after discount)
 	const commissionAmount = Math.round(orderTotal * affiliate.commission_rate * 100) / 100;
 
-	const commission = recordCommission({
+	const commission = await recordCommission({
 		affiliate_id: affiliate.id,
 		order_id: order.id,
 		order_number: order.number ?? "",

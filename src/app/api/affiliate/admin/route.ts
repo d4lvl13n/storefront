@@ -9,6 +9,7 @@ import {
 	updateApplicationStatus,
 	updateCommissionStatus,
 } from "@/lib/affiliate/db";
+import { notifyApplicationApproved, notifyApplicationRejected } from "@/lib/affiliate/notify";
 
 const ADMIN_SECRET = process.env.AFFILIATE_ADMIN_SECRET;
 
@@ -46,7 +47,7 @@ export async function GET(request: NextRequest) {
 	const view = params.get("view") || "affiliates";
 
 	if (view === "affiliates") {
-		const affiliates = listAffiliates();
+		const affiliates = await listAffiliates();
 		return Response.json({ affiliates });
 	}
 
@@ -56,7 +57,7 @@ export async function GET(request: NextRequest) {
 		const limit = parseInt(params.get("limit") || "50", 10);
 		const offset = parseInt(params.get("offset") || "0", 10);
 
-		const result = listCommissions({
+		const result = await listCommissions({
 			affiliate_id: affiliateId ? parseInt(affiliateId, 10) : undefined,
 			status: status || undefined,
 			limit: Math.min(limit, 200),
@@ -71,7 +72,7 @@ export async function GET(request: NextRequest) {
 		const limit = parseInt(params.get("limit") || "50", 10);
 		const offset = parseInt(params.get("offset") || "0", 10);
 
-		const result = listApplications({
+		const result = await listApplications({
 			status: status || undefined,
 			limit: Math.min(limit, 200),
 			offset,
@@ -134,12 +135,12 @@ export async function POST(request: NextRequest) {
 			}
 
 			// Check for duplicate code
-			const existing = getAffiliateByCode(code);
+			const existing = await getAffiliateByCode(code);
 			if (existing) {
 				return Response.json({ error: `Affiliate code "${code}" already exists` }, { status: 409 });
 			}
 
-			const affiliate = createAffiliate({ code, name, email, commission_rate });
+			const affiliate = await createAffiliate({ code, name, email, commission_rate });
 			return Response.json({ affiliate }, { status: 201 });
 		}
 
@@ -165,7 +166,7 @@ export async function POST(request: NextRequest) {
 
 			// Remove the action field from updates
 			const { action: _, ...cleanUpdates } = updates as Record<string, unknown>;
-			const affiliate = updateAffiliate(id, cleanUpdates as Parameters<typeof updateAffiliate>[1]);
+			const affiliate = await updateAffiliate(id, cleanUpdates as Parameters<typeof updateAffiliate>[1]);
 
 			if (!affiliate) {
 				return Response.json({ error: "Affiliate not found" }, { status: 404 });
@@ -185,7 +186,7 @@ export async function POST(request: NextRequest) {
 				return Response.json({ error: "Status must be 'pending', 'approved', or 'paid'" }, { status: 400 });
 			}
 
-			const updated = updateCommissionStatus(ids, status as "pending" | "approved" | "paid");
+			const updated = await updateCommissionStatus(ids, status as "pending" | "approved" | "paid");
 			return Response.json({ updated });
 		}
 
@@ -209,26 +210,29 @@ export async function POST(request: NextRequest) {
 			}
 
 			// Check code isn't already taken
-			const existingCode = getAffiliateByCode(code);
+			const existingCode = await getAffiliateByCode(code);
 			if (existingCode) {
 				return Response.json({ error: `Code "${code}" is already in use` }, { status: 409 });
 			}
 
 			// Update application status
-			const application = updateApplicationStatus(application_id, "approved", notes);
+			const application = await updateApplicationStatus(application_id, "approved", notes);
 			if (!application) {
 				return Response.json({ error: "Application not found" }, { status: 404 });
 			}
 
 			// Create the affiliate record from the application
-			const affiliate = createAffiliate({
+			const affiliate = await createAffiliate({
 				code,
 				name: application.name,
 				email: application.email,
 				commission_rate,
 			});
 
-			return Response.json({ application, affiliate }, { status: 201 });
+			// Fail-soft: send the affiliate their code + referral link.
+			const emailed = await notifyApplicationApproved(affiliate);
+
+			return Response.json({ application, affiliate, emailed }, { status: 201 });
 		}
 
 		case "reject_application": {
@@ -238,12 +242,15 @@ export async function POST(request: NextRequest) {
 				return Response.json({ error: "Missing required field: application_id" }, { status: 400 });
 			}
 
-			const application = updateApplicationStatus(application_id, "rejected", notes);
+			const application = await updateApplicationStatus(application_id, "rejected", notes);
 			if (!application) {
 				return Response.json({ error: "Application not found" }, { status: 404 });
 			}
 
-			return Response.json({ application });
+			// Fail-soft courtesy note to the applicant.
+			const emailed = await notifyApplicationRejected(application, notes);
+
+			return Response.json({ application, emailed });
 		}
 
 		default:
