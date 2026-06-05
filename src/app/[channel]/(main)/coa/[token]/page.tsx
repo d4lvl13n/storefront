@@ -11,8 +11,12 @@ import { CopyTokenButton } from "./copy-token-button";
 export const dynamic = "force-dynamic"; // never cache the rendered HTML — status flips matter
 
 type Params = { channel: string; token: string };
+// `via`, not `ref` — the middleware reserves ?ref= for affiliate capture and
+// strips it from the URL with a redirect before the page would ever see it.
+type SearchParams = { via?: string | string[] };
 type PendingCoa = Extract<PublicCoa, { status: "pending" }>;
-type PublishedCoa = Exclude<PublicCoa, PendingCoa>;
+type SharedCoa = Extract<PublicCoa, { status: "shared" }>;
+type PublishedCoa = Exclude<PublicCoa, PendingCoa | SharedCoa>;
 
 export async function generateMetadata(props: { params: Promise<Params> }): Promise<Metadata> {
 	const { channel, token } = await props.params;
@@ -27,8 +31,17 @@ export async function generateMetadata(props: { params: Promise<Params> }): Prom
 	return { ...base, robots: noIndexRobots };
 }
 
-export default async function CoaVerificationPage(props: { params: Promise<Params> }) {
+export default async function CoaVerificationPage(props: {
+	params: Promise<Params>;
+	searchParams: Promise<SearchParams>;
+}) {
 	const { channel, token: rawToken } = await props.params;
+	const { via } = await props.searchParams;
+	// Customer arrived from the guided picker (/coa/find) that shared
+	// mis-printed QR codes redirect to — their label's batch number is known
+	// to be wrong, so swap the "must match your label" warning for an
+	// explanation. Cosmetic only; spoofing the param changes nothing material.
+	const viaLabelMisprint = via === "label-misprint";
 
 	// 1) Reject malformed tokens early — generic 404 (no existence leak).
 	const canonical = normalizeToken(rawToken);
@@ -72,6 +85,14 @@ export default async function CoaVerificationPage(props: { params: Promise<Param
 	}
 
 	const coa: PublicCoa = toPublicCoa(result.record);
+
+	// Shared / mis-printed token (the same QR was printed on multiple
+	// batches): never assert a single batch's authenticity here — send the
+	// customer to the guided picker instead.
+	if (coa.status === "shared") {
+		redirect(`/${channel}/coa/find`);
+	}
+
 	if (coa.status === "pending") {
 		return <PendingCoaPage coa={coa} />;
 	}
@@ -86,7 +107,7 @@ export default async function CoaVerificationPage(props: { params: Promise<Param
 
 			<div className="relative mx-auto max-w-5xl px-6 py-16 sm:py-20">
 				{/* Header */}
-				<CoaHeader coa={coa} />
+				<CoaHeader coa={coa} viaLabelMisprint={viaLabelMisprint} />
 
 				{/* Status-driven body */}
 				{coa.status === "recalled" ? (
@@ -175,7 +196,7 @@ function PendingCoaPage({ coa }: { coa: PendingCoa }) {
 
 // ─── Header ────────────────────────────────────────────────────
 
-function CoaHeader({ coa }: { coa: PublishedCoa }) {
+function CoaHeader({ coa, viaLabelMisprint }: { coa: PublishedCoa; viaLabelMisprint: boolean }) {
 	const issuedAtLabel = formatIssuedAt(coa.issuedAt);
 
 	return (
@@ -236,10 +257,22 @@ function CoaHeader({ coa }: { coa: PublishedCoa }) {
 				</div>
 			</div>
 
-			<p className="mt-4 text-sm leading-relaxed text-muted-foreground">
-				If the peptide or batch above doesn&rsquo;t match the label on your vial,{" "}
-				<span className="text-emerald-400">contact us</span> before using this product for research.
-			</p>
+			{viaLabelMisprint ? (
+				// Arrived via /coa/find: their label's printed batch number is known
+				// to be wrong, so "must match your label" would contradict reality.
+				<p className="mt-4 text-sm leading-relaxed text-muted-foreground">
+					<span className="font-semibold text-amber-300">About your label:</span> a printing error on a recent
+					production run means the batch number printed on your vial may not match the batch shown above. The{" "}
+					<span className="text-foreground">product name</span> on your label is the correct reference. If
+					that doesn&rsquo;t match the peptide above, <span className="text-emerald-400">contact us</span>{" "}
+					before using this product for research.
+				</p>
+			) : (
+				<p className="mt-4 text-sm leading-relaxed text-muted-foreground">
+					If the peptide or batch above doesn&rsquo;t match the label on your vial,{" "}
+					<span className="text-emerald-400">contact us</span> before using this product for research.
+				</p>
+			)}
 		</div>
 	);
 }

@@ -65,7 +65,7 @@ const pdfUrlSchema = z.string().refine(
 	{ message: "pdfUrl must be HTTPS and within the configured COA registry origin" },
 );
 
-export const CoaStatusSchema = z.enum(["pending", "active", "superseded", "recalled"]);
+export const CoaStatusSchema = z.enum(["pending", "active", "superseded", "recalled", "shared"]);
 export type CoaStatus = z.infer<typeof CoaStatusSchema>;
 
 const CoaTraceabilityFields = {
@@ -123,6 +123,20 @@ export const CoaRecordSchema = z.discriminatedUnion("status", [
 				});
 			}
 		}),
+	// A token that was mistakenly printed on labels across multiple batches
+	// (e.g. the same QR repeated on every product of a print run). The verify
+	// page must NOT assert a single batch's authenticity for these — it
+	// redirects to the guided "find your COA" page (/coa/find) instead.
+	// Only token + status are required so ops can flip a record by replacing
+	// its JSON with `{ "token": "...", "status": "shared" }`; any leftover
+	// published fields are stripped by Zod and never rendered.
+	z.object({
+		token: z.string().regex(COA_TOKEN_REGEX, "Token must match XXXX-XXXX-XXXX format"),
+		status: z.literal("shared"),
+		// Optional operator note documenting why the token was marked shared.
+		note: z.string().max(2000).optional(),
+		...CoaTraceabilityFields,
+	}),
 ]);
 
 export type CoaRecord = z.infer<typeof CoaRecordSchema>;
@@ -149,3 +163,29 @@ export function toPublicCoa(record: CoaRecord): PublicCoa {
 export type CoaLookupResponse =
 	| { ok: true; coa: PublicCoa }
 	| { ok: false; error: "not_found" | "rate_limited" | "server_error"; message: string };
+
+/**
+ * COA index — published by the backend registry at
+ * `${COA_REGISTRY_BASE_URL}/index.json`. Powers the guided "find your COA"
+ * page (`/coa/find`) that mis-printed shared QR codes redirect to.
+ *
+ * Listing tokens here makes them enumerable **by design**: COAs are public
+ * trust assets (product pages already link them); the random 2^60 keyspace
+ * was an anti-guessing measure, never secrecy. Entries never use the
+ * `shared` status — shared tokens are routing artifacts, not selectable
+ * certificates.
+ */
+export const CoaIndexEntrySchema = z.object({
+	token: z.string().regex(COA_TOKEN_REGEX, "Token must match XXXX-XXXX-XXXX format"),
+	peptideName: z.string().min(1).max(200),
+	batchNumber: z.string().min(1).max(200),
+	issuedAt: z.string().regex(ISO_DATE_LOOSE, "issuedAt must be ISO 8601 (date or datetime)").optional(),
+	status: z.enum(["pending", "active", "superseded", "recalled"]),
+});
+export type CoaIndexEntry = z.infer<typeof CoaIndexEntrySchema>;
+
+export const CoaIndexSchema = z.object({
+	updatedAt: z.string().regex(ISO_DATE_LOOSE, "updatedAt must be ISO 8601 (date or datetime)").optional(),
+	entries: z.array(CoaIndexEntrySchema),
+});
+export type CoaIndex = z.infer<typeof CoaIndexSchema>;

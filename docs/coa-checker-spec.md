@@ -432,3 +432,71 @@ page. Unknown fields in the JSON record are ignored.
 | End-to-end smoke test with a real QR printed on a real vial                                                                  | Joint          | 30 min     |
 
 **Total: ~1.5 days end-to-end** if backend and storefront work in parallel.
+
+---
+
+## Addendum — shared / mis-printed QR codes (June 2026 label incident)
+
+A label printing error placed **the same QR code and batch number on every
+product of a production run**. The scanned token therefore cannot identify a
+single batch, and the printed batch number is not a usable reference either —
+only the product name on the label is correct.
+
+### Storefront behaviour (shipped)
+
+- New record status: **`shared`**. A record may be reduced to
+  `{ "token": "XXXX-XXXX-XXXX", "status": "shared", "note": "..." }` — any
+  leftover published fields are stripped by the Zod schema and never rendered.
+- `/coa/<shared-token>` (and `/<channel>/coa/<shared-token>`) redirects to the
+  guided picker at `/<channel>/coa/find` instead of asserting any batch's
+  authenticity.
+- `/coa/find` discloses the printing error, lists published COAs grouped by
+  peptide (from the registry index), and links each batch to its real
+  per-token verification page with `?via=label-misprint`, which swaps the
+  "batch must match your label" warning for an explanation of the misprint.
+- Correctly printed labels are unaffected: their tokens resolve straight to
+  the verification page and never see the picker.
+
+### Backend / registry deliverables (required to activate)
+
+1. **Flip the mis-printed token's record** to `status: "shared"` (status-only
+   mutation — consistent with the existing mutability rules; add `shared` to
+   the allowed status transitions in the admin script).
+2. **Publish an index** at `${COA_REGISTRY_BASE_URL}/index.json`, regenerated
+   whenever a COA is published or a status flips:
+
+   ```json
+   {
+   	"updatedAt": "2026-06-05T10:00:00Z",
+   	"entries": [
+   		{
+   			"token": "A8K2-9F4R-XP73",
+   			"peptideName": "BPC-157",
+   			"batchNumber": "B-2026-014",
+   			"issuedAt": "2026-05-12",
+   			"status": "active"
+   		}
+   	]
+   }
+   ```
+
+   - `entries[].status` ∈ `pending | active | superseded | recalled` —
+     **never `shared`** (shared tokens are routing artifacts, not
+     certificates).
+   - The storefront validates against `CoaIndexSchema`
+     (`src/lib/coa/schema.ts`) and caches for 60 s. A missing `index.json`
+     degrades gracefully (picker shows a contact fallback).
+   - Listing tokens makes them enumerable **by design**: COAs are public
+     trust assets; the random keyspace was anti-guessing, not secrecy.
+
+### Print-pipeline corrective actions (ops, outside this repo)
+
+- Generate the **complete label artwork** (QR + batch number together) from
+  the publish pipeline as one artifact, so components can't be mismatched at
+  the print shop.
+- **First-article check**: scan one label from every print run and confirm
+  the resolved page shows the matching peptide + batch before the roll is
+  applied to vials.
+- Remaining unshipped stock from the affected run should be re-stickered with
+  correct per-batch labels; the web mitigation only needs to cover units
+  already shipped.

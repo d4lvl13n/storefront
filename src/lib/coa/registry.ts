@@ -13,7 +13,7 @@
  * private host config and is not safe to bundle.
  */
 
-import { CoaRecordSchema, type CoaRecord } from "./schema";
+import { CoaIndexSchema, CoaRecordSchema, type CoaIndex, type CoaRecord } from "./schema";
 import { normalizeToken } from "./token";
 
 export type CoaLookupResult =
@@ -98,4 +98,68 @@ export async function lookupCoa(rawToken: unknown): Promise<CoaLookupResult> {
 	}
 
 	return { ok: true, record: parsed.data };
+}
+
+export type CoaIndexResult =
+	| { ok: true; index: CoaIndex }
+	| { ok: false; reason: "not_published" | "registry_unavailable" | "invalid_record" };
+
+/**
+ * Fetch the published COA index (`${COA_REGISTRY_BASE_URL}/index.json`).
+ *
+ * Used by the guided lookup page (`/coa/find`) that shared/mis-printed QR
+ * tokens redirect to. Same hardening posture as `lookupCoa`: no redirects,
+ * short revalidation so status flips (e.g. a recall) reach the picker within
+ * ~60 seconds, Zod validation before anything is rendered.
+ *
+ * - `not_published`        → registry returned 404 (backend hasn't published
+ *                            an index yet). Caller renders a graceful fallback.
+ * - `registry_unavailable` → network / 5xx. Graceful fallback + log.
+ * - `invalid_record`       → JSON parse or schema failure. Graceful fallback + log.
+ */
+export async function fetchCoaIndex(): Promise<CoaIndexResult> {
+	const baseUrl = process.env.COA_REGISTRY_BASE_URL;
+	if (!baseUrl) {
+		console.error("[coa] COA_REGISTRY_BASE_URL is not configured");
+		return { ok: false, reason: "registry_unavailable" };
+	}
+
+	const url = `${baseUrl.replace(/\/+$/, "")}/index.json`;
+
+	let response: Response;
+	try {
+		response = await fetch(url, {
+			next: { revalidate: 60 },
+			redirect: "error",
+			headers: { Accept: "application/json" },
+		});
+	} catch (err) {
+		console.error("[coa] Registry network error fetching index:", err);
+		return { ok: false, reason: "registry_unavailable" };
+	}
+
+	if (response.status === 404) {
+		return { ok: false, reason: "not_published" };
+	}
+
+	if (!response.ok) {
+		console.error(`[coa] Registry returned ${response.status} for index.json`);
+		return { ok: false, reason: "registry_unavailable" };
+	}
+
+	let json: unknown;
+	try {
+		json = await response.json();
+	} catch (err) {
+		console.error("[coa] Registry index JSON parse failed:", err);
+		return { ok: false, reason: "invalid_record" };
+	}
+
+	const parsed = CoaIndexSchema.safeParse(json);
+	if (!parsed.success) {
+		console.error("[coa] Registry index failed validation:", parsed.error.flatten());
+		return { ok: false, reason: "invalid_record" };
+	}
+
+	return { ok: true, index: parsed.data };
 }
