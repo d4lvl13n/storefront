@@ -49,7 +49,7 @@ export default async function CoaFindPage(props: { params: Promise<Params> }) {
 
 			<div className="relative mx-auto max-w-xl px-6 py-16 sm:py-24">
 				{/* Header */}
-				<div className="animate-[ib-card-enter_0.5s_ease-out_both] text-center">
+				<div className="text-center">
 					<p className="mb-4 text-sm font-medium uppercase tracking-[0.25em] text-emerald-400">
 						Certificates of Analysis
 					</p>
@@ -60,7 +60,7 @@ export default async function CoaFindPage(props: { params: Promise<Params> }) {
 				</div>
 
 				{/* Picker terminal card — gradient ring, glass body */}
-				<div className="mt-10 animate-[ib-card-enter_0.55s_ease-out_both] [animation-delay:120ms]">
+				<div className="mt-10">
 					<div className="rounded-2xl bg-gradient-to-b from-emerald-500/40 via-teal-500/10 to-transparent p-px shadow-[0_18px_60px_-30px_rgba(16,185,129,0.45)]">
 						<div className="relative rounded-[calc(1rem-1px)] bg-neutral-950/95 p-6 sm:p-8">
 							{entries && entries.length > 0 ? <CoaProductPicker entries={entries} /> : <UnavailableNotice />}
@@ -69,7 +69,7 @@ export default async function CoaFindPage(props: { params: Promise<Params> }) {
 				</div>
 
 				{/* Honest disclosure — why a list instead of one COA */}
-				<div className="mt-6 animate-[ib-card-enter_0.55s_ease-out_both] rounded-xl border border-amber-500/20 bg-amber-500/[0.06] px-4 py-3.5 [animation-delay:220ms]">
+				<div className="mt-6 rounded-xl border border-amber-500/20 bg-amber-500/[0.06] px-4 py-3.5">
 					<p className="text-xs leading-relaxed text-amber-100/80">
 						<span className="font-semibold text-amber-300">Why am I choosing from a list?</span> A printing
 						error on a recent production run placed the same QR code and batch number on several different
@@ -78,7 +78,7 @@ export default async function CoaFindPage(props: { params: Promise<Params> }) {
 				</div>
 
 				{/* Footer */}
-				<div className="mt-10 animate-[ib-card-enter_0.55s_ease-out_both] space-y-3 border-t border-border pt-6 text-xs leading-relaxed text-muted-foreground [animation-delay:320ms]">
+				<div className="mt-10 space-y-3 border-t border-border pt-6 text-xs leading-relaxed text-muted-foreground">
 					<p>
 						Don&rsquo;t see your product, or unsure which one you have?{" "}
 						<LinkWithChannel

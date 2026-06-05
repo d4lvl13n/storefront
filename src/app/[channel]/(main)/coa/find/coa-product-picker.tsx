@@ -192,7 +192,7 @@ export function CoaProductPicker({ entries }: { entries: CoaIndexEntry[] }) {
 								placeholder="Type to filter…"
 								aria-autocomplete="list"
 								aria-controls="coa-product-listbox"
-								className="h-12 w-full border-b border-neutral-800 bg-transparent px-4 text-base text-white outline-none placeholder:text-neutral-600"
+								className="outline-hidden h-12 w-full border-b border-neutral-800 bg-transparent px-4 text-base text-white placeholder:text-neutral-600"
 							/>
 
 							<ul
@@ -244,7 +244,7 @@ export function CoaProductPicker({ entries }: { entries: CoaIndexEntry[] }) {
 			{selected && readout && (
 				<div
 					key={selected.token}
-					className="flex animate-[ib-card-enter_0.3s_ease-out_both] items-center justify-between gap-3 rounded-xl border border-neutral-800 bg-neutral-900/50 px-4 py-3"
+					className="flex items-center justify-between gap-3 rounded-xl border border-neutral-800 bg-neutral-900/50 px-4 py-3"
 				>
 					<span className={`flex items-center gap-2.5 text-xs font-medium ${readout.text}`}>
 						<span className={`h-1.5 w-1.5 rounded-full ${readout.dot}`} />
