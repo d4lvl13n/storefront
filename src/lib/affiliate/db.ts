@@ -187,6 +187,12 @@ export async function listAffiliates(): Promise<AffiliateWithStats[]> {
 // Commission CRUD
 // ============================================================================
 
+/**
+ * Idempotent on order_id: Saleor retries any non-2xx delivery, so the same
+ * ORDER_PAID can arrive more than once (including concurrently). ON CONFLICT
+ * DO NOTHING makes the duplicate a no-op at the database level — returns
+ * `null` when the commission already existed.
+ */
 export async function recordCommission(data: {
 	affiliate_id: number;
 	order_id: string;
@@ -195,11 +201,12 @@ export async function recordCommission(data: {
 	discount_amount: number;
 	commission_amount: number;
 	currency: string;
-}): Promise<Commission> {
+}): Promise<Commission | null> {
 	const sql = await db();
 	const rows = (await sql.query(
 		`INSERT INTO commissions (affiliate_id, order_id, order_number, order_total, discount_amount, commission_amount, currency)
 		 VALUES ($1, $2, $3, $4, $5, $6, $7)
+		 ON CONFLICT (order_id) DO NOTHING
 		 RETURNING *`,
 		[
 			data.affiliate_id,
@@ -211,7 +218,7 @@ export async function recordCommission(data: {
 			data.currency,
 		],
 	)) as Commission[];
-	return rows[0]!;
+	return rows[0] ?? null;
 }
 
 export async function getCommissionByOrderId(orderId: string): Promise<Commission | null> {

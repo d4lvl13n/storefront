@@ -5,7 +5,8 @@ import { getAffiliateByCode, recordCommission, getCommissionByOrderId } from "@/
 const WEBHOOK_SECRET = process.env.SALEOR_WEBHOOK_SECRET;
 
 /**
- * Verify Saleor webhook HMAC signature.
+ * Verify Saleor webhook HMAC signature: HMAC-SHA256 hex of the RAW request
+ * body (unparsed bytes), keyed with SALEOR_WEBHOOK_SECRET.
  */
 function verifySignature(payload: string, signature: string | null): boolean {
 	if (!WEBHOOK_SECRET || !signature) return false;
@@ -13,7 +14,7 @@ function verifySignature(payload: string, signature: string | null): boolean {
 	hmac.update(payload);
 	const expected = hmac.digest("hex");
 	try {
-		return timingSafeEqual(Buffer.from(signature), Buffer.from(expected));
+		return timingSafeEqual(Buffer.from(signature.toLowerCase()), Buffer.from(expected));
 	} catch {
 		return false;
 	}
@@ -46,8 +47,9 @@ function verifySignature(payload: string, signature: string | null): boolean {
 export async function POST(request: NextRequest) {
 	const rawBody = await request.text();
 
-	// Verify webhook signature
-	const signature = request.headers.get("saleor-signature");
+	// Verify webhook signature. Saleor sends `Saleor-Signature`; older
+	// versions used the deprecated `X-Saleor-Signature` — accept either.
+	const signature = request.headers.get("saleor-signature") ?? request.headers.get("x-saleor-signature");
 	if (!verifySignature(rawBody, signature)) {
 		console.warn("[Affiliate Webhook] Invalid signature");
 		return Response.json({ error: "Unauthorized" }, { status: 401 });
@@ -114,6 +116,13 @@ export async function POST(request: NextRequest) {
 		commission_amount: commissionAmount,
 		currency,
 	});
+
+	// Race-safe duplicate (a concurrent retry won the insert): still a 2xx so
+	// Saleor stops retrying — never double-credits, never loops.
+	if (!commission) {
+		console.log(`[Affiliate Webhook] Commission already recorded for order ${order.id} (race)`);
+		return Response.json({ ok: true, skipped: true, reason: "duplicate" });
+	}
 
 	const sanitizedCode = voucherCode.replace(/[\r\n]/g, "");
 	const sanitizedNumber = (order.number ?? "").replace(/[\r\n]/g, "");
