@@ -68,7 +68,7 @@ export function HandlingGuideView() {
 				title="4. Storage and Labeling"
 				items={[
 					{
-						text: "Refrigerate reconstituted peptide at 2-8 C (standard refrigerator). Do not freeze.",
+						text: "Refrigerate reconstituted peptide at 36-46 F (standard refrigerator). Do not freeze.",
 						icon: "cold",
 					},
 					{

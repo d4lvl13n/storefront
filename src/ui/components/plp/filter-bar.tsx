@@ -8,11 +8,13 @@
  * Not launch-blocking — generic Category/Vial-size/Price cover the v1 need.
  */
 import { useState } from "react";
+import Link from "next/link";
 import { ChevronDown, SlidersHorizontal, X } from "lucide-react";
 import { Button } from "@/ui/components/ui/button";
 import {
 	DropdownMenu,
 	DropdownMenuContent,
+	DropdownMenuItem,
 	DropdownMenuRadioGroup,
 	DropdownMenuRadioItem,
 	DropdownMenuTrigger,
@@ -46,6 +48,11 @@ export interface CategoryFilterOption {
 	count: number;
 }
 
+export interface ProductNavOption {
+	name: string;
+	href: string;
+}
+
 export interface ActiveFilter {
 	key: string;
 	label: string;
@@ -61,19 +68,18 @@ interface FilterBarProps {
 	onClearFilters?: () => void;
 	// Filter options
 	categoryOptions?: readonly CategoryFilterOption[];
+	/** Quick-jump list of products rendered as a "Products" dropdown. */
+	productOptions?: readonly ProductNavOption[];
 	colorOptions?: readonly FilterOption[];
 	sizeOptions?: readonly FilterOption[];
-	priceRanges?: readonly { label: string; value: string; count: number }[];
 	// Selected filters
 	selectedCategories?: readonly string[];
 	selectedColors?: readonly string[];
 	selectedSizes?: readonly string[];
-	selectedPriceRange?: string | null;
 	// Filter handlers
 	onCategoryToggle?: (slug: string) => void;
 	onColorToggle?: (color: string) => void;
 	onSizeToggle?: (size: string) => void;
-	onPriceRangeChange?: (range: string | null) => void;
 }
 
 export function FilterBar({
@@ -84,25 +90,25 @@ export function FilterBar({
 	onRemoveFilter,
 	onClearFilters,
 	categoryOptions = [],
+	productOptions = [],
 	colorOptions = [],
 	sizeOptions = [],
-	priceRanges = [],
 	selectedCategories = [],
 	selectedColors = [],
 	selectedSizes = [],
-	selectedPriceRange = null,
 	onCategoryToggle,
 	onColorToggle,
 	onSizeToggle,
-	onPriceRangeChange,
 }: FilterBarProps) {
 	const [mobileFiltersOpen, setMobileFiltersOpen] = useState(false);
 
 	const hasFilters =
-		categoryOptions.length > 0 || colorOptions.length > 0 || sizeOptions.length > 0 || priceRanges.length > 0;
+		categoryOptions.length > 0 ||
+		productOptions.length > 0 ||
+		colorOptions.length > 0 ||
+		sizeOptions.length > 0;
 
-	const activeFilterCount =
-		selectedCategories.length + selectedColors.length + selectedSizes.length + (selectedPriceRange ? 1 : 0);
+	const activeFilterCount = selectedCategories.length + selectedColors.length + selectedSizes.length;
 
 	return (
 		<div className="sticky top-20 z-30 border-b border-white/[0.06] bg-background backdrop-blur-xl">
@@ -174,6 +180,26 @@ export function FilterBar({
 												</div>
 											)}
 
+											{productOptions.length > 0 && (
+												<div className="px-4 py-6">
+													<h3 className="mb-4 text-xs font-semibold uppercase tracking-wider text-muted-foreground">
+														Products
+													</h3>
+													<div className="space-y-3">
+														{productOptions.map((product) => (
+															<Link
+																key={product.href}
+																href={product.href}
+																onClick={() => setMobileFiltersOpen(false)}
+																className="block text-sm text-foreground transition-colors hover:text-emerald-400"
+															>
+																{product.name}
+															</Link>
+														))}
+													</div>
+												</div>
+											)}
+
 											{colorOptions.length > 0 && onColorToggle && (
 												<div className="px-4 py-6">
 													<h3 className="mb-4 text-xs font-semibold uppercase tracking-wider text-muted-foreground">
@@ -237,35 +263,6 @@ export function FilterBar({
 													</div>
 												</div>
 											)}
-
-											{priceRanges.length > 0 && onPriceRangeChange && (
-												<div className="px-4 py-6">
-													<h3 className="mb-4 text-xs font-semibold uppercase tracking-wider text-muted-foreground">
-														Price
-													</h3>
-													<div className="space-y-3">
-														{priceRanges.map((range) => {
-															const isSelected = selectedPriceRange === range.value;
-															return (
-																<button
-																	key={range.value}
-																	onClick={() => onPriceRangeChange(isSelected ? null : range.value)}
-																	className="flex w-full items-center gap-3 text-left"
-																>
-																	<span
-																		className={`flex h-5 w-5 shrink-0 items-center justify-center rounded-full border transition-colors ${
-																			isSelected ? "border-emerald-500 bg-emerald-500" : "border-border"
-																		}`}
-																	>
-																		{isSelected && <span className="h-2 w-2 rounded-full bg-white" />}
-																	</span>
-																	<span className="text-sm text-foreground">{range.label}</span>
-																</button>
-															);
-														})}
-													</div>
-												</div>
-											)}
 										</div>
 									</div>
 
@@ -318,6 +315,30 @@ export function FilterBar({
 										>
 											{category.name}
 										</DropdownMenuCheckboxItem>
+									))}
+								</DropdownMenuContent>
+							</DropdownMenu>
+						)}
+
+						{productOptions.length > 0 && (
+							<DropdownMenu>
+								<DropdownMenuTrigger asChild>
+									<Button
+										variant="outline-solid"
+										size="sm"
+										className="hidden shrink-0 border-white/[0.08] bg-transparent text-foreground hover:border-white/[0.15] hover:text-foreground md:flex"
+									>
+										Products
+										<ChevronDown className="ml-1.5 h-4 w-4 opacity-50" />
+									</Button>
+								</DropdownMenuTrigger>
+								<DropdownMenuContent align="start" className="max-h-80 w-64 overflow-y-auto">
+									<DropdownMenuLabel>All products</DropdownMenuLabel>
+									<DropdownMenuSeparator />
+									{productOptions.map((product) => (
+										<DropdownMenuItem key={product.href} asChild>
+											<Link href={product.href}>{product.name}</Link>
+										</DropdownMenuItem>
 									))}
 								</DropdownMenuContent>
 							</DropdownMenu>
@@ -402,43 +423,6 @@ export function FilterBar({
 								</DropdownMenuContent>
 							</DropdownMenu>
 						)}
-
-						{priceRanges.length > 0 && onPriceRangeChange && (
-							<DropdownMenu>
-								<DropdownMenuTrigger asChild>
-									<Button
-										variant="outline-solid"
-										size="sm"
-										className="hidden shrink-0 border-white/[0.08] bg-transparent text-foreground hover:border-white/[0.15] hover:text-foreground md:flex"
-									>
-										Price
-										{selectedPriceRange && (
-											<Badge
-												variant="secondary"
-												className="ml-2 h-5 bg-emerald-500/15 px-1.5 py-0 text-xs text-emerald-400"
-											>
-												1
-											</Badge>
-										)}
-										<ChevronDown className="ml-1.5 h-4 w-4 opacity-50" />
-									</Button>
-								</DropdownMenuTrigger>
-								<DropdownMenuContent align="start" className="w-48">
-									<DropdownMenuLabel>Price Range</DropdownMenuLabel>
-									<DropdownMenuSeparator />
-									<DropdownMenuRadioGroup
-										value={selectedPriceRange || ""}
-										onValueChange={(v) => onPriceRangeChange(v || null)}
-									>
-										{priceRanges.map((range) => (
-											<DropdownMenuRadioItem key={range.value} value={range.value}>
-												{range.label}
-											</DropdownMenuRadioItem>
-										))}
-									</DropdownMenuRadioGroup>
-								</DropdownMenuContent>
-							</DropdownMenu>
-						)}
 					</div>
 
 					{/* Right: Result Count + Sort */}
@@ -465,8 +449,6 @@ export function FilterBar({
 								>
 									<DropdownMenuRadioItem value="featured">Featured</DropdownMenuRadioItem>
 									<DropdownMenuRadioItem value="newest">Newest</DropdownMenuRadioItem>
-									<DropdownMenuRadioItem value="price_asc">Price: Low to High</DropdownMenuRadioItem>
-									<DropdownMenuRadioItem value="price_desc">Price: High to Low</DropdownMenuRadioItem>
 									<DropdownMenuRadioItem value="bestselling">Best Selling</DropdownMenuRadioItem>
 								</DropdownMenuRadioGroup>
 							</DropdownMenuContent>

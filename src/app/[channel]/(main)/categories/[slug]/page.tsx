@@ -110,16 +110,23 @@ async function CategoryProducts({
 	const sortBy = buildSortVariables(searchParams.sort);
 	const filter = buildFilterVariables({ priceRange: searchParams.price });
 
-	const result = await executePublicGraphQL(ProductListByCategoryDocument, {
-		variables: {
-			slug: params.slug,
-			channel: params.channel,
-			...paginationVariables,
-			sortBy,
-			filter,
-		},
-		revalidate: 300,
-	});
+	const [result, allProductsResult] = await Promise.all([
+		executePublicGraphQL(ProductListByCategoryDocument, {
+			variables: {
+				slug: params.slug,
+				channel: params.channel,
+				...paginationVariables,
+				sortBy,
+				filter,
+			},
+			revalidate: 300,
+		}),
+		// All products in this category (name + slug) for the quick-jump Products dropdown.
+		executePublicGraphQL(ProductListByCategoryDocument, {
+			variables: { slug: params.slug, channel: params.channel, first: 100 },
+			revalidate: 300,
+		}),
+	]);
 
 	const products = result.ok ? result.data.category?.products : null;
 	if (!products) {
@@ -128,9 +135,14 @@ async function CategoryProducts({
 
 	const productCards = products.edges.map((e) => transformToProductCard(e.node, params.channel));
 
+	const productOptions = (allProductsResult.ok ? allProductsResult.data.category?.products?.edges ?? [] : [])
+		.map((e) => ({ name: e.node.name, href: `/${params.channel}/products/${e.node.slug}` }))
+		.sort((a, b) => a.name.localeCompare(b.name));
+
 	return (
 		<CategoryPageClient
 			products={productCards}
+			productOptions={productOptions}
 			pageInfo={products.pageInfo}
 			totalCount={products.totalCount ?? productCards.length}
 		/>

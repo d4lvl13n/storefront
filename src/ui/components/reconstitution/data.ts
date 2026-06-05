@@ -71,6 +71,6 @@ export const RECONSTITUTION_STEPS = [
 	},
 	{
 		name: "Store properly",
-		text: "Refrigerate the reconstituted vial at 2-8 C. Label with peptide name, concentration, and date. Most reconstituted peptides remain stable for 14-28 days.",
+		text: "Refrigerate the reconstituted vial at 36-46 F. Label with peptide name, concentration, and date. Most reconstituted peptides remain stable for 14-28 days.",
 	},
 ];

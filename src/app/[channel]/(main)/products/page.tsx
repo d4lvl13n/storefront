@@ -1,7 +1,7 @@
 import { Suspense } from "react";
 import { notFound } from "next/navigation";
 import { ShieldCheck, FlaskConical, FileCheck2, Truck } from "lucide-react";
-import { ProductListPaginatedDocument } from "@/gql/graphql";
+import { ProductListDocument, ProductListPaginatedDocument } from "@/gql/graphql";
 import { executePublicGraphQL } from "@/lib/graphql";
 import { getPaginatedListVariables } from "@/lib/utils";
 import { CategoryHero, transformToProductCard } from "@/ui/components/plp";
@@ -50,9 +50,9 @@ export default async function Page(props: PageProps) {
 				breadcrumbs={breadcrumbs}
 				badges={[
 					{ icon: ShieldCheck, title: "≥ 99% Purity", subtitle: "HPLC-verified" },
-					{ icon: FlaskConical, title: "Independently Tested", subtitle: "Third-party labs" },
+					{ icon: FlaskConical, title: "Independently Tested", subtitle: "Third-party US labs" },
 					{ icon: FileCheck2, title: "COA Every Batch", subtitle: "Full documentation" },
-					{ icon: Truck, title: "Fast Dispatch", subtitle: "24–48h, tracked" },
+					{ icon: Truck, title: "Fast Dispatch", subtitle: "Same day for orders before 4pm EST" },
 				]}
 			/>
 			{/* Dynamic content - streams in via Suspense */}
@@ -89,15 +89,22 @@ async function ProductsContent({
 		categoryIds,
 	});
 
-	const result = await executePublicGraphQL(ProductListPaginatedDocument, {
-		variables: {
-			...paginationVariables,
-			channel: params.channel,
-			sortBy,
-			filter,
-		},
-		revalidate: 300,
-	});
+	const [result, allProductsResult] = await Promise.all([
+		executePublicGraphQL(ProductListPaginatedDocument, {
+			variables: {
+				...paginationVariables,
+				channel: params.channel,
+				sortBy,
+				filter,
+			},
+			revalidate: 300,
+		}),
+		// Full catalog (name + slug) for the quick-jump Products dropdown.
+		executePublicGraphQL(ProductListDocument, {
+			variables: { first: 100, channel: params.channel },
+			revalidate: 300,
+		}),
+	]);
 
 	if (!result.ok) {
 		// Transient/backend failure is NOT "page doesn't exist" — throw so the error
@@ -112,6 +119,10 @@ async function ProductsContent({
 	const products = result.data.products;
 	const productCards = products.edges.map((e) => transformToProductCard(e.node, params.channel));
 
+	const productOptions = (allProductsResult.ok ? allProductsResult.data.products?.edges ?? [] : [])
+		.map((e) => ({ name: e.node.name, href: `/${params.channel}/products/${e.node.slug}` }))
+		.sort((a, b) => a.name.localeCompare(b.name));
+
 	// Build resolved categories array for the client (for active filter display)
 	const resolvedCategories = categorySlugs
 		.map((slug) => {
@@ -123,6 +134,7 @@ async function ProductsContent({
 	return (
 		<ProductsPageClient
 			products={productCards}
+			productOptions={productOptions}
 			pageInfo={products.pageInfo}
 			totalCount={products.totalCount ?? productCards.length}
 			resolvedCategories={resolvedCategories}

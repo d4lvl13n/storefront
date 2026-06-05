@@ -10,7 +10,7 @@ const faqItems = [
 	},
 	{
 		q: "How are your products shipped and stored?",
-		a: "Lyophilized peptides are shipped in temperature-controlled packaging with cold packs to maintain stability. We recommend storing at -20°C protected from light and moisture. After reconstitution, store at 2-8°C and use within the timeframe specified on each product's COA.",
+		a: "Lyophilized peptides are shipped in temperature-controlled packaging with cold packs to maintain stability. We recommend storing at -4°F protected from light and moisture. After reconstitution, store at 36-46°F and use within the timeframe specified on each product's COA.",
 	},
 	{
 		q: "Are your products intended for human use?",

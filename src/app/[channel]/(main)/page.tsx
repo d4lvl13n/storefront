@@ -261,7 +261,7 @@ const qualityPillars = [
 	},
 	{
 		title: "Cold‑Chain Logistics",
-		stat: "2-8°C",
+		stat: "36-46°F",
 		description: "Temperature‑controlled packaging ensures compound stability from our facility to your lab.",
 	},
 ];

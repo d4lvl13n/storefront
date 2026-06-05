@@ -29,15 +29,12 @@ export function CollectionPageClient({ products, pageInfo }: CollectionPageClien
 		filteredProducts,
 		colorOptions,
 		sizeOptions,
-		priceRanges,
 		selectedColors,
 		selectedSizes,
-		selectedPriceRange,
 		sortValue,
 		activeFilters,
 		handleColorToggle,
 		handleSizeToggle,
-		handlePriceRangeChange,
 		handleSortChange,
 		handleRemoveFilter,
 		handleClearFilters,
@@ -51,13 +48,10 @@ export function CollectionPageClient({ products, pageInfo }: CollectionPageClien
 				onSortChange={handleSortChange}
 				colorOptions={colorOptions}
 				sizeOptions={sizeOptions}
-				priceRanges={priceRanges}
 				selectedColors={selectedColors}
 				selectedSizes={selectedSizes}
-				selectedPriceRange={selectedPriceRange}
 				onColorToggle={handleColorToggle}
 				onSizeToggle={handleSizeToggle}
-				onPriceRangeChange={handlePriceRangeChange}
 				activeFilters={activeFilters}
 				onRemoveFilter={handleRemoveFilter}
 				onClearFilters={handleClearFilters}

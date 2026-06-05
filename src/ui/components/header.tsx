@@ -11,7 +11,7 @@ import { LinkWithChannel } from "@/ui/atoms/link-with-channel";
 
 const primaryNavItems = [
 	{ href: "/products", label: "Shop", description: "Full research catalog" },
-	{ href: "/coa", label: "COA", description: "Verify batch documentation" },
+	{ href: "/coa/find", label: "COA", description: "Verify batch documentation" },
 	{ href: "/peptide-calculator", label: "Tools", description: "Protocol planning utilities" },
 	{ href: "/research-library", label: "Research", description: "Peer-reviewed literature" },
 	{ href: "/faq", label: "FAQ", description: "Shipping, storage, and orders" },
@@ -29,7 +29,7 @@ function DesktopNav() {
 					<LinkWithChannel
 						href={item.href}
 						prefetch={false}
-						className="text-[15px] font-medium text-muted-foreground transition-colors hover:text-foreground"
+						className="text-[20px] font-medium text-muted-foreground transition-colors hover:text-foreground"
 					>
 						{item.label}
 					</LinkWithChannel>

@@ -7,6 +7,7 @@ export {
 	type SortOption,
 	type FilterOption,
 	type CategoryFilterOption,
+	type ProductNavOption,
 	type ActiveFilter,
 } from "./filter-bar";
 export { transformToProductCard, formatPrice } from "./utils";

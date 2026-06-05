@@ -1,11 +1,19 @@
 "use client";
 
 import { Suspense } from "react";
-import { FilterBar, ProductGrid, useProductFilters, type ProductCardData } from "@/ui/components/plp";
+import {
+	FilterBar,
+	ProductGrid,
+	useProductFilters,
+	type ProductCardData,
+	type ProductNavOption,
+} from "@/ui/components/plp";
 import { Pagination } from "@/ui/components/pagination";
 
 interface CategoryPageClientProps {
 	products: ProductCardData[];
+	/** Full product list (name + href) for the quick-jump Products dropdown. */
+	productOptions?: ProductNavOption[];
 	pageInfo: {
 		hasNextPage: boolean;
 		hasPreviousPage: boolean;
@@ -24,20 +32,17 @@ function PaginationSkeleton() {
 	);
 }
 
-export function CategoryPageClient({ products, pageInfo }: CategoryPageClientProps) {
+export function CategoryPageClient({ products, productOptions, pageInfo }: CategoryPageClientProps) {
 	const {
 		filteredProducts,
 		colorOptions,
 		sizeOptions,
-		priceRanges,
 		selectedColors,
 		selectedSizes,
-		selectedPriceRange,
 		sortValue,
 		activeFilters,
 		handleColorToggle,
 		handleSizeToggle,
-		handlePriceRangeChange,
 		handleSortChange,
 		handleRemoveFilter,
 		handleClearFilters,
@@ -49,15 +54,13 @@ export function CategoryPageClient({ products, pageInfo }: CategoryPageClientPro
 				resultCount={filteredProducts.length}
 				sortValue={sortValue}
 				onSortChange={handleSortChange}
+				productOptions={productOptions}
 				colorOptions={colorOptions}
 				sizeOptions={sizeOptions}
-				priceRanges={priceRanges}
 				selectedColors={selectedColors}
 				selectedSizes={selectedSizes}
-				selectedPriceRange={selectedPriceRange}
 				onColorToggle={handleColorToggle}
 				onSizeToggle={handleSizeToggle}
-				onPriceRangeChange={handlePriceRangeChange}
 				activeFilters={activeFilters}
 				onRemoveFilter={handleRemoveFilter}
 				onClearFilters={handleClearFilters}

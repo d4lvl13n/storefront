@@ -17,7 +17,7 @@ const META_FIELDS = [
 	{ label: "Doc ID", value: "COA-0847-A" },
 	{ label: "Issued", value: "26 Mar 2026" },
 	{ label: "Retest", value: "Sep 2026" },
-	{ label: "Storage", value: "-20 C" },
+	{ label: "Storage", value: "-4 F" },
 ];
 
 const METHOD_TAGS = ["HPLC-UV", "LC-MS", "LAL assay", "Visual ID"];

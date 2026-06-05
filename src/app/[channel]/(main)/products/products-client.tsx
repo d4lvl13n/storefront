@@ -1,11 +1,19 @@
 "use client";
 
 import { Suspense } from "react";
-import { FilterBar, ProductGrid, useProductFilters, type ProductCardData } from "@/ui/components/plp";
+import {
+	FilterBar,
+	ProductGrid,
+	useProductFilters,
+	type ProductCardData,
+	type ProductNavOption,
+} from "@/ui/components/plp";
 import { Pagination } from "@/ui/components/pagination";
 
 interface ProductsPageClientProps {
 	products: ProductCardData[];
+	/** Full catalog list (name + href) for the quick-jump Products dropdown. */
+	productOptions?: ProductNavOption[];
 	pageInfo: {
 		hasNextPage: boolean;
 		hasPreviousPage: boolean;
@@ -26,23 +34,25 @@ function PaginationSkeleton() {
 	);
 }
 
-export function ProductsPageClient({ products, pageInfo, resolvedCategories = [] }: ProductsPageClientProps) {
+export function ProductsPageClient({
+	products,
+	productOptions,
+	pageInfo,
+	resolvedCategories = [],
+}: ProductsPageClientProps) {
 	const {
 		filteredProducts,
 		categoryOptions,
 		colorOptions,
 		sizeOptions,
-		priceRanges,
 		selectedCategories,
 		selectedColors,
 		selectedSizes,
-		selectedPriceRange,
 		sortValue,
 		activeFilters,
 		handleCategoryToggle,
 		handleColorToggle,
 		handleSizeToggle,
-		handlePriceRangeChange,
 		handleSortChange,
 		handleRemoveFilter,
 		handleClearFilters,
@@ -60,17 +70,15 @@ export function ProductsPageClient({ products, pageInfo, resolvedCategories = []
 				sortValue={sortValue}
 				onSortChange={handleSortChange}
 				categoryOptions={categoryOptions}
+				productOptions={productOptions}
 				colorOptions={colorOptions}
 				sizeOptions={sizeOptions}
-				priceRanges={priceRanges}
 				selectedCategories={selectedCategories}
 				selectedColors={selectedColors}
 				selectedSizes={selectedSizes}
-				selectedPriceRange={selectedPriceRange}
 				onCategoryToggle={handleCategoryToggle}
 				onColorToggle={handleColorToggle}
 				onSizeToggle={handleSizeToggle}
-				onPriceRangeChange={handlePriceRangeChange}
 				activeFilters={activeFilters}
 				onRemoveFilter={handleRemoveFilter}
 				onClearFilters={handleClearFilters}
