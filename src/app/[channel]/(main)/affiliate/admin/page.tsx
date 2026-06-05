@@ -167,10 +167,10 @@ export default async function AffiliateAdminPage(props: {
 
 				{/* Footer note */}
 				<p className="mt-12 border-t border-border pt-6 text-xs leading-relaxed text-muted-foreground">
-					Approving an application creates the affiliate and emails them their code and referral link
-					automatically. <span className="text-foreground">One manual step remains:</span> create a voucher
-					with the same code in the Saleor Dashboard (Catalog → Vouchers) so the discount actually applies at
-					checkout. Commissions appear here on paid orders and move pending → approved → paid; the payment
+					Approving an application does everything in one step: creates the affiliate, creates the matching
+					Saleor voucher (the customer discount), and emails them their code and referral link. If the voucher
+					can&rsquo;t be created automatically, the confirmation banner will tell you to add it in the Saleor
+					Dashboard. Commissions appear here on paid orders and move pending → approved → paid; the payment
 					itself (wire / PayPal) happens outside this page.
 				</p>
 			</div>
@@ -289,6 +289,18 @@ function ApplicationCard({ app, channel }: { app: AffiliateApplication; channel:
 						</span>
 						<input
 							name="rate_pct"
+							required
+							placeholder="10"
+							inputMode="decimal"
+							className={`${inputClass} w-24`}
+						/>
+					</label>
+					<label className="block">
+						<span className="mb-1 block text-[11px] uppercase tracking-[0.15em] text-muted-foreground">
+							Customer discount %
+						</span>
+						<input
+							name="discount_pct"
 							required
 							placeholder="10"
 							inputMode="decimal"

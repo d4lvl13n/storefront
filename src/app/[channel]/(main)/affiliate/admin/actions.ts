@@ -10,6 +10,7 @@ import {
 	updateCommissionStatus,
 } from "@/lib/affiliate/db";
 import { notifyApplicationApproved, notifyApplicationRejected } from "@/lib/affiliate/notify";
+import { createAffiliateVoucher } from "@/lib/affiliate/saleor-voucher";
 
 /**
  * Server actions for the affiliate operator page. Every action re-verifies
@@ -33,6 +34,7 @@ export async function approveApplicationAction(formData: FormData): Promise<void
 	const applicationId = Number(formData.get("application_id"));
 	const code = String(formData.get("code") ?? "").trim();
 	const ratePct = Number(String(formData.get("rate_pct") ?? "").replace(",", "."));
+	const discountPct = Number(String(formData.get("discount_pct") ?? "").replace(",", "."));
 
 	if (!applicationId) backTo(channel, { err: "Missing application id." });
 	if (!CODE_RE.test(code)) {
@@ -42,6 +44,9 @@ export async function approveApplicationAction(formData: FormData): Promise<void
 	}
 	if (!Number.isFinite(ratePct) || ratePct <= 0 || ratePct > 100) {
 		backTo(channel, { err: "Commission must be a percentage between 0 and 100 (e.g. 10)." });
+	}
+	if (!Number.isFinite(discountPct) || discountPct <= 0 || discountPct > 100) {
+		backTo(channel, { err: "Customer discount must be a percentage between 0 and 100 (e.g. 10)." });
 	}
 
 	if (await getAffiliateByCode(code)) {
@@ -58,13 +63,19 @@ export async function approveApplicationAction(formData: FormData): Promise<void
 		commission_rate: Math.round(ratePct * 100) / 10000,
 	});
 
+	// Create the matching Saleor voucher automatically (fail-soft: falls back
+	// to manual instructions so a missing permission never blocks approval).
+	const voucher = await createAffiliateVoucher({ code, discountPct, channelSlug: channel });
+
 	const emailed = await notifyApplicationApproved(affiliate);
 
 	backTo(channel, {
 		ok:
-			`Approved ${application.name} as "${affiliate.code}" at ${ratePct}%.` +
+			`Approved ${application.name} as "${affiliate.code}" — ${ratePct}% commission, ${discountPct}% customer discount.` +
 			(emailed ? " They've been emailed their referral link." : " ⚠ Email failed — contact them manually.") +
-			` Next step: create voucher "${affiliate.code}" in the Saleor Dashboard (Catalog → Vouchers).`,
+			(voucher.ok
+				? ` Voucher "${affiliate.code}" created in Saleor — the program is live for them.`
+				: ` ⚠ Voucher not created automatically (${voucher.reason}) — create "${affiliate.code}" manually in the Saleor Dashboard (Catalog → Vouchers, ${discountPct}% entire order).`),
 	});
 }
 
