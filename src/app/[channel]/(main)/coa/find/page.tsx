@@ -90,9 +90,9 @@ export default async function CoaFindPage(props: { params: Promise<Params> }) {
 				{/* Product / batch picker */}
 				{groups && groups.length > 0 ? (
 					<ul className="space-y-4">
-						{groups.map(([peptideName, entries]) => (
-							<li key={peptideName} className="bg-card/40 rounded-2xl border border-border p-5 sm:p-6">
-								<h2 className="text-lg font-semibold tracking-tight text-foreground">{peptideName}</h2>
+						{groups.map(([product, entries]) => (
+							<li key={product} className="bg-card/40 rounded-2xl border border-border p-5 sm:p-6">
+								<h2 className="text-lg font-semibold tracking-tight text-foreground">{product}</h2>
 								<ul className="divide-border/60 mt-3 divide-y">
 									{entries.map((entry) => (
 										<li key={entry.token}>
@@ -102,7 +102,9 @@ export default async function CoaFindPage(props: { params: Promise<Params> }) {
 												href={`/coa/${entry.token}?via=label-misprint`}
 												className="group flex flex-wrap items-center gap-x-4 gap-y-1 py-3 transition-colors"
 											>
-												<span className="font-mono text-sm text-foreground">Batch {entry.batchNumber}</span>
+												<span className="font-mono text-sm text-foreground">
+													{entry.batch ? `Batch ${entry.batch}` : "Current batch"}
+												</span>
 												{entry.issuedAt && (
 													<span className="text-xs text-muted-foreground">
 														Issued {formatIssuedAt(entry.issuedAt)}
@@ -193,15 +195,15 @@ function UnavailableNotice() {
 
 // ─── Helpers ───────────────────────────────────────────────────
 
-/** Group entries by peptide (alphabetical), newest batch first within each. */
+/** Group entries by product (alphabetical), newest batch first within each. */
 function groupByPeptide(entries: CoaIndexEntry[]): Array<[string, CoaIndexEntry[]]> {
 	const map = new Map<string, CoaIndexEntry[]>();
 	for (const entry of entries) {
-		const group = map.get(entry.peptideName);
+		const group = map.get(entry.product);
 		if (group) {
 			group.push(entry);
 		} else {
-			map.set(entry.peptideName, [entry]);
+			map.set(entry.product, [entry]);
 		}
 	}
 	for (const group of map.values()) {

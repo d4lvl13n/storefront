@@ -457,35 +457,39 @@ only the product name on the label is correct.
 - Correctly printed labels are unaffected: their tokens resolve straight to
   the verification page and never see the picker.
 
-### Backend / registry deliverables (required to activate)
+### Backend / registry deliverables (SHIPPED June 5, 2026)
 
-1. **Flip the mis-printed token's record** to `status: "shared"` (status-only
-   mutation — consistent with the existing mutability rules; add `shared` to
-   the allowed status transitions in the admin script).
-2. **Publish an index** at `${COA_REGISTRY_BASE_URL}/index.json`, regenerated
-   whenever a COA is published or a status flips:
+1. **Mis-printed token flipped to shared** — `GH83-YF3E-7XZP.json` is now
+   `{ "token": "GH83-YF3E-7XZP", "status": "shared", "note": "June 2026 label misprint" }`
+   (original pending record backed up to `/opt/saleor/backups/` on the server).
+2. **Index published** at `${COA_REGISTRY_BASE_URL}/index.json`, regenerated
+   whenever a COA is published or a status flips. **Actual wire shape:**
 
    ```json
    {
-   	"updatedAt": "2026-06-05T10:00:00Z",
-   	"entries": [
+   	"updatedAt": "2026-06-05",
+   	"coas": [
    		{
    			"token": "A8K2-9F4R-XP73",
-   			"peptideName": "BPC-157",
-   			"batchNumber": "B-2026-014",
-   			"issuedAt": "2026-05-12",
-   			"status": "active"
+   			"product": "BPC 157 10mg/vial",
+   			"batch": null,
+   			"status": "pending"
    		}
    	]
    }
    ```
 
-   - `entries[].status` ∈ `pending | active | superseded | recalled` —
+   - Top-level key is `coas`; entry fields are `product` and `batch`
+     (nullable until the lab report is published). `issuedAt` is optional
+     and accepted if added later.
+   - `coas[].status` ∈ `pending | active | superseded | recalled` —
      **never `shared`** (shared tokens are routing artifacts, not
-     certificates).
-   - The storefront validates against `CoaIndexSchema`
-     (`src/lib/coa/schema.ts`) and caches for 60 s. A missing `index.json`
-     degrades gracefully (picker shows a contact fallback).
+     certificates; the storefront drops such entries).
+   - The storefront parses leniently via `parseCoaIndex`
+     (`src/lib/coa/schema.ts`): an invalid entry is dropped (and logged)
+     rather than blanking the whole picker; only an unusable envelope fails
+     the fetch. Cached 60 s; a missing `index.json` degrades gracefully
+     (picker shows a contact fallback).
    - Listing tokens makes them enumerable **by design**: COAs are public
      trust assets; the random keyspace was anti-guessing, not secrecy.
 

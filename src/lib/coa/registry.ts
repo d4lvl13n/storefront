@@ -13,7 +13,7 @@
  * private host config and is not safe to bundle.
  */
 
-import { CoaIndexSchema, CoaRecordSchema, type CoaIndex, type CoaRecord } from "./schema";
+import { CoaRecordSchema, parseCoaIndex, type CoaIndex, type CoaRecord } from "./schema";
 import { normalizeToken } from "./token";
 
 export type CoaLookupResult =
@@ -155,11 +155,16 @@ export async function fetchCoaIndex(): Promise<CoaIndexResult> {
 		return { ok: false, reason: "invalid_record" };
 	}
 
-	const parsed = CoaIndexSchema.safeParse(json);
-	if (!parsed.success) {
-		console.error("[coa] Registry index failed validation:", parsed.error.flatten());
+	const parsed = parseCoaIndex(json);
+	if (!parsed) {
+		console.error("[coa] Registry index envelope failed validation");
 		return { ok: false, reason: "invalid_record" };
 	}
+	if (parsed.dropped > 0) {
+		// Lenient by design: a bad entry shouldn't blank the picker, but it
+		// must be visible in logs so the registry gets fixed.
+		console.error(`[coa] Registry index: dropped ${parsed.dropped} invalid entr(y/ies)`);
+	}
 
-	return { ok: true, index: parsed.data };
+	return { ok: true, index: parsed.index };
 }

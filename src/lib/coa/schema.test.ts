@@ -1,6 +1,6 @@
 import { describe, it, expect } from "vitest";
 
-import { CoaIndexSchema, CoaRecordSchema, toPublicCoa } from "./schema";
+import { CoaIndexEntrySchema, CoaRecordSchema, parseCoaIndex, toPublicCoa } from "./schema";
 
 // Valid tokens for fixtures — must use the strict alphabet (no 0/1/I/L/O/U).
 const TOKEN_A = "A8K2-9F4R-XP73";
@@ -60,57 +60,58 @@ describe("CoaRecordSchema — shared status", () => {
 	});
 });
 
-describe("CoaIndexSchema", () => {
+describe("COA index parsing (live wire shape: { updatedAt, coas: [...] })", () => {
 	const validIndex = {
-		updatedAt: "2026-06-05T10:00:00Z",
-		entries: [
+		updatedAt: "2026-06-05",
+		coas: [
 			{
 				token: TOKEN_A,
-				peptideName: "BPC-157",
-				batchNumber: "B-2026-014",
+				product: "BPC 157 10mg/vial",
+				batch: "B-2026-014",
 				issuedAt: "2026-05-12",
 				status: "active",
 			},
-			{ token: TOKEN_B, peptideName: "GLP-3", batchNumber: "B-2026-015", status: "pending" },
+			// Live registry publishes batch: null until the lab report exists.
+			{ token: TOKEN_B, product: "GLP-3 10mg/vial", batch: null, status: "pending" },
 		],
 	};
 
-	it("accepts a valid index", () => {
-		const parsed = CoaIndexSchema.safeParse(validIndex);
-		expect(parsed.success).toBe(true);
-		if (parsed.success) {
-			expect(parsed.data.entries).toHaveLength(2);
-		}
+	it("accepts the live index shape, including null batch", () => {
+		const parsed = parseCoaIndex(validIndex);
+		expect(parsed).not.toBeNull();
+		expect(parsed?.index.entries).toHaveLength(2);
+		expect(parsed?.dropped).toBe(0);
+		expect(parsed?.index.entries[1]?.batch).toBeNull();
+		expect(parsed?.index.updatedAt).toBe("2026-06-05");
 	});
 
-	it("accepts an empty entries array", () => {
-		expect(CoaIndexSchema.safeParse({ entries: [] }).success).toBe(true);
+	it("accepts an empty coas array", () => {
+		const parsed = parseCoaIndex({ coas: [] });
+		expect(parsed?.index.entries).toHaveLength(0);
 	});
 
-	it("rejects entries with the shared status (routing artifact, not a certificate)", () => {
-		const index = {
-			entries: [{ token: TOKEN_A, peptideName: "BPC-157", batchNumber: "B-2026-014", status: "shared" }],
-		};
-		expect(CoaIndexSchema.safeParse(index).success).toBe(false);
-	});
-
-	it("rejects entries with malformed tokens", () => {
-		const index = {
-			entries: [
-				{ token: "not-a-token", peptideName: "BPC-157", batchNumber: "B-2026-014", status: "active" },
+	it("drops invalid entries without blanking the rest (lenient)", () => {
+		const parsed = parseCoaIndex({
+			coas: [
+				validIndex.coas[0],
+				{ token: "not-a-token", product: "GLP-2", batch: null, status: "active" },
+				{ token: TOKEN_B, product: "GLP-3", batch: null, status: "shared" }, // routing artifact, not a certificate
 			],
-		};
-		expect(CoaIndexSchema.safeParse(index).success).toBe(false);
+		});
+		expect(parsed).not.toBeNull();
+		expect(parsed?.index.entries).toHaveLength(1);
+		expect(parsed?.dropped).toBe(2);
 	});
 
-	it("rejects entries missing peptideName or batchNumber", () => {
-		expect(
-			CoaIndexSchema.safeParse({ entries: [{ token: TOKEN_A, batchNumber: "B-1", status: "active" }] })
-				.success,
-		).toBe(false);
-		expect(
-			CoaIndexSchema.safeParse({ entries: [{ token: TOKEN_A, peptideName: "BPC-157", status: "active" }] })
-				.success,
-		).toBe(false);
+	it("returns null when the envelope is unusable", () => {
+		expect(parseCoaIndex({ entries: [] })).toBeNull(); // old/wrong key
+		expect(parseCoaIndex("nonsense")).toBeNull();
+		expect(parseCoaIndex(null)).toBeNull();
+	});
+
+	it("rejects individual entries missing product", () => {
+		expect(CoaIndexEntrySchema.safeParse({ token: TOKEN_A, batch: "B-1", status: "active" }).success).toBe(
+			false,
+		);
 	});
 });

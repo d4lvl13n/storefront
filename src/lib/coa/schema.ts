@@ -169,6 +169,11 @@ export type CoaLookupResponse =
  * `${COA_REGISTRY_BASE_URL}/index.json`. Powers the guided "find your COA"
  * page (`/coa/find`) that mis-printed shared QR codes redirect to.
  *
+ * Wire shape (as actually published by the backend, June 2026):
+ *   { "updatedAt": "2026-06-05", "coas": [{ "token", "product", "batch", "status" }] }
+ * `batch` is null until the lab report is published. `issuedAt` is accepted
+ * if the backend adds it later.
+ *
  * Listing tokens here makes them enumerable **by design**: COAs are public
  * trust assets (product pages already link them); the random 2^60 keyspace
  * was an anti-guessing measure, never secrecy. Entries never use the
@@ -177,15 +182,42 @@ export type CoaLookupResponse =
  */
 export const CoaIndexEntrySchema = z.object({
 	token: z.string().regex(COA_TOKEN_REGEX, "Token must match XXXX-XXXX-XXXX format"),
-	peptideName: z.string().min(1).max(200),
-	batchNumber: z.string().min(1).max(200),
+	product: z.string().min(1).max(200),
+	batch: z.string().min(1).max(200).nullable().optional(),
 	issuedAt: z.string().regex(ISO_DATE_LOOSE, "issuedAt must be ISO 8601 (date or datetime)").optional(),
 	status: z.enum(["pending", "active", "superseded", "recalled"]),
 });
 export type CoaIndexEntry = z.infer<typeof CoaIndexEntrySchema>;
 
-export const CoaIndexSchema = z.object({
+const CoaIndexEnvelopeSchema = z.object({
 	updatedAt: z.string().regex(ISO_DATE_LOOSE, "updatedAt must be ISO 8601 (date or datetime)").optional(),
-	entries: z.array(CoaIndexEntrySchema),
+	coas: z.array(z.unknown()),
 });
-export type CoaIndex = z.infer<typeof CoaIndexSchema>;
+
+export type CoaIndex = { updatedAt?: string | undefined; entries: CoaIndexEntry[] };
+
+/**
+ * Lenient index parser: validates the envelope strictly, but per-entry
+ * failures only drop that entry — one malformed record published by the
+ * backend must not blank the entire picker for every customer.
+ *
+ * @returns the valid entries plus a count of dropped ones (caller logs), or
+ *          `null` when the envelope itself is unusable.
+ */
+export function parseCoaIndex(json: unknown): { index: CoaIndex; dropped: number } | null {
+	const envelope = CoaIndexEnvelopeSchema.safeParse(json);
+	if (!envelope.success) return null;
+
+	const entries: CoaIndexEntry[] = [];
+	let dropped = 0;
+	for (const raw of envelope.data.coas) {
+		const parsed = CoaIndexEntrySchema.safeParse(raw);
+		if (parsed.success) {
+			entries.push(parsed.data);
+		} else {
+			dropped++;
+		}
+	}
+
+	return { index: { updatedAt: envelope.data.updatedAt, entries }, dropped };
+}
