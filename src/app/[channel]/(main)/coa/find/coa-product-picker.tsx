@@ -1,46 +1,113 @@
 "use client";
 
-import { useMemo, useState, type FormEvent } from "react";
+import { useEffect, useMemo, useRef, useState, type FormEvent, type KeyboardEvent } from "react";
 import { useParams, useRouter } from "next/navigation";
 import { type CoaIndexEntry } from "@/lib/coa/schema";
+import { cn } from "@/lib/utils";
 
 /**
- * Dropdown product selector for the shared/mis-printed QR landing page.
- *
- * Native <select> on purpose: nearly everyone lands here from a phone QR
- * scan, and the OS wheel/sheet picker beats any custom combobox on mobile.
- * The styling makes it feel custom; the control stays native.
+ * Custom combobox product selector for the shared/mis-printed QR landing
+ * page. Fully styled dropdown (no native <select> — the OS list breaks the
+ * dark brand): search filter, keyboard navigation, ARIA combobox/listbox
+ * semantics. Deliberately typographic — no decorative icons.
  */
 
-const STATUS_READOUT: Record<
-	CoaIndexEntry["status"],
-	{ dot: string; text: string; label: string; pulse?: boolean }
-> = {
+const STATUS_READOUT: Record<CoaIndexEntry["status"], { dot: string; text: string; label: string }> = {
 	active: { dot: "bg-emerald-400", text: "text-emerald-300", label: "Lab report available" },
-	pending: {
-		dot: "bg-amber-400",
-		text: "text-amber-200",
-		label: "Lab report pending publication",
-		pulse: true,
-	},
+	pending: { dot: "bg-amber-400", text: "text-amber-200", label: "Lab report pending publication" },
 	superseded: { dot: "bg-amber-400", text: "text-amber-200", label: "Updated report available" },
-	recalled: {
-		dot: "bg-red-400",
-		text: "text-red-300",
-		label: "Batch recalled — review details",
-		pulse: true,
-	},
+	recalled: { dot: "bg-red-400", text: "text-red-300", label: "Batch recalled — review details" },
 };
 
 export function CoaProductPicker({ entries }: { entries: CoaIndexEntry[] }) {
 	const router = useRouter();
 	const { channel } = useParams<{ channel?: string }>();
+
+	const [open, setOpen] = useState(false);
+	const [query, setQuery] = useState("");
+	const [highlighted, setHighlighted] = useState(0);
 	const [token, setToken] = useState("");
 	const [navigating, setNavigating] = useState(false);
 
+	const containerRef = useRef<HTMLDivElement>(null);
+	const searchRef = useRef<HTMLInputElement>(null);
+	const listRef = useRef<HTMLUListElement>(null);
+
 	const options = useMemo(() => [...entries].sort((a, b) => a.product.localeCompare(b.product)), [entries]);
+	const filtered = useMemo(() => {
+		const q = query.trim().toLowerCase();
+		if (!q) return options;
+		return options.filter(
+			(entry) => entry.product.toLowerCase().includes(q) || (entry.batch ?? "").toLowerCase().includes(q),
+		);
+	}, [options, query]);
+
 	const selected = options.find((entry) => entry.token === token) ?? null;
 	const readout = selected ? STATUS_READOUT[selected.status] : null;
+
+	// Close on click/tap outside.
+	useEffect(() => {
+		if (!open) return;
+		const onPointerDown = (event: PointerEvent) => {
+			if (containerRef.current && !containerRef.current.contains(event.target as Node)) {
+				setOpen(false);
+			}
+		};
+		document.addEventListener("pointerdown", onPointerDown);
+		return () => document.removeEventListener("pointerdown", onPointerDown);
+	}, [open]);
+
+	// Focus the search field when the panel opens.
+	useEffect(() => {
+		if (open) searchRef.current?.focus();
+	}, [open]);
+
+	// Keep the highlighted row in view while arrowing through the list.
+	useEffect(() => {
+		listRef.current?.querySelector(`[data-index="${highlighted}"]`)?.scrollIntoView({ block: "nearest" });
+	}, [highlighted]);
+
+	const openPanel = () => {
+		setQuery("");
+		setHighlighted(selected ? Math.max(0, options.indexOf(selected)) : 0);
+		setOpen(true);
+	};
+
+	const choose = (entry: CoaIndexEntry) => {
+		setToken(entry.token);
+		setOpen(false);
+	};
+
+	const onSearchKeyDown = (event: KeyboardEvent<HTMLInputElement>) => {
+		switch (event.key) {
+			case "ArrowDown":
+				event.preventDefault();
+				setHighlighted((i) => Math.min(i + 1, filtered.length - 1));
+				break;
+			case "ArrowUp":
+				event.preventDefault();
+				setHighlighted((i) => Math.max(i - 1, 0));
+				break;
+			case "Home":
+				event.preventDefault();
+				setHighlighted(0);
+				break;
+			case "End":
+				event.preventDefault();
+				setHighlighted(filtered.length - 1);
+				break;
+			case "Enter": {
+				event.preventDefault();
+				const entry = filtered[highlighted];
+				if (entry) choose(entry);
+				break;
+			}
+			case "Escape":
+			case "Tab":
+				setOpen(false);
+				break;
+		}
+	};
 
 	const handleSubmit = (event: FormEvent) => {
 		event.preventDefault();
@@ -54,61 +121,133 @@ export function CoaProductPicker({ entries }: { entries: CoaIndexEntry[] }) {
 		<form onSubmit={handleSubmit} className="space-y-4">
 			<div>
 				<label
-					htmlFor="coa-product"
+					htmlFor="coa-product-trigger"
 					className="mb-2 block text-[11px] font-medium uppercase tracking-[0.22em] text-emerald-400"
 				>
 					Product on your vial label
 				</label>
-				<div className="group relative">
-					<select
-						id="coa-product"
-						value={token}
-						onChange={(event) => setToken(event.target.value)}
-						className="h-14 w-full cursor-pointer appearance-none truncate rounded-xl border border-neutral-700/80 bg-neutral-900/80 pl-4 pr-14 text-base font-medium text-white shadow-[inset_0_1px_0_rgba(255,255,255,0.04)] outline-none transition-all duration-200 focus:border-emerald-500/60 focus:bg-neutral-900 focus:ring-4 focus:ring-emerald-500/25 [&>option]:bg-neutral-900 [&>option]:text-white"
+
+				<div ref={containerRef} className="relative">
+					{/* Trigger */}
+					<button
+						id="coa-product-trigger"
+						type="button"
+						role="combobox"
+						aria-expanded={open}
+						aria-haspopup="listbox"
+						aria-controls="coa-product-listbox"
+						onClick={() => (open ? setOpen(false) : openPanel())}
+						onKeyDown={(event) => {
+							if (!open && (event.key === "ArrowDown" || event.key === "Enter" || event.key === " ")) {
+								event.preventDefault();
+								openPanel();
+							}
+						}}
+						className={cn(
+							"flex h-14 w-full cursor-pointer items-center justify-between gap-3 rounded-xl border bg-neutral-900 px-4 text-left outline-none transition-colors duration-150",
+							open
+								? "border-emerald-500/60"
+								: "border-neutral-700/80 hover:border-neutral-500 focus-visible:border-emerald-500/60",
+						)}
 					>
-						<option value="" disabled>
-							Select your product…
-						</option>
-						{options.map((entry) => (
-							<option key={entry.token} value={entry.token}>
-								{entry.product}
-								{entry.batch ? ` — Batch ${entry.batch}` : ""}
-							</option>
-						))}
-					</select>
-					{/* Custom chevron — sits over the native control, never intercepts taps */}
-					<span
-						aria-hidden="true"
-						className="pointer-events-none absolute right-3 top-1/2 flex h-8 w-8 -translate-y-1/2 items-center justify-center rounded-lg border border-neutral-700/70 bg-neutral-800/80 text-emerald-400 transition-colors duration-200 group-focus-within:border-emerald-500/50 group-focus-within:text-emerald-300"
-					>
-						<svg className="h-3.5 w-3.5" viewBox="0 0 12 12" fill="none">
+						<span
+							className={cn(
+								"min-w-0 flex-1 truncate text-base",
+								selected ? "font-medium text-white" : "text-neutral-500",
+							)}
+						>
+							{selected ? selected.product : "Select your product…"}
+						</span>
+						<svg
+							aria-hidden="true"
+							className={cn(
+								"h-4 w-4 shrink-0 text-neutral-400 transition-transform duration-150",
+								open && "rotate-180",
+							)}
+							viewBox="0 0 16 16"
+							fill="none"
+						>
 							<path
-								d="M2.5 4.5L6 8L9.5 4.5"
+								d="M4 6l4 4 4-4"
 								stroke="currentColor"
-								strokeWidth="1.6"
+								strokeWidth="1.5"
 								strokeLinecap="round"
 								strokeLinejoin="round"
 							/>
 						</svg>
-					</span>
+					</button>
+
+					{/* Panel */}
+					{open && (
+						<div className="absolute left-0 right-0 top-full z-30 mt-2 overflow-hidden rounded-xl border border-neutral-700/80 bg-neutral-900 shadow-[0_24px_60px_-12px_rgba(0,0,0,0.85)]">
+							<input
+								ref={searchRef}
+								type="text"
+								value={query}
+								onChange={(event) => {
+									setQuery(event.target.value);
+									setHighlighted(0);
+								}}
+								onKeyDown={onSearchKeyDown}
+								placeholder="Type to filter…"
+								aria-autocomplete="list"
+								aria-controls="coa-product-listbox"
+								className="h-12 w-full border-b border-neutral-800 bg-transparent px-4 text-base text-white outline-none placeholder:text-neutral-600"
+							/>
+
+							<ul
+								ref={listRef}
+								id="coa-product-listbox"
+								role="listbox"
+								aria-label="Products"
+								className="max-h-[17rem] overflow-y-auto overscroll-contain py-1"
+							>
+								{filtered.length === 0 ? (
+									<li className="px-4 py-6 text-center text-sm text-neutral-500">
+										No product matches — check the spelling on your label.
+									</li>
+								) : (
+									filtered.map((entry, index) => {
+										const isSelected = entry.token === token;
+										const isHighlighted = index === highlighted;
+										return (
+											<li
+												key={entry.token}
+												data-index={index}
+												role="option"
+												aria-selected={isSelected}
+												onPointerMove={() => setHighlighted(index)}
+												onClick={() => choose(entry)}
+												className={cn(
+													"flex cursor-pointer items-baseline justify-between gap-4 px-4 py-2.5 text-sm transition-colors duration-75",
+													isHighlighted && "bg-neutral-800",
+													isSelected ? "text-emerald-300" : isHighlighted ? "text-white" : "text-neutral-300",
+												)}
+											>
+												<span className="min-w-0 flex-1 truncate">{entry.product}</span>
+												{entry.batch && (
+													<span className="shrink-0 font-mono text-[11px] text-neutral-500">
+														{entry.batch}
+													</span>
+												)}
+											</li>
+										);
+									})
+								)}
+							</ul>
+						</div>
+					)}
 				</div>
 			</div>
 
-			{/* Status readout — materialises once a product is chosen, re-animates per selection */}
+			{/* Status readout — appears once a product is chosen */}
 			{selected && readout && (
 				<div
 					key={selected.token}
-					className="flex animate-[ib-card-enter_0.35s_ease-out_both] items-center justify-between gap-3 rounded-xl border border-neutral-800 bg-neutral-900/50 px-4 py-3"
+					className="flex animate-[ib-card-enter_0.3s_ease-out_both] items-center justify-between gap-3 rounded-xl border border-neutral-800 bg-neutral-900/50 px-4 py-3"
 				>
 					<span className={`flex items-center gap-2.5 text-xs font-medium ${readout.text}`}>
-						<span className="relative flex h-2 w-2">
-							{readout.pulse && (
-								<span
-									className={`absolute inline-flex h-full w-full animate-ping rounded-full opacity-60 ${readout.dot}`}
-								/>
-							)}
-							<span className={`relative inline-flex h-2 w-2 rounded-full ${readout.dot}`} />
-						</span>
+						<span className={`h-1.5 w-1.5 rounded-full ${readout.dot}`} />
 						{readout.label}
 					</span>
 					<span className="select-all font-mono text-[11px] tracking-wide text-neutral-500">
@@ -120,15 +259,8 @@ export function CoaProductPicker({ entries }: { entries: CoaIndexEntry[] }) {
 			<button
 				type="submit"
 				disabled={!selected || navigating}
-				className="flex h-12 w-full items-center justify-center gap-2.5 rounded-xl bg-emerald-500 px-5 text-sm font-semibold text-neutral-950 transition-all duration-200 hover:bg-emerald-400 hover:shadow-[0_0_28px_rgba(16,185,129,0.35)] active:scale-[0.99] disabled:cursor-not-allowed disabled:bg-neutral-800 disabled:text-neutral-500 disabled:shadow-none"
+				className="h-12 w-full rounded-xl bg-emerald-500 px-5 text-sm font-semibold text-neutral-950 transition-colors duration-150 hover:bg-emerald-400 disabled:cursor-not-allowed disabled:bg-neutral-800 disabled:text-neutral-500"
 			>
-				<svg className="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2}>
-					<path
-						strokeLinecap="round"
-						strokeLinejoin="round"
-						d="M9 12.75L11.25 15 15 9.75m-3-7.036A11.959 11.959 0 013.598 6 11.99 11.99 0 003 9.749c0 5.592 3.824 10.29 9 11.623 5.176-1.332 9-6.03 9-11.622 0-1.31-.21-2.571-.598-3.751h-.152c-3.196 0-6.1-1.248-8.25-3.285z"
-					/>
-				</svg>
 				{navigating ? "Opening certificate…" : "View Certificate of Analysis"}
 			</button>
 		</form>
