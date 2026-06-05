@@ -93,6 +93,66 @@ Uses `"use cache"` directive with `cacheLife()` and `cacheTag()` — NOT the old
 9. FAQ (dark, accordion — `homepage-faq.tsx`)
 10. Newsletter (dark, gradient border card)
 
+## Affiliate System
+
+**Not a Saleor app** — built into this storefront. Saleor only ever sees ordinary vouchers; all affiliate semantics (applications, commission rates, payout status) live in **Neon Postgres** (Vercel↔Neon integration, `DATABASE_URL`). Full spec: `docs/affiliate-system.md`.
+
+### Customer flow
+
+```
+?ref=CODE on any URL
+  → middleware sanitizes + UPPERCASES code, sets `affiliate_code` cookie (30d), 307s to clean URL
+  → useAffiliateCode hook auto-applies the code at checkout (checkoutAddPromoCode; never overrides a manual voucher)
+  → Saleor applies the voucher discount
+  → ORDER_PAID webhook (HMAC) → commission recorded in Neon (order_total × commission_rate)
+```
+
+### Operator flow
+
+1. Visitor applies at `/affiliate` → row in Neon + **ops alert email** + applicant confirmation (Resend)
+2. Operator opens **`/[channel]/affiliate/admin`** (operator console) → approves with code + commission % + customer discount %
+3. Approval does everything: creates affiliate in Neon, **auto-mints the Saleor voucher** (ENTIRE_ORDER percentage, channel-listed, `applyOncePerCustomer`), emails the affiliate their code + `?ref=` link
+4. Commissions appear on paid orders → operator marks approved → paid (actual payment is off-platform)
+
+### Console auth
+
+Operators log in with their **normal storefront (Saleor) account**; access requires their email in `AFFILIATE_ADMIN_EMAILS` (comma-separated, fail-closed). Anonymous → login redirect; non-whitelisted → 404. Server actions re-verify the whitelist on every submit. A Bearer-token API (`/api/affiliate/admin`, `AFFILIATE_ADMIN_SECRET`) remains for scripts — note it does NOT mint vouchers.
+
+### Key files
+
+| File                                           | Responsibility                                                           |
+| ---------------------------------------------- | ------------------------------------------------------------------------ |
+| `src/middleware.ts` (§3)                       | `?ref=` capture → uppercase cookie + clean-URL redirect                  |
+| `src/checkout/hooks/use-affiliate-code.ts`     | Auto-apply cookie code at checkout                                       |
+| `src/lib/affiliate/db.ts`                      | Neon storage (affiliates / commissions / applications)                   |
+| `src/lib/affiliate/notify.ts`                  | Resend emails (ops alert, confirmation, approval, rejection) — fail-soft |
+| `src/lib/affiliate/saleor-voucher.ts`          | Voucher minting (rollback on partial failure; duplicate code = reuse)    |
+| `src/lib/affiliate/admin-auth.ts`              | Email-whitelist gate for the console                                     |
+| `src/app/[channel]/(main)/affiliate/`          | Public landing + application form; `admin/` = operator console           |
+| `src/app/api/affiliate/{apply,webhook,admin}/` | Public apply, ORDER_PAID webhook, Bearer API                             |
+
+### Env vars (Vercel)
+
+| Var                      | Purpose                                                                          |
+| ------------------------ | -------------------------------------------------------------------------------- |
+| `DATABASE_URL`           | Neon Postgres (injected by the Vercel↔Neon integration)                         |
+| `RESEND_API_KEY`         | Email notifications (shared with contact form)                                   |
+| `AFFILIATE_NOTIFY_EMAIL` | Ops alert recipient (falls back to `CONTACT_EMAIL`, then support@)               |
+| `AFFILIATE_ADMIN_EMAILS` | Console whitelist (must match Saleor account emails)                             |
+| `AFFILIATE_ADMIN_SECRET` | Bearer token for the script API (optional)                                       |
+| `SALEOR_WEBHOOK_SECRET`  | HMAC for the ORDER_PAID webhook (must match Saleor webhook config)               |
+| `SALEOR_APP_TOKEN`       | App 1 token (needs MANAGE_DISCOUNTS for minting + MANAGE_ORDERS for track-order) |
+| `SALEOR_CHANNEL_ID`      | Optional channel GID fast-path (else resolved from slug)                         |
+
+### Affiliate gotchas
+
+- **Codes are canonical UPPERCASE everywhere** — Saleor's checkout promo match is case-sensitive. Approval uppercases the code; the middleware uppercases the `?ref=` capture. Don't introduce lowercase codes anywhere.
+- **Commission ≠ discount.** `commission_rate` (Neon, what the affiliate earns, used by the webhook) and the voucher's `discountValue` (what the customer saves) are independent numbers set separately at approval.
+- **`?ref=` is reserved** by the middleware for affiliate capture (it strips the param with a redirect and sets a cookie). Never use a `ref` query param for anything else — use `via=` etc.
+- **Voucher minting is atomic**: if channel listing fails after `voucherCreate`, the orphan voucher is deleted and the approval aborts (application stays pending, no email). Re-approval is idempotent — an existing code counts as provisioned.
+- **Webhook is race-proof**: commissions insert with `ON CONFLICT (order_id) DO NOTHING`; duplicate/concurrent Saleor retries return 2xx skips, never double-credit.
+- The webhook accepts `Saleor-Signature` and the deprecated `X-Saleor-Signature` (HMAC-SHA256 hex of the raw body).
+
 ## Infrastructure & Deployment
 
 ### Architecture
