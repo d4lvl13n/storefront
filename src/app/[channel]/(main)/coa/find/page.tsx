@@ -68,15 +68,6 @@ export default async function CoaFindPage(props: { params: Promise<Params> }) {
 					</div>
 				</div>
 
-				{/* Honest disclosure — why a list instead of one COA */}
-				<div className="mt-6 rounded-xl border border-amber-500/20 bg-amber-500/[0.06] px-4 py-3.5">
-					<p className="text-xs leading-relaxed text-amber-100/80">
-						<span className="font-semibold text-amber-300">Why am I choosing from a list?</span> A printing
-						error on a recent production run placed the same QR code and batch number on several different
-						products. The product name printed on your vial is the correct reference.
-					</p>
-				</div>
-
 				{/* Footer */}
 				<div className="mt-10 space-y-3 border-t border-border pt-6 text-xs leading-relaxed text-muted-foreground">
 					<p>

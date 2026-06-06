@@ -447,9 +447,16 @@ export function FilterBar({
 									value={sortValue}
 									onValueChange={(v) => onSortChange(v as SortOption)}
 								>
-									<DropdownMenuRadioItem value="featured">Featured</DropdownMenuRadioItem>
-									<DropdownMenuRadioItem value="newest">Newest</DropdownMenuRadioItem>
-									<DropdownMenuRadioItem value="bestselling">Best Selling</DropdownMenuRadioItem>
+									{/*
+									  Merch-facing labels mapped onto the existing sort values:
+									  - "New Arrivals"  → `newest`      (Saleor DATE desc)
+									  - "Best Sellers"  → `bestselling` (Saleor RATING desc — backend-curated)
+									  - "SALE"          → `featured`    (Saleor default catalog order; no
+									    discount-based sort exists yet, so SALE reuses it until one does)
+									*/}
+									<DropdownMenuRadioItem value="newest">New Arrivals</DropdownMenuRadioItem>
+									<DropdownMenuRadioItem value="bestselling">Best Sellers</DropdownMenuRadioItem>
+									<DropdownMenuRadioItem value="featured">SALE</DropdownMenuRadioItem>
 								</DropdownMenuRadioGroup>
 							</DropdownMenuContent>
 						</DropdownMenu>
