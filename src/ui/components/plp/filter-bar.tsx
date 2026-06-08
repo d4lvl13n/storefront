@@ -149,6 +149,26 @@ export function FilterBar({
 
 									<div className="flex-1 overflow-y-auto">
 										<div className="divide-y divide-white/[0.06]">
+											{productOptions.length > 0 && (
+												<div className="px-4 py-6">
+													<h3 className="mb-4 text-xs font-semibold uppercase tracking-wider text-muted-foreground">
+														Products
+													</h3>
+													<div className="space-y-3">
+														{productOptions.map((product) => (
+															<Link
+																key={product.href}
+																href={product.href}
+																onClick={() => setMobileFiltersOpen(false)}
+																className="block text-sm text-foreground transition-colors hover:text-emerald-400"
+															>
+																{product.name}
+															</Link>
+														))}
+													</div>
+												</div>
+											)}
+
 											{categoryOptions.length > 0 && onCategoryToggle && (
 												<div className="px-4 py-6">
 													<h3 className="mb-4 text-xs font-semibold uppercase tracking-wider text-muted-foreground">
@@ -176,26 +196,6 @@ export function FilterBar({
 																</button>
 															);
 														})}
-													</div>
-												</div>
-											)}
-
-											{productOptions.length > 0 && (
-												<div className="px-4 py-6">
-													<h3 className="mb-4 text-xs font-semibold uppercase tracking-wider text-muted-foreground">
-														Products
-													</h3>
-													<div className="space-y-3">
-														{productOptions.map((product) => (
-															<Link
-																key={product.href}
-																href={product.href}
-																onClick={() => setMobileFiltersOpen(false)}
-																className="block text-sm text-foreground transition-colors hover:text-emerald-400"
-															>
-																{product.name}
-															</Link>
-														))}
 													</div>
 												</div>
 											)}
@@ -284,6 +284,30 @@ export function FilterBar({
 							</Sheet>
 						)}
 
+						{productOptions.length > 0 && (
+							<DropdownMenu>
+								<DropdownMenuTrigger asChild>
+									<Button
+										variant="outline-solid"
+										size="sm"
+										className="hidden shrink-0 border-white/[0.08] bg-transparent text-foreground hover:border-white/[0.15] hover:text-foreground md:flex"
+									>
+										Products
+										<ChevronDown className="ml-1.5 h-4 w-4 opacity-50" />
+									</Button>
+								</DropdownMenuTrigger>
+								<DropdownMenuContent align="start" className="max-h-80 w-64 overflow-y-auto">
+									<DropdownMenuLabel>All products</DropdownMenuLabel>
+									<DropdownMenuSeparator />
+									{productOptions.map((product) => (
+										<DropdownMenuItem key={product.href} asChild>
+											<Link href={product.href}>{product.name}</Link>
+										</DropdownMenuItem>
+									))}
+								</DropdownMenuContent>
+							</DropdownMenu>
+						)}
+
 						{categoryOptions.length > 0 && onCategoryToggle && (
 							<DropdownMenu>
 								<DropdownMenuTrigger asChild>
@@ -315,30 +339,6 @@ export function FilterBar({
 										>
 											{category.name}
 										</DropdownMenuCheckboxItem>
-									))}
-								</DropdownMenuContent>
-							</DropdownMenu>
-						)}
-
-						{productOptions.length > 0 && (
-							<DropdownMenu>
-								<DropdownMenuTrigger asChild>
-									<Button
-										variant="outline-solid"
-										size="sm"
-										className="hidden shrink-0 border-white/[0.08] bg-transparent text-foreground hover:border-white/[0.15] hover:text-foreground md:flex"
-									>
-										Products
-										<ChevronDown className="ml-1.5 h-4 w-4 opacity-50" />
-									</Button>
-								</DropdownMenuTrigger>
-								<DropdownMenuContent align="start" className="max-h-80 w-64 overflow-y-auto">
-									<DropdownMenuLabel>All products</DropdownMenuLabel>
-									<DropdownMenuSeparator />
-									{productOptions.map((product) => (
-										<DropdownMenuItem key={product.href} asChild>
-											<Link href={product.href}>{product.name}</Link>
-										</DropdownMenuItem>
 									))}
 								</DropdownMenuContent>
 							</DropdownMenu>

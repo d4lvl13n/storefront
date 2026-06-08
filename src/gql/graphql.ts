@@ -33504,6 +33504,7 @@ export type ProductDetailsQuery = {
 			name: string;
 			sku?: string | null;
 			quantityAvailable?: number | null;
+			packSize?: string | null;
 			selectionAttributes: Array<{
 				__typename?: "SelectedAttribute";
 				values: Array<{ __typename?: "AttributeValue"; name?: string | null; value?: string | null }>;
@@ -33968,6 +33969,7 @@ export type VariantDetailsFragment = {
 	name: string;
 	sku?: string | null;
 	quantityAvailable?: number | null;
+	packSize?: string | null;
 	selectionAttributes: Array<{
 		__typename?: "SelectedAttribute";
 		values: Array<{ __typename?: "AttributeValue"; name?: string | null; value?: string | null }>;
@@ -34287,6 +34289,7 @@ export const VariantDetailsFragmentDoc = new TypedDocumentString(
   name
   sku
   quantityAvailable
+  packSize: metafield(key: "pack_size")
   selectionAttributes: attributes(variantSelection: VARIANT_SELECTION) {
     values {
       name
@@ -35134,6 +35137,7 @@ export const ProductDetailsDocument = new TypedDocumentString(`
   name
   sku
   quantityAvailable
+  packSize: metafield(key: "pack_size")
   selectionAttributes: attributes(variantSelection: VARIANT_SELECTION) {
     values {
       name

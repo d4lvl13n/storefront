@@ -1,5 +1,6 @@
 export { ProductGallery } from "./product-gallery";
 export { AddToCart } from "./add-to-cart";
+export { BulkOrderSelector, type BulkPackVariant } from "./bulk-order-selector";
 export { PdpTrustRow } from "./trust-row";
 export { StickyBar } from "./sticky-bar";
 

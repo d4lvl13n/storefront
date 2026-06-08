@@ -117,9 +117,9 @@ export function transformToProductCard(product: ProductListItemFragment, channel
 
 	const minAmount = startPrice?.amount ?? 0;
 	const maxAmount = stopPrice?.amount ?? null;
-	// Bulk / qty-based pricing is surfaced whenever variants span a price range
-	// (typical for peptides: 5mg / 10mg / 20mg at descending $/mg).
-	const hasQtyDiscount = maxAmount != null && maxAmount > minAmount;
+	// Bulk / qty-based pricing is offered on every product, so always surface the
+	// label (was previously gated on variants spanning a price range).
+	const hasQtyDiscount = true;
 
 	return {
 		id: product.id,

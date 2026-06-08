@@ -10,6 +10,7 @@ import * as Checkout from "@/lib/checkout";
 
 import { AddToCart } from "./add-to-cart";
 import { AddToCartSync } from "./add-to-cart-sync";
+import { BulkOrderSelector, type BulkPackVariant } from "./bulk-order-selector";
 import { extractReviews, RatingSummary } from "./product-reviews";
 import { PdpTrustRow } from "./trust-row";
 import { VariantSelectionSection } from "./variant-selection";
@@ -77,9 +78,45 @@ export async function VariantSectionDynamic({ product, channel, searchParams }: 
 	// Purity drives the accent spec chip
 	const purity = extractPurity(product);
 
-	// Auto-select variant: use URL param, or auto-select if only one variant exists
-	const selectedVariantID = variantParam || (variants.length === 1 ? variants[0].id : undefined);
+	// ── Bulk-order packs ──────────────────────────────────────────────────────
+	// A variant is a "pack" iff it carries public metadata pack_size; the base
+	// single vial has none. Bulk mode applies when a product has exactly one
+	// single + at least one pack (today's catalog shape). Anything else falls
+	// back to the standard selector unchanged.
+	const packVariants = variants.filter((v) => v.packSize);
+	const singleVariants = variants.filter((v) => !v.packSize);
+	const bulkSingle = packVariants.length > 0 && singleVariants.length === 1 ? singleVariants[0] : undefined;
+	const isBulkMode = Boolean(bulkSingle);
+
+	// Auto-select variant: URL param wins; otherwise default to the single vial
+	// in bulk mode (so price + Add to Cart work out of the box), else the lone
+	// variant for single-variant products.
+	const defaultVariantID = isBulkMode ? bulkSingle!.id : variants.length === 1 ? variants[0].id : undefined;
+	const selectedVariantID = variantParam || defaultVariantID;
 	const selectedVariant = variants.find(({ id }) => id === selectedVariantID);
+
+	// Is the active variant one of the bulk packs? (drives qty lock + price calc)
+	const isPackSelected = isBulkMode && packVariants.some((v) => v.id === selectedVariantID);
+
+	// Pack tiers handed to the bulk selector (only those with live pricing).
+	const bulkPacks: BulkPackVariant[] = isBulkMode
+		? packVariants.flatMap((v) => {
+				const gross = v.pricing?.price?.gross;
+				if (!gross || !v.packSize) return [];
+				return [
+					{
+						id: v.id,
+						name: v.name,
+						packSize: v.packSize,
+						quantityAvailable: v.quantityAvailable ?? 0,
+						price: gross.amount,
+						currency: gross.currency,
+					},
+				];
+			})
+		: [];
+	const singleUnitPrice = bulkSingle?.pricing?.price?.gross?.amount ?? 0;
+	const bulkCurrency = bulkSingle?.pricing?.price?.gross?.currency ?? "USD";
 
 	// Check availability
 	const isAvailable = variants.some((variant) => variant.quantityAvailable);
@@ -229,9 +266,10 @@ export async function VariantSectionDynamic({ product, channel, searchParams }: 
 
 			{/* Buy form - order:4 */}
 			<form action={addToCart} className="order-4 mt-2 space-y-5">
-				{/* Variant Selectors */}
+				{/* Variant Selectors — in bulk mode the packs are handled by the
+				    bulk selector below, so the standard selector only sees singles. */}
 				<VariantSelectionSection
-					variants={variants}
+					variants={isBulkMode ? singleVariants : variants}
 					selectedVariantId={selectedVariantID}
 					productSlug={product.slug}
 					channel={channel}
@@ -255,7 +293,24 @@ export async function VariantSectionDynamic({ product, channel, searchParams }: 
 				)}
 
 				{/* Add to Cart */}
-				<AddToCart disabled={isAddToCartDisabled} disabledReason={disabledReason} />
+				<AddToCart
+					disabled={isAddToCartDisabled}
+					disabledReason={disabledReason}
+					lockQuantity={isPackSelected}
+				/>
+
+				{/* Buy in bulk & save — pack-tier selector (only when packs exist) */}
+				{isBulkMode && bulkSingle && bulkPacks.length > 0 && (
+					<BulkOrderSelector
+						singleId={bulkSingle.id}
+						singleUnitPrice={singleUnitPrice}
+						currency={bulkCurrency}
+						packs={bulkPacks}
+						selectedVariantId={selectedVariantID}
+						channel={channel}
+						productSlug={product.slug}
+					/>
+				)}
 
 				{/* Compact Research Use Only note (full detail lives in the policy pages) */}
 				<div className="flex items-start gap-2 rounded-lg border border-amber-500/20 bg-amber-500/5 px-3 py-2.5">

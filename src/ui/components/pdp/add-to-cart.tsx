@@ -9,6 +9,11 @@ import { cn } from "@/lib/utils";
 interface AddToCartProps {
 	disabled?: boolean;
 	disabledReason?: "no-selection" | "out-of-stock";
+	/**
+	 * When true (a bulk pack is selected) the pack IS the quantity, so we hide
+	 * the stepper and submit a fixed quantity of 1 — never multiply pack_size.
+	 */
+	lockQuantity?: boolean;
 }
 
 const MAX_QTY = 10;
@@ -82,11 +87,15 @@ function AddToCartButton({
 	);
 }
 
-export function AddToCart({ disabled = false, disabledReason }: AddToCartProps) {
+export function AddToCart({ disabled = false, disabledReason, lockQuantity = false }: AddToCartProps) {
 	return (
 		<div className="space-y-4">
-			{/* Quantity Stepper */}
-			<QuantityStepper disabled={disabled} />
+			{/* Quantity: stepper for single vials; fixed at 1 for bulk packs */}
+			{lockQuantity ? (
+				<input type="hidden" name="quantity" value={1} />
+			) : (
+				<QuantityStepper disabled={disabled} />
+			)}
 
 			{/* Add to Cart Button */}
 			<AddToCartButton disabled={disabled} disabledReason={disabledReason} />

@@ -3,6 +3,9 @@ fragment VariantDetails on ProductVariant {
 	name
 	sku
 	quantityAvailable
+	# Bulk-order packs carry public metadata pack_size ("10"/"20"/"50");
+	# the single base vial has none. Drives the "Buy in bulk & save" selector.
+	packSize: metafield(key: "pack_size")
 	selectionAttributes: attributes(variantSelection: VARIANT_SELECTION) {
 		values {
 			name
