@@ -356,19 +356,31 @@ function CommissionRow({
 			</td>
 			<td className="px-4 py-3">
 				<StatusChip
-					tone={c.status === "paid" ? "emerald" : c.status === "approved" ? "amber" : "neutral"}
+					tone={
+						c.status === "paid"
+							? "emerald"
+							: c.status === "approved"
+								? "amber"
+								: c.status === "reversed"
+									? "red"
+									: "neutral"
+					}
 					label={c.status}
 				/>
 				{c.status === "paid" && c.paid_at && (
 					<span className="ml-2 text-xs text-muted-foreground">{formatDate(c.paid_at)}</span>
 				)}
+				{c.status === "reversed" && (
+					<span className="ml-2 text-xs text-muted-foreground">order refunded / cancelled</span>
+				)}
 			</td>
 			<td className="px-4 py-3 text-right">
 				<div className="inline-flex gap-2">
+					{/* Reversed commissions are terminal — no approve/pay actions. */}
 					{c.status === "pending" && (
 						<CommissionButton channel={channel} id={c.id} status="approved" label="Approve" />
 					)}
-					{c.status !== "paid" && (
+					{(c.status === "pending" || c.status === "approved") && (
 						<CommissionButton channel={channel} id={c.id} status="paid" label="Mark paid" />
 					)}
 				</div>

@@ -56,10 +56,14 @@ const SCHEMA_STATEMENTS = [
 		discount_amount DOUBLE PRECISION NOT NULL DEFAULT 0,
 		commission_amount DOUBLE PRECISION NOT NULL,
 		currency TEXT NOT NULL DEFAULT 'USD',
-		status TEXT NOT NULL DEFAULT 'pending' CHECK (status IN ('pending', 'approved', 'paid')),
+		status TEXT NOT NULL DEFAULT 'pending' CHECK (status IN ('pending', 'approved', 'paid', 'reversed')),
 		created_at TIMESTAMPTZ NOT NULL DEFAULT now(),
 		paid_at TIMESTAMPTZ
 	)`,
+	// Widen the status check on databases created before 'reversed' existed
+	// (refund/cancellation reversal). Drop+add is idempotent across restarts.
+	`ALTER TABLE commissions DROP CONSTRAINT IF EXISTS commissions_status_check`,
+	`ALTER TABLE commissions ADD CONSTRAINT commissions_status_check CHECK (status IN ('pending', 'approved', 'paid', 'reversed'))`,
 	`CREATE INDEX IF NOT EXISTS idx_commissions_affiliate ON commissions (affiliate_id)`,
 	`CREATE INDEX IF NOT EXISTS idx_commissions_status ON commissions (status)`,
 	`CREATE TABLE IF NOT EXISTS affiliate_applications (
@@ -229,6 +233,23 @@ export async function recordCommission(data: {
 export async function getCommissionByOrderId(orderId: string): Promise<Commission | null> {
 	const sql = await db();
 	const rows = (await sql.query(`SELECT * FROM commissions WHERE order_id = $1`, [orderId])) as Commission[];
+	return rows[0] ?? null;
+}
+
+/**
+ * Reverse a commission when its order is refunded or cancelled, so a clawed-back
+ * order is never paid out. Idempotent: a row already `reversed` matches nothing
+ * and returns `null`; a non-existent order also returns `null`. A reversal wins
+ * even over an already-`paid` commission (it flags the off-platform clawback).
+ */
+export async function reverseCommissionByOrderId(orderId: string): Promise<Commission | null> {
+	const sql = await db();
+	const rows = (await sql.query(
+		`UPDATE commissions SET status = 'reversed'
+		 WHERE order_id = $1 AND status <> 'reversed'
+		 RETURNING *`,
+		[orderId],
+	)) as Commission[];
 	return rows[0] ?? null;
 }
 

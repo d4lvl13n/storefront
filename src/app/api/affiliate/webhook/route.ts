@@ -1,6 +1,11 @@
 import { NextRequest } from "next/server";
 import { createHmac, timingSafeEqual } from "crypto";
-import { getAffiliateByCode, recordCommission, getCommissionByOrderId } from "@/lib/affiliate/db";
+import {
+	getAffiliateByCode,
+	recordCommission,
+	getCommissionByOrderId,
+	reverseCommissionByOrderId,
+} from "@/lib/affiliate/db";
 import { mirrorPaidOrderToKlaviyo } from "@/lib/analytics/klaviyo-server";
 
 const WEBHOOK_SECRET = process.env.SALEOR_WEBHOOK_SECRET;
@@ -22,27 +27,33 @@ function verifySignature(payload: string, signature: string | null): boolean {
 }
 
 /**
- * Webhook handler for ORDER_PAID events from Saleor.
+ * Webhook handler for Saleor order events.
  *
  * Configure in Saleor Dashboard → Configuration → Webhooks:
  *   URL: https://your-site.com/api/affiliate/webhook
- *   Events: ORDER_PAID
- *   Subscription query:
+ *   Events: ORDER_PAID (records commission) plus ORDER_FULLY_REFUNDED,
+ *           ORDER_REFUNDED and ORDER_CANCELLED (reverse the commission so a
+ *           clawed-back order is never paid out).
+ *   The handler dispatches on the `Saleor-Event` header, so all of these point
+ *   at this one URL. The subscription MUST select `userEmail` (used for the
+ *   self-referral guard and the Klaviyo mirror):
  *
  *   subscription {
  *     event {
- *       ... on OrderPaid {
- *         order {
- *           id
- *           number
- *           userEmail
- *           total { gross { amount currency } }
- *           discounts { amount { amount } }
- *           voucher { code }
- *           channel { slug }
- *         }
- *       }
+ *       ... on OrderPaid { order { ...orderFields } }
+ *       ... on OrderFullyRefunded { order { id } }
+ *       ... on OrderRefunded { order { id } }
+ *       ... on OrderCancelled { order { id } }
  *     }
+ *   }
+ *   fragment orderFields on Order {
+ *     id
+ *     number
+ *     userEmail
+ *     total { gross { amount currency } }
+ *     discounts { amount { amount } }
+ *     voucher { code }
+ *     channel { slug }
  *   }
  */
 export async function POST(request: NextRequest) {
@@ -69,6 +80,30 @@ export async function POST(request: NextRequest) {
 	if (!order) {
 		console.log("[Affiliate Webhook] No order data in payload, skipping");
 		return Response.json({ ok: true, skipped: true });
+	}
+
+	// Saleor sends the event name in the `Saleor-Event` header (e.g. "order_paid").
+	// Dispatch on it so this one endpoint handles both payment and refund/cancel,
+	// and so an unrelated order event can never be mistaken for a payment. An
+	// absent header is treated as the legacy ORDER_PAID path for compatibility.
+	const event = (request.headers.get("saleor-event") ?? "").toLowerCase();
+	const isRefundOrCancel =
+		event === "order_refunded" || event === "order_fully_refunded" || event === "order_cancelled";
+	const isPaid = event === "order_paid" || event === "";
+
+	// Refund / cancellation: reverse the commission so a clawed-back order is
+	// never paid out. Idempotent — a re-delivery finds it already reversed.
+	if (isRefundOrCancel) {
+		const reversed = await reverseCommissionByOrderId(order.id);
+		if (reversed) {
+			console.log(`[Affiliate Webhook] Reversed commission for order ${order.id} (${event})`);
+		}
+		return Response.json({ ok: true, reversed: Boolean(reversed) });
+	}
+
+	if (!isPaid) {
+		console.log(`[Affiliate Webhook] Unhandled event "${event}" for order ${order.id}, skipping`);
+		return Response.json({ ok: true, skipped: true, reason: "unhandled-event" });
 	}
 
 	// Mirror EVERY paid order into Klaviyo (Placed Order + per-line Ordered
@@ -100,6 +135,17 @@ export async function POST(request: NextRequest) {
 	if (!affiliate.active) {
 		console.log(`[Affiliate Webhook] Affiliate "${affiliate.code}" is inactive, skipping`);
 		return Response.json({ ok: true, skipped: true, reason: "inactive" });
+	}
+
+	// Self-referral guard: an affiliate must not earn commission on their own
+	// purchase (a fresh account + their own code). Compare the buyer email to the
+	// affiliate's, case-insensitively.
+	const buyerEmail = order.userEmail?.trim().toLowerCase();
+	if (buyerEmail && buyerEmail === affiliate.email.trim().toLowerCase()) {
+		console.log(
+			`[Affiliate Webhook] Order #${order.number} is a self-referral by "${affiliate.code}", skipping commission`,
+		);
+		return Response.json({ ok: true, skipped: true, reason: "self-referral" });
 	}
 
 	// Calculate commission

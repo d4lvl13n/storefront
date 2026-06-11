@@ -20,7 +20,8 @@ export interface Commission {
 	discount_amount: number;
 	commission_amount: number;
 	currency: string;
-	status: "pending" | "approved" | "paid";
+	/** `reversed` is set automatically when the order is refunded/cancelled. */
+	status: "pending" | "approved" | "paid" | "reversed";
 	created_at: string;
 	paid_at: string | null;
 }
