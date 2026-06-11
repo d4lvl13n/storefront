@@ -1,22 +1,9 @@
 import { NextRequest, NextResponse } from "next/server";
+import { getClientIp, rateLimit } from "@/lib/rate-limit";
 
 // ── Rate limiting ─────────────────────────────────────────────────
 const RATE_LIMIT_WINDOW_MS = 15 * 60 * 1000; // 15 minutes
 const RATE_LIMIT_MAX = 5; // Max 5 submissions per window per IP
-
-const rateLimitStore = new Map<string, { count: number; resetTime: number }>();
-
-function checkRateLimit(ip: string): boolean {
-	const now = Date.now();
-	const entry = rateLimitStore.get(ip);
-	if (!entry || entry.resetTime < now) {
-		rateLimitStore.set(ip, { count: 1, resetTime: now + RATE_LIMIT_WINDOW_MS });
-		return true;
-	}
-	if (entry.count >= RATE_LIMIT_MAX) return false;
-	entry.count++;
-	return true;
-}
 
 // ── Validation ────────────────────────────────────────────────────
 const VALID_REASONS = [
@@ -65,10 +52,19 @@ function validatePayload(body: unknown): { ok: true; data: ContactPayload } | { 
 
 // ── Handler ───────────────────────────────────────────────────────
 export async function POST(request: NextRequest) {
-	// Rate limit
-	const ip = request.headers.get("x-forwarded-for")?.split(",")[0]?.trim() ?? "unknown";
-	if (!checkRateLimit(ip)) {
-		return NextResponse.json({ error: "Too many requests. Please try again later." }, { status: 429 });
+	// Rate limit (durable across serverless instances)
+	const ip = getClientIp(request);
+	const limit = await rateLimit({
+		bucket: "contact",
+		identifier: ip,
+		max: RATE_LIMIT_MAX,
+		windowMs: RATE_LIMIT_WINDOW_MS,
+	});
+	if (!limit.ok) {
+		return NextResponse.json(
+			{ error: "Too many requests. Please try again later." },
+			{ status: 429, headers: { "Retry-After": String(limit.retryAfterSeconds) } },
+		);
 	}
 
 	// Parse & validate

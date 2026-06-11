@@ -1,23 +1,10 @@
 import { NextRequest, NextResponse } from "next/server";
 import { executeRawGraphQL } from "@/lib/graphql";
+import { getClientIp, rateLimit } from "@/lib/rate-limit";
 
 // ── Rate limiting ─────────────────────────────────────────────
 const RATE_LIMIT_WINDOW_MS = 15 * 60 * 1000; // 15 minutes
 const RATE_LIMIT_MAX = 10; // Max 10 lookups per window per IP
-
-const rateLimitStore = new Map<string, { count: number; resetTime: number }>();
-
-function checkRateLimit(ip: string): boolean {
-	const now = Date.now();
-	const entry = rateLimitStore.get(ip);
-	if (!entry || entry.resetTime < now) {
-		rateLimitStore.set(ip, { count: 1, resetTime: now + RATE_LIMIT_WINDOW_MS });
-		return true;
-	}
-	if (entry.count >= RATE_LIMIT_MAX) return false;
-	entry.count++;
-	return true;
-}
 
 // ── GraphQL ───────────────────────────────────────────────────
 const ORDERS_BY_NUMBER_QUERY = /* GraphQL */ `
@@ -70,9 +57,18 @@ interface OrderLookupResponse {
 
 // ── Handler ───────────────────────────────────────────────────
 export async function POST(request: NextRequest) {
-	const ip = request.headers.get("x-forwarded-for")?.split(",")[0]?.trim() ?? "unknown";
-	if (!checkRateLimit(ip)) {
-		return NextResponse.json({ error: "Too many lookups. Please try again later." }, { status: 429 });
+	const ip = getClientIp(request);
+	const limit = await rateLimit({
+		bucket: "track-order",
+		identifier: ip,
+		max: RATE_LIMIT_MAX,
+		windowMs: RATE_LIMIT_WINDOW_MS,
+	});
+	if (!limit.ok) {
+		return NextResponse.json(
+			{ error: "Too many lookups. Please try again later." },
+			{ status: 429, headers: { "Retry-After": String(limit.retryAfterSeconds) } },
+		);
 	}
 
 	let body: unknown;

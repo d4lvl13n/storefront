@@ -1,5 +1,8 @@
 import { NextRequest, NextResponse } from "next/server";
 import { executeRawGraphQL, asValidationError, getUserMessage } from "@/lib/graphql";
+import { getClientIp, rateLimit } from "@/lib/rate-limit";
+
+const RATE_LIMIT_WINDOW_MS = 15 * 60 * 1000; // 15 minutes
 
 const SET_PASSWORD_MUTATION = `
   mutation SetPassword($email: String!, $token: String!, $password: String!) {
@@ -30,6 +33,20 @@ interface SetPasswordResult {
 }
 
 export async function POST(request: NextRequest) {
+	// Throttle to slow brute-forcing of the reset token.
+	const limit = await rateLimit({
+		bucket: "auth:set-password",
+		identifier: getClientIp(request),
+		max: 10,
+		windowMs: RATE_LIMIT_WINDOW_MS,
+	});
+	if (!limit.ok) {
+		return NextResponse.json(
+			{ errors: [{ message: "Too many attempts. Please try again later.", code: "RATE_LIMITED" }] },
+			{ status: 429, headers: { "Retry-After": String(limit.retryAfterSeconds) } },
+		);
+	}
+
 	const body = (await request.json()) as SetPasswordRequest;
 	const { email, token, password } = body;
 

@@ -1,5 +1,8 @@
 import { NextRequest, NextResponse } from "next/server";
 import { executeRawGraphQL, asValidationError, getUserMessage } from "@/lib/graphql";
+import { getClientIp, rateLimit } from "@/lib/rate-limit";
+
+const RATE_LIMIT_WINDOW_MS = 15 * 60 * 1000; // 15 minutes
 
 /**
  * Confirms a newly-registered account via the email link token.
@@ -43,6 +46,20 @@ interface ConfirmAccountResult {
 }
 
 export async function POST(request: NextRequest) {
+	// Throttle to slow brute-forcing of the confirmation token.
+	const limit = await rateLimit({
+		bucket: "auth:confirm",
+		identifier: getClientIp(request),
+		max: 10,
+		windowMs: RATE_LIMIT_WINDOW_MS,
+	});
+	if (!limit.ok) {
+		return NextResponse.json(
+			{ errors: [{ message: "Too many attempts. Please try again later.", code: "RATE_LIMITED" }] },
+			{ status: 429, headers: { "Retry-After": String(limit.retryAfterSeconds) } },
+		);
+	}
+
 	const body = (await request.json()) as ConfirmRequest;
 	const { email, token } = body;
 
