@@ -14,7 +14,9 @@
  *     The money event (Placed Order) is sent server-side — see klaviyo-server.ts.
  *
  * Every function no-ops safely when `window`, `dataLayer`, or `klaviyo` is absent
- * (SSR, ad-blockers, consent gating), so callers can fire unconditionally.
+ * (SSR or ad-blockers), so callers can fire unconditionally. NOTE: there is no
+ * consent gate today — GTM and the Klaviyo SDK load unconditionally; a CMP /
+ * Google Consent Mode is tracked as follow-up, not implemented here.
  *
  * All numeric outputs are coerced to finite Numbers; currency is whatever the
  * caller passes (expected 3-letter ISO 4217).

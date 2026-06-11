@@ -51,10 +51,14 @@ function originOf(value: string | null | undefined): string | null {
  * confirmation / password-reset email link. The register & reset-password API
  * routes are public, so an attacker could POST a redirectUrl pointing at their
  * own origin and have Saleor email the victim a link carrying the single-use
- * token to that origin. Require the URL's origin to match the storefront's own
- * origin — the request's `Origin` header (works across prod/preview/dev) or the
- * configured `NEXT_PUBLIC_STOREFRONT_URL`. Defense-in-depth on top of Saleor's
- * own ALLOWED_CLIENT_HOSTS.
+ * token to that origin. We require the URL's origin to match the storefront's:
+ * the configured `NEXT_PUBLIC_STOREFRONT_URL` (trusted) or the request's `Origin`
+ * header (so preview/dev deploys on changing domains keep working).
+ *
+ * Caveat: the `Origin` header is request-controlled, so this check is best-effort
+ * defence-in-depth, NOT the authoritative control. Saleor's own
+ * ALLOWED_CLIENT_HOSTS is what ultimately rejects an off-domain redirectUrl and
+ * MUST be configured to the storefront origin(s).
  */
 export function isAllowedRedirectUrl(
 	redirectUrl: string | null | undefined,

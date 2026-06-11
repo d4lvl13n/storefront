@@ -30,8 +30,8 @@ export const OrderConfirmation = () => {
 	const { order } = useOrder();
 	const channel = DefaultChannelSlug;
 
-	// GA4 purchase — dedup by order number (sessionStorage) shared with the
-	// post-payment confirmation view, so an order is only ever counted once.
+	// GA4 purchase — dedup by order number (localStorage, in trackPurchase) shared
+	// with the post-payment confirmation view, so an order is only ever counted once.
 	useEffect(() => {
 		if (order) trackPurchaseFromOrder(order);
 	}, [order]);

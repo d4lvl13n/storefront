@@ -73,7 +73,7 @@ export async function GET(request: NextRequest) {
 						<svg width="32" height="32" viewBox="0 0 24 24" fill="none" style={{ marginRight: "12px" }}>
 							<path d="M12 2L14.4 9.6L22 12L14.4 14.4L12 22L9.6 14.4L2 12L9.6 9.6L12 2Z" fill="#1A1A1A" />
 						</svg>
-						saleor
+						InfinityBio Labs
 					</div>
 
 					{/* Title */}

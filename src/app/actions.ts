@@ -24,8 +24,10 @@ export async function clearCheckout(channel: string) {
  * This affirmation is the memo-recommended gate (Frier Levitt Peptide Guidance
  * Memorandum, Section III.B.b — Affirmation of Use). The visitor attests that
  * products will be used for in-vitro laboratory research only, and not for
- * human or animal administration. Middleware reads the same cookie to block
- * direct-navigation access to sensitive routes.
+ * human or animal administration. This is a UX attestation gate only: the cookie
+ * is read client-side to hide the modal and is NOT enforced at the middleware or
+ * at any commerce mutation, so it must not be treated as a security/compliance
+ * control on its own (see ResearchGate in src/ui/components/research-gate.tsx).
  */
 export async function acknowledgeResearchUse() {
 	"use server";

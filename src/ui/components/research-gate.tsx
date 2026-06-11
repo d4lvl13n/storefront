@@ -14,8 +14,12 @@ export const RUO_COOKIE = "ruo_acknowledged";
  * Memorandum, April 2026, Section III.B.b — Know-Your-Customer Screening).
  *
  * Cookie `ruo_acknowledged` is set by `acknowledgeResearchUse()` in
- * `src/app/actions.ts`. The middleware enforces the same cookie on sensitive
- * routes for direct-navigation visitors.
+ * `src/app/actions.ts`. NOTE: this is a UX attestation gate only — the cookie
+ * controls whether this overlay renders and is NOT enforced at the middleware or
+ * at any commerce mutation (Saleor's GraphQL API is public, so a client-set
+ * cookie can't be authoritative). Durable enforcement — an account-level
+ * attestation captured at registration plus a Saleor-side gate — is tracked as
+ * follow-up work, not implemented here.
  */
 export async function ResearchGate() {
 	const jar = await cookies();

@@ -56,7 +56,7 @@ export const PostPaymentConfirmation: FC = () => {
 	}, [matchedOrder, timedOut, pollStart, reexecuteQuery]);
 
 	// GA4 purchase — fires once the order resolves; trackPurchase dedups by order
-	// number (sessionStorage), so polling re-renders never double-count.
+	// number (localStorage), so polling re-renders never double-count.
 	useEffect(() => {
 		if (matchedOrder) trackPurchaseFromOrder(matchedOrder);
 	}, [matchedOrder]);

@@ -191,9 +191,6 @@ export async function POST(request: NextRequest) {
 	try {
 		const payload = JSON.parse(rawBody);
 
-		// Debug: Log raw payload to understand webhook structure
-		console.log("[Revalidate] Raw payload:", JSON.stringify(payload, null, 2));
-
 		const { type, slug, channel, categorySlug } = parseWebhookPayload(payload);
 
 		// Use channel from webhook payload, or fall back to configured default
