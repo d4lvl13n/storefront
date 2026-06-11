@@ -32,6 +32,16 @@ import { formatMoneyWithFallback } from "@/checkout/lib/utils/money";
 
 const dummyGatewayId = "mirumee.payments.dummy";
 
+/**
+ * The Saleor "dummy" gateway mints a fully-paid order with no real charge
+ * (transactionInitialize → CHARGE_SUCCESS). It exists for local/preview testing
+ * only and is compiled out of production: `process.env.NODE_ENV` is inlined by
+ * Next at build time, so the CHARGE_SUCCESS path is dead-code-eliminated in prod
+ * bundles. Defence in depth only — `mirumee.payments.dummy` must ALSO be disabled
+ * on every production Saleor channel so it is never offered to a real shopper.
+ */
+const DUMMY_GATEWAY_ENABLED = process.env.NODE_ENV !== "production";
+
 type HostedPaymentData = {
 	widgetUrl: string;
 	widgetMode: string;
@@ -151,7 +161,7 @@ export const PaymentStep: FC<PaymentStepProps> = ({
 	const availableGateways = checkout.availablePaymentGateways || [];
 	const hostedGateway = availableGateways.find(isHostedGateway);
 	const hasHostedGateway = Boolean(hostedGateway);
-	const hasDummyGateway = availableGateways.some((g) => g.id === dummyGatewayId);
+	const hasDummyGateway = DUMMY_GATEWAY_ENABLED && availableGateways.some((g) => g.id === dummyGatewayId);
 	const hasSupportedGateway = hasHostedGateway || hasDummyGateway;
 
 	// A physical order must have a shipping address + a delivery method before
@@ -295,6 +305,9 @@ export const PaymentStep: FC<PaymentStepProps> = ({
 	const handleDummySubmit = useCallback(
 		async (event?: React.FormEvent) => {
 			if (event) event.preventDefault();
+			// Dummy gateway is dev/preview only — never initialize a no-charge
+			// CHARGE_SUCCESS transaction in production (see DUMMY_GATEWAY_ENABLED).
+			if (!DUMMY_GATEWAY_ENABLED) return;
 			setErrors({});
 			setIsProcessing(true);
 
