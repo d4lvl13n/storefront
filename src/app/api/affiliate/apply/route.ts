@@ -7,6 +7,7 @@ import {
 	resubmitApplication,
 } from "@/lib/affiliate/db";
 import { notifyApplicationReceived } from "@/lib/affiliate/notify";
+import { safeHttpUrl } from "@/lib/safe-url";
 
 // ============================================================================
 // Rate limiting (in-memory, same pattern as revalidate route)
@@ -73,13 +74,20 @@ export async function POST(request: NextRequest) {
 	// Validate required fields
 	const name = sanitize(body.name, 200);
 	const email = sanitize(body.email, 200).toLowerCase();
-	const website = sanitize(body.website, 500);
+	const websiteInput = sanitize(body.website, 500);
+	// Normalize to a safe http(s) URL at ingestion so a hostile value (e.g.
+	// `javascript:…`) can never be stored and later rendered as a link in the
+	// operator console. `null` = supplied but invalid (rejected below); we store
+	// the normalized string (or "" when none was supplied).
+	const websiteSafe = websiteInput ? safeHttpUrl(websiteInput) : "";
+	const website = websiteSafe ?? "";
 	const social_media = sanitize(body.social_media, 500);
 	const promotion_plan = sanitize(body.promotion_plan);
 
 	const errors: string[] = [];
 	if (!name) errors.push("Name is required");
 	if (!email || !EMAIL_RE.test(email)) errors.push("A valid email is required");
+	if (websiteInput && websiteSafe === null) errors.push("Website must be a valid http(s) URL");
 	if (!promotion_plan) errors.push("Please describe how you plan to promote our products");
 
 	if (errors.length > 0) {

@@ -5,6 +5,7 @@ import { buildPageMetadata, noIndexRobots } from "@/lib/seo";
 import { getOperatorGate } from "@/lib/affiliate/admin-auth";
 import { listAffiliates, listApplications, listCommissions } from "@/lib/affiliate/db";
 import type { AffiliateApplication, AffiliateWithStats, Commission } from "@/lib/affiliate/types";
+import { safeHttpUrl } from "@/lib/safe-url";
 import {
 	approveApplicationAction,
 	rejectApplicationAction,
@@ -234,6 +235,10 @@ const secondaryBtn =
 	"h-9 rounded-lg border border-neutral-700 px-4 text-sm font-medium text-neutral-300 transition-colors hover:border-red-500/50 hover:text-red-300";
 
 function ApplicationCard({ app, channel }: { app: AffiliateApplication; channel: string }) {
+	// Guard the href at the sink too: only render the link for a valid http(s)
+	// URL, so a hostile stored value can never become a clickable `javascript:`
+	// link in this privileged console (defence in depth with the ingestion check).
+	const websiteUrl = safeHttpUrl(app.website);
 	return (
 		<div className="bg-card/40 rounded-2xl border border-border p-5 sm:p-6">
 			<div className="flex flex-wrap items-baseline justify-between gap-2">
@@ -243,11 +248,11 @@ function ApplicationCard({ app, channel }: { app: AffiliateApplication; channel:
 						<a href={`mailto:${app.email}`} className="hover:text-foreground">
 							{app.email}
 						</a>
-						{app.website && (
+						{websiteUrl && (
 							<>
 								{" · "}
 								<a
-									href={app.website}
+									href={websiteUrl}
 									target="_blank"
 									rel="noopener noreferrer nofollow"
 									className="text-emerald-400 underline underline-offset-2 hover:text-emerald-300"
