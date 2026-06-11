@@ -104,7 +104,9 @@ Uses `"use cache"` directive with `cacheLife()` and `cacheTag()` — NOT the old
   → middleware sanitizes + UPPERCASES code, sets `affiliate_code` cookie (30d), 307s to clean URL
   → useAffiliateCode hook auto-applies the code at checkout (checkoutAddPromoCode; never overrides a manual voucher)
   → Saleor applies the voucher discount
-  → ORDER_PAID webhook (HMAC) → commission recorded in Neon (order_total × commission_rate)
+  → ORDER_PAID webhook (HMAC) → mirrors the order to Klaviyo + records commission in Neon
+    (order_total × commission_rate; skipped when buyer email == affiliate email — no self-referral)
+  → ORDER_REFUNDED / ORDER_FULLY_REFUNDED / ORDER_CANCELLED (same endpoint) → commission marked `reversed`
 ```
 
 ### Operator flow
@@ -112,7 +114,7 @@ Uses `"use cache"` directive with `cacheLife()` and `cacheTag()` — NOT the old
 1. Visitor applies at `/affiliate` → row in Neon + **ops alert email** + applicant confirmation (Resend)
 2. Operator opens **`/[channel]/affiliate/admin`** (operator console) → approves with code + commission % + customer discount %
 3. Approval does everything: creates affiliate in Neon, **auto-mints the Saleor voucher** (ENTIRE_ORDER percentage, channel-listed, `applyOncePerCustomer`), emails the affiliate their code + `?ref=` link
-4. Commissions appear on paid orders → operator marks approved → paid (actual payment is off-platform)
+4. Commissions appear on paid orders → operator marks approved → paid (actual payment is off-platform). Refunded/cancelled orders auto-reverse to status `reversed` (excluded from payout; approve/pay actions hidden in the console)
 
 ### Console auth
 
@@ -129,20 +131,23 @@ Operators log in with their **normal storefront (Saleor) account**; access requi
 | `src/lib/affiliate/saleor-voucher.ts`          | Voucher minting (rollback on partial failure; duplicate code = reuse)    |
 | `src/lib/affiliate/admin-auth.ts`              | Email-whitelist gate for the console                                     |
 | `src/app/[channel]/(main)/affiliate/`          | Public landing + application form; `admin/` = operator console           |
-| `src/app/api/affiliate/{apply,webhook,admin}/` | Public apply, ORDER_PAID webhook, Bearer API                             |
+| `src/app/api/affiliate/{apply,webhook,admin}/` | Public apply, order webhook (paid + refund/cancel), Bearer API           |
+| `src/lib/analytics/klaviyo-server.ts`          | Server-side Klaviyo "Placed Order" mirror, called from the webhook       |
+| `src/lib/rate-limit.ts`                        | Shared durable (Neon) rate limiter used by apply + other public routes   |
 
 ### Env vars (Vercel)
 
-| Var                      | Purpose                                                                          |
-| ------------------------ | -------------------------------------------------------------------------------- |
-| `DATABASE_URL`           | Neon Postgres (injected by the Vercel↔Neon integration)                         |
-| `RESEND_API_KEY`         | Email notifications (shared with contact form)                                   |
-| `AFFILIATE_NOTIFY_EMAIL` | Ops alert recipient (falls back to `CONTACT_EMAIL`, then support@)               |
-| `AFFILIATE_ADMIN_EMAILS` | Console whitelist (must match Saleor account emails)                             |
-| `AFFILIATE_ADMIN_SECRET` | Bearer token for the script API (optional)                                       |
-| `SALEOR_WEBHOOK_SECRET`  | HMAC for the ORDER_PAID webhook (must match Saleor webhook config)               |
-| `SALEOR_APP_TOKEN`       | App 1 token (needs MANAGE_DISCOUNTS for minting + MANAGE_ORDERS for track-order) |
-| `SALEOR_CHANNEL_ID`      | Optional channel GID fast-path (else resolved from slug)                         |
+| Var                       | Purpose                                                                                         |
+| ------------------------- | ----------------------------------------------------------------------------------------------- |
+| `DATABASE_URL`            | Neon Postgres (injected by the Vercel↔Neon integration)                                        |
+| `RESEND_API_KEY`          | Email notifications (shared with contact form)                                                  |
+| `AFFILIATE_NOTIFY_EMAIL`  | Ops alert recipient (falls back to `CONTACT_EMAIL`, then support@)                              |
+| `AFFILIATE_ADMIN_EMAILS`  | Console whitelist (must match Saleor account emails)                                            |
+| `AFFILIATE_ADMIN_SECRET`  | Bearer token for the script API (optional)                                                      |
+| `SALEOR_WEBHOOK_SECRET`   | HMAC for the affiliate webhook (ORDER_PAID + ORDER_REFUNDED/FULLY_REFUNDED/CANCELLED)           |
+| `SALEOR_APP_TOKEN`        | App 1 token (MANAGE_DISCOUNTS for minting + MANAGE_ORDERS for track-order & Klaviyo line fetch) |
+| `SALEOR_CHANNEL_ID`       | Optional channel GID fast-path (else resolved from slug)                                        |
+| `KLAVIYO_PRIVATE_API_KEY` | Server-side Klaviyo key for the webhook's "Placed Order" mirror (fail-soft when unset)          |
 
 ### Affiliate gotchas
 
@@ -152,27 +157,35 @@ Operators log in with their **normal storefront (Saleor) account**; access requi
 - **Voucher minting is atomic**: if channel listing fails after `voucherCreate`, the orphan voucher is deleted and the approval aborts (application stays pending, no email). Re-approval is idempotent — an existing code counts as provisioned.
 - **Webhook is race-proof**: commissions insert with `ON CONFLICT (order_id) DO NOTHING`; duplicate/concurrent Saleor retries return 2xx skips, never double-credit.
 - The webhook accepts `Saleor-Signature` and the deprecated `X-Saleor-Signature` (HMAC-SHA256 hex of the raw body).
+- **One endpoint, many events**: the webhook dispatches on the `Saleor-Event` header. Register ORDER_PAID **and** ORDER_REFUNDED / ORDER_FULLY_REFUNDED / ORDER_CANCELLED at `/api/affiliate/webhook`, and make the subscription select `order { userEmail }` (needed for the self-referral guard and the Klaviyo mirror). A missing event header is treated as ORDER_PAID for back-compat.
+- **No self-referral**: a commission is skipped when `order.userEmail` matches the affiliate's email (case-insensitive).
+- **Refunds reverse, never delete**: refund/cancel events set the commission to `reversed` (idempotent, wins over `paid` to flag clawback); reversed rows are excluded from the payout totals and lose their console approve/pay actions.
 
 ## Infrastructure & Deployment
 
 ### Architecture
 
-All services run on a single Hetzner VPS (`46.224.112.183`):
+The **storefront** (this repo) is deployed on **Vercel** — production is
+`https://www.infinitybiolabs.com`, auto-built and deployed on push to `main` via
+the Vercel Git integration, with Neon Postgres attached through the Vercel↔Neon
+integration. It is NOT the Hetzner container described below (that path is legacy).
 
-| Service       | Image                                             | Port | Repo                               |
-| ------------- | ------------------------------------------------- | ---- | ---------------------------------- |
-| Storefront    | `infinitybio-storefront:latest` (built on server) | 3000 | `d4lvl13n/storefront`              |
-| Dashboard     | `infinitybio-dashboard:latest` (built on server)  | 9000 | `d4lvl13n/saleor-dashboard` (fork) |
-| Saleor API    | `ghcr.io/saleor/saleor:3.22`                      | 8000 | Official image                     |
-| Celery Worker | `ghcr.io/saleor/saleor:3.22`                      | —    | Official image                     |
-| Postgres      | `postgres:15-alpine`                              | —    | Official image                     |
-| Valkey/Redis  | `valkey:8.1-alpine`                               | —    | Official image                     |
+The Saleor **backend** (API, worker, DB, cache) and the **dashboard** run on a
+single Hetzner VPS (`46.224.112.183`):
+
+| Service       | Image                                            | Port | Repo                               |
+| ------------- | ------------------------------------------------ | ---- | ---------------------------------- |
+| Dashboard     | `infinitybio-dashboard:latest` (built on server) | 9000 | `d4lvl13n/saleor-dashboard` (fork) |
+| Saleor API    | `ghcr.io/saleor/saleor:3.22`                     | 8000 | Official image                     |
+| Celery Worker | `ghcr.io/saleor/saleor:3.22`                     | —    | Official image                     |
+| Postgres      | `postgres:15-alpine`                             | —    | Official image                     |
+| Valkey/Redis  | `valkey:8.1-alpine`                              | —    | Official image                     |
 
 ### Repos
 
 | Repo                        | Purpose                                           | CI/CD                                                  |
 | --------------------------- | ------------------------------------------------- | ------------------------------------------------------ |
-| `d4lvl13n/storefront`       | Next.js storefront (this repo)                    | Push → SSH to Hetzner → build Docker image → restart   |
+| `d4lvl13n/storefront`       | Next.js storefront (this repo)                    | Push to `main` → Vercel auto-build & deploy            |
 | `d4lvl13n/saleor-platform`  | Infra: docker-compose, nginx, scripts, env config | Push → SSH to Hetzner → pull images → restart services |
 | `d4lvl13n/saleor-dashboard` | Saleor Dashboard fork (admin UI)                  | Push → SSH to Hetzner → build Docker image → restart   |
 
@@ -193,12 +206,17 @@ scripts/init-ssl.sh         # First-time Let's Encrypt cert setup
 
 ### CI/CD Flow
 
-**Storefront push:**
+**Storefront push (current — Vercel):**
 
-1. GitHub Actions SSHs into Hetzner
-2. Pulls latest code to `/opt/storefront`
-3. Builds Docker image on server (`--network=host` so `next build` can reach the Saleor API on localhost:8000)
-4. Restarts storefront container via `docker compose --profile frontend up -d`
+1. Push to `main` triggers a Vercel build & deploy via the Git integration
+2. `next build` runs on Vercel; env vars come from the Vercel project settings
+3. Promoted to production at `https://www.infinitybiolabs.com`
+
+> Legacy (Hetzner Docker) flow, kept for reference / self-hosting: GitHub Actions
+> SSHs into Hetzner, pulls to `/opt/storefront`, builds the image with
+> `--network=host` (so `next build` can reach the Saleor API on localhost:8000),
+> and restarts via `docker compose --profile frontend up -d`. The Build Gotchas
+> below describe that Dockerfile and do not apply to the Vercel deploy.
 
 **Infra push:**
 
