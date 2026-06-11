@@ -9,6 +9,7 @@ import { Input } from "@/ui/components/ui/input";
 import { Label } from "@/ui/components/ui/label";
 import { cn } from "@/lib/utils";
 import { isSafeNextPath } from "@/lib/auth/safe-next";
+import { trackSignUp, identify } from "@/lib/analytics/track";
 
 export function SignUpForm() {
 	const params = useParams<{ channel: string }>();
@@ -91,6 +92,10 @@ export function SignUpForm() {
 				}
 				return;
 			}
+
+			// Conversion tracking: GA4 sign_up + Klaviyo profile identify.
+			trackSignUp({ method: "email", userId: data.user?.id });
+			if (data.user?.email) identify(data.user.email);
 
 			setSuccess(true);
 		} catch {

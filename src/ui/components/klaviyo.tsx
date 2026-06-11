@@ -1,4 +1,5 @@
 import Script from "next/script";
+import { getKlaviyoCompanyId } from "@/config/analytics";
 
 /**
  * Klaviyo onsite tracking snippet.
@@ -6,12 +7,11 @@ import Script from "next/script";
  * Loads klaviyo.js and bootstraps the in-page queue so any `klaviyo.push(...)`
  * calls fired before the SDK finishes loading are replayed once it does.
  *
- * Company ID is a public identifier (also visible in the script URL), so the
- * public Klaviyo public key is safe to ship to the browser. The value can be
- * overridden per environment via NEXT_PUBLIC_KLAVIYO_COMPANY_ID.
+ * Company ID is a public identifier (also visible in the script URL), so it is
+ * safe to ship to the browser. Overridable via NEXT_PUBLIC_KLAVIYO_COMPANY_ID.
  */
 export function Klaviyo() {
-	const companyId = process.env.NEXT_PUBLIC_KLAVIYO_COMPANY_ID ?? "VQxsBE";
+	const companyId = getKlaviyoCompanyId();
 
 	if (!companyId) {
 		return null;

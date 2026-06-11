@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { trackNewsletter } from "@/lib/analytics/track";
 
 type Status = "idle" | "pending" | "success" | "error";
 
@@ -29,6 +30,10 @@ export function NewsletterForm() {
 				setErrorMessage(data.error ?? "Something went wrong. Please try again.");
 				return;
 			}
+
+			// Conversion tracking: GA4 newsletter_subscribe (Klaviyo opt-in itself is
+			// recorded server-side by /api/newsletter). Fire before clearing the input.
+			trackNewsletter({ formLocation: "footer" });
 
 			setStatus("success");
 			setEmail("");

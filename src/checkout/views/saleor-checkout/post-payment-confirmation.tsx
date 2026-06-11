@@ -8,6 +8,7 @@ import { CheckCircle, Mail, MapPin, Package, CreditCard, Loader2, AlertCircle } 
 import { useLatestOrderQuery, type OrderFragment } from "@/checkout/graphql";
 import { localeConfig } from "@/config/locale";
 import { formatMoneyWithFallback } from "@/checkout/lib/utils/money";
+import { trackPurchaseFromOrder } from "@/lib/analytics/track";
 
 const POLL_INTERVAL = 1500;
 const MAX_POLL_TIME = 30_000;
@@ -53,6 +54,12 @@ export const PostPaymentConfirmation: FC = () => {
 
 		return () => clearInterval(interval);
 	}, [matchedOrder, timedOut, pollStart, reexecuteQuery]);
+
+	// GA4 purchase — fires once the order resolves; trackPurchase dedups by order
+	// number (sessionStorage), so polling re-renders never double-count.
+	useEffect(() => {
+		if (matchedOrder) trackPurchaseFromOrder(matchedOrder);
+	}, [matchedOrder]);
 
 	if (!matchedOrder && !timedOut) {
 		return <PollingState />;

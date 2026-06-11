@@ -38,6 +38,7 @@ import {
 import { useUser } from "@/checkout/hooks/use-user";
 import { getQueryParams, createQueryString } from "@/checkout/lib/utils/url";
 import { localeConfig } from "@/config/locale";
+import { trackStartedCheckoutFromCheckout } from "@/lib/analytics/track";
 import { getStepNumber } from "./flow";
 
 // Extracted components
@@ -513,6 +514,12 @@ export const InformationStep: FC<InformationStepProps> = ({ checkout, onNext }) 
 					}
 				}
 
+				// Klaviyo Started Checkout + identify — email is now known and persisted,
+				// so the abandoned-checkout flow can reach this customer. Authenticated
+				// users don't re-submit email here, so fall back to their account email
+				// (covers the case where checkout.email hasn't back-filled from attach yet).
+				trackStartedCheckoutFromCheckout(latestCheckout, email || user?.email || undefined);
+
 				onNext();
 			} finally {
 				setIsSubmitting(false);
@@ -527,6 +534,7 @@ export const InformationStep: FC<InformationStepProps> = ({ checkout, onNext }) 
 			user?.addresses,
 			showNewAddressForm,
 			selectedAddressId,
+			user?.email,
 			orderedAddressFields,
 			isRequiredField,
 			getFieldLabel,

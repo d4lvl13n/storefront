@@ -1,8 +1,10 @@
 "use client";
 
+import { useEffect } from "react";
 import Link from "next/link";
 import { CheckCircle, Mail, MapPin, Package, CreditCard } from "lucide-react";
 import { useOrder } from "@/checkout/hooks/use-order";
+import { trackPurchaseFromOrder } from "@/lib/analytics/track";
 import { OrderSummary } from "@/checkout/views/saleor-checkout/order-summary";
 import { CheckoutHeader } from "@/checkout/views/saleor-checkout/checkout-header";
 import { DefaultChannelSlug } from "@/app/config";
@@ -27,6 +29,12 @@ function formatAddress(address: {
 export const OrderConfirmation = () => {
 	const { order } = useOrder();
 	const channel = DefaultChannelSlug;
+
+	// GA4 purchase — dedup by order number (sessionStorage) shared with the
+	// post-payment confirmation view, so an order is only ever counted once.
+	useEffect(() => {
+		if (order) trackPurchaseFromOrder(order);
+	}, [order]);
 
 	// Calculate estimated delivery (7 days from now)
 	// Using a static calculation - this component only renders once after order creation

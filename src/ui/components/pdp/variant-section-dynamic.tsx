@@ -9,7 +9,8 @@ import { executeAuthenticatedGraphQL } from "@/lib/graphql";
 import * as Checkout from "@/lib/checkout";
 
 import { AddToCart } from "./add-to-cart";
-import { AddToCartSync } from "./add-to-cart-sync";
+import { AddToCartSync, type AddToCartTrackingItem } from "./add-to-cart-sync";
+import { ProductViewTracker } from "./product-view-tracker";
 import { BulkOrderSelector, type BulkPackVariant } from "./bulk-order-selector";
 import { extractReviews, RatingSummary } from "./product-reviews";
 import { PdpTrustRow } from "./trust-row";
@@ -166,6 +167,32 @@ export async function VariantSectionDynamic({ product, channel, searchParams }: 
 	// Review summary (from product metadata) for the inline rating
 	const reviews = extractReviews(product.metadata);
 
+	// ── Analytics items ──
+	// The item wired to the add-to-cart form (selected variant — or pack, which
+	// flows through the same form with a locked quantity of 1).
+	const selectedGross = selectedVariant?.pricing?.price?.gross;
+	const trackingItem: AddToCartTrackingItem | undefined = selectedVariant
+		? {
+				id: selectedVariant.id,
+				name: product.name,
+				variant: selectedVariant.name,
+				sku: selectedVariant.sku ?? undefined,
+				price: selectedGross?.amount ?? 0,
+				currency: selectedGross?.currency ?? bulkCurrency,
+			}
+		: undefined;
+	// Product-view item: the active variant's price, else the range-start price.
+	const viewGross = selectedGross ?? product.pricing?.priceRange?.start?.gross;
+	const viewItem = {
+		id: selectedVariantID ?? product.id,
+		name: product.name,
+		variant: selectedVariant?.name,
+		sku: selectedVariant?.sku ?? undefined,
+		price: viewGross?.amount ?? 0,
+		quantity: 1,
+	};
+	const viewCurrency = viewGross?.currency ?? bulkCurrency;
+
 	// Server action for adding to cart
 	async function addToCart(formData: FormData) {
 		"use server";
@@ -321,8 +348,11 @@ export async function VariantSectionDynamic({ product, channel, searchParams }: 
 					</p>
 				</div>
 
-				{/* Open the cart drawer + refresh badge after a successful add */}
-				<AddToCartSync />
+				{/* Open the cart drawer + refresh badge + fire add_to_cart after a successful add */}
+				<AddToCartSync item={trackingItem} />
+
+				{/* Klaviyo Viewed Product (browse-abandonment signal) */}
+				<ProductViewTracker item={viewItem} currency={viewCurrency} />
 
 				{/* Sticky Add to Cart Bar (Mobile) */}
 				<StickyBar productName={product.name} price={price} show={!isAddToCartDisabled} />

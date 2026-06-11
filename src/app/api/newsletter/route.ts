@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
+import { getKlaviyoCompanyId, getKlaviyoNewsletterListId } from "@/config/analytics";
 
 // ── Rate limiting ─────────────────────────────────────────────────
 const RATE_LIMIT_WINDOW_MS = 15 * 60 * 1000; // 15 minutes
@@ -39,32 +40,50 @@ export async function POST(request: NextRequest) {
 
 	const normalized = email.trim().toLowerCase();
 
-	const resendApiKey = process.env.RESEND_API_KEY;
-	const audienceId = process.env.RESEND_AUDIENCE_ID;
+	const companyId = getKlaviyoCompanyId();
+	const listId = getKlaviyoNewsletterListId();
 
-	// Preferred path: add to Resend Audience
-	if (resendApiKey && audienceId) {
-		const res = await fetch(`https://api.resend.com/audiences/${audienceId}/contacts`, {
+	// Preferred path: subscribe to Klaviyo via the client subscriptions endpoint.
+	// Uses the public company ID only (no private API key). For a double opt-in
+	// list this triggers Klaviyo's confirmation email; consent is recorded by
+	// Klaviyo. Re-subscribing an existing profile is idempotent (also 202).
+	if (companyId && listId) {
+		const res = await fetch(`https://a.klaviyo.com/client/subscriptions/?company_id=${companyId}`, {
 			method: "POST",
 			headers: {
-				Authorization: `Bearer ${resendApiKey}`,
 				"Content-Type": "application/json",
+				Accept: "application/json",
+				revision: "2024-10-15",
 			},
-			body: JSON.stringify({ email: normalized, unsubscribed: false }),
+			body: JSON.stringify({
+				data: {
+					type: "subscription",
+					attributes: {
+						profile: {
+							data: {
+								type: "profile",
+								attributes: {
+									email: normalized,
+									subscriptions: { email: { marketing: { consent: "SUBSCRIBED" } } },
+								},
+							},
+						},
+					},
+					relationships: { list: { data: { type: "list", id: listId } } },
+				},
+			}),
 		});
 
+		// Success is 202 Accepted with an empty body.
 		if (!res.ok) {
-			const errorBody = await res.text();
-			// 409 = already exists — treat as success for idempotency
-			if (res.status !== 409) {
-				console.error("Resend audience error:", res.status, errorBody);
-				return NextResponse.json({ error: "Subscription failed. Please try again." }, { status: 502 });
-			}
+			console.error("Klaviyo subscribe error:", res.status, await res.text());
+			return NextResponse.json({ error: "Subscription failed. Please try again." }, { status: 502 });
 		}
 		return NextResponse.json({ success: true });
 	}
 
-	// Fallback: notify ops via email if audience isn't configured
+	// Fallback: notify ops via email if Klaviyo isn't configured
+	const resendApiKey = process.env.RESEND_API_KEY;
 	const notifyTo = process.env.NEWSLETTER_NOTIFY_EMAIL ?? process.env.CONTACT_EMAIL;
 	if (resendApiKey && notifyTo) {
 		const res = await fetch("https://api.resend.com/emails", {

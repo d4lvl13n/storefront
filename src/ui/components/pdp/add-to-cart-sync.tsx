@@ -4,6 +4,18 @@ import { useEffect, useRef } from "react";
 import { useRouter } from "next/navigation";
 import { useFormStatus } from "react-dom";
 import { useCart } from "@/ui/components/cart/cart-context";
+import { trackAddToCart } from "@/lib/analytics/track";
+
+/** The item currently wired to the add-to-cart form (the selected variant/pack). */
+export interface AddToCartTrackingItem {
+	id: string;
+	name: string;
+	variant?: string;
+	sku?: string;
+	/** Unit price in major currency units. */
+	price: number;
+	currency: string;
+}
 
 /**
  * Invisible helper that lives inside the PDP add-to-cart <form>.
@@ -15,20 +27,46 @@ import { useCart } from "@/ui/components/cart/cart-context";
  *      up the new line.
  *   2. openCart() — slides the cart drawer open as add-to-cart confirmation
  *      (which also surfaces the free-shipping progress bar at the ideal moment).
+ *   3. trackAddToCart() — GA4 `add_to_cart` + Klaviyo `Added to Cart`, using the
+ *      quantity actually submitted (read from the in-flight FormData). Bulk packs
+ *      flow through here too: the pack variant is `item`, with quantity 1.
  */
-export function AddToCartSync() {
-	const { pending } = useFormStatus();
+export function AddToCartSync({ item }: { item?: AddToCartTrackingItem }) {
+	const { pending, data } = useFormStatus();
 	const { openCart } = useCart();
 	const router = useRouter();
 	const wasPending = useRef(false);
+	// Capture the submitted FormData while the action is in flight; `data` is null
+	// again by the time pending flips back to false, so stash it from an effect.
+	const submitted = useRef<FormData | null>(null);
+	useEffect(() => {
+		if (pending && data) submitted.current = data;
+	}, [pending, data]);
 
 	useEffect(() => {
 		if (wasPending.current && !pending) {
 			router.refresh();
 			openCart();
+			if (item) {
+				const rawQty = Number(submitted.current?.get("quantity") ?? 1);
+				const quantity = Number.isFinite(rawQty) && rawQty > 0 ? rawQty : 1;
+				trackAddToCart({
+					currency: item.currency,
+					items: [
+						{
+							id: item.id,
+							name: item.name,
+							variant: item.variant,
+							sku: item.sku,
+							price: item.price,
+							quantity,
+						},
+					],
+				});
+			}
 		}
 		wasPending.current = pending;
-	}, [pending, router, openCart]);
+	}, [pending, router, openCart, item]);
 
 	return null;
 }

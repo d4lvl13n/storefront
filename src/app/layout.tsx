@@ -5,7 +5,6 @@ import { type ReactNode } from "react";
 import { Analytics } from "@vercel/analytics/react";
 import { SpeedInsights } from "@vercel/speed-insights/next";
 import { DraftModeNotification } from "@/ui/components/draft-mode-notification";
-import { GoogleAnalytics } from "@/ui/components/google-analytics";
 import { GoogleTagManager, GoogleTagManagerNoscript } from "@/ui/components/google-tag-manager";
 import { Klaviyo } from "@/ui/components/klaviyo";
 import { ThemeProvider } from "@/ui/providers/theme-provider";
@@ -44,7 +43,8 @@ export default function RootLayout(props: { children: ReactNode }) {
 					{!maintenanceMode && <ResearchGate />}
 				</ThemeProvider>
 				<DraftModeNotification />
-				<GoogleAnalytics />
+				{/* GA4 is configured inside the GTM container (GoogleTagManager above),
+				    so there is no separate gtag.js loader here — avoids double-counting. */}
 				{!maintenanceMode && <Klaviyo />}
 				<Analytics />
 				{/* Web Vitals collection — the dependency was installed but never rendered */}

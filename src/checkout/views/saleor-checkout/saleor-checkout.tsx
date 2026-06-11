@@ -17,6 +17,7 @@ import { PostPaymentConfirmation } from "./post-payment-confirmation";
 import { CheckoutSkeleton } from "./checkout-skeleton";
 import { getCheckoutSteps, getCurrentStepFromParams, type CheckoutStepType } from "./flow";
 import { createQueryString } from "@/checkout/lib/utils/url";
+import { trackBeginCheckoutFromCheckout } from "@/lib/analytics/track";
 
 /**
  * Saleor checkout view with multi-step flow.
@@ -59,6 +60,17 @@ export const SaleorCheckout: FC = () => {
 		window.scrollTo({ top: 0, behavior: "instant" });
 		stepRef.current?.focus();
 	}, [currentStep.id]);
+
+	// GA4 begin_checkout — once per checkout, when the user enters the flow (not on
+	// the post-payment confirmation view, where the checkout is already consumed).
+	const beganCheckoutFor = useRef<string | null>(null);
+	useEffect(() => {
+		if (!checkout || fetchingCheckout) return;
+		if (searchParams.get("step") === "confirmation") return;
+		if (beganCheckoutFor.current === checkout.id) return;
+		beganCheckoutFor.current = checkout.id;
+		trackBeginCheckoutFromCheckout(checkout);
+	}, [checkout, fetchingCheckout, searchParams]);
 
 	// Post-payment: if step=confirmation, show success page immediately.
 	// The checkout is consumed by Saleor after payment, so don't wait for it.

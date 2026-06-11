@@ -1,6 +1,7 @@
 import { NextRequest } from "next/server";
 import { createHmac, timingSafeEqual } from "crypto";
 import { getAffiliateByCode, recordCommission, getCommissionByOrderId } from "@/lib/affiliate/db";
+import { mirrorPaidOrderToKlaviyo } from "@/lib/analytics/klaviyo-server";
 
 const WEBHOOK_SECRET = process.env.SALEOR_WEBHOOK_SECRET;
 
@@ -69,6 +70,12 @@ export async function POST(request: NextRequest) {
 		console.log("[Affiliate Webhook] No order data in payload, skipping");
 		return Response.json({ ok: true, skipped: true });
 	}
+
+	// Mirror EVERY paid order into Klaviyo (Placed Order + per-line Ordered
+	// Product) — independent of affiliate status, so it runs before the
+	// voucher/affiliate early-returns below. Never throws and dedups via unique_id
+	// against Saleor retries; awaited so it finishes before this function returns.
+	await mirrorPaidOrderToKlaviyo(order);
 
 	const voucherCode = order.voucher?.code;
 	if (!voucherCode) {
@@ -150,6 +157,7 @@ export async function POST(request: NextRequest) {
 interface OrderPayload {
 	id: string;
 	number?: string;
+	userEmail?: string;
 	total?: { gross?: { amount?: number; currency?: string } };
 	discounts?: Array<{ amount?: { amount?: number } }>;
 	voucher?: { code?: string };
