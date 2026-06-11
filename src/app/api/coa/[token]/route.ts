@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 
 import { lookupCoa } from "@/lib/coa/registry";
 import { type CoaLookupResponse, toPublicCoa } from "@/lib/coa/schema";
+import { getClientIp, rateLimit } from "@/lib/rate-limit";
 
 // ── Rate limiting ─────────────────────────────────────────────
 // Same envelope as /api/track-order: 10 lookups per IP per 15-minute window.
@@ -10,20 +11,6 @@ import { type CoaLookupResponse, toPublicCoa } from "@/lib/coa/schema";
 // scrape them in bulk.
 const RATE_LIMIT_WINDOW_MS = 15 * 60 * 1000;
 const RATE_LIMIT_MAX = 10;
-
-const rateLimitStore = new Map<string, { count: number; resetTime: number }>();
-
-function checkRateLimit(ip: string): boolean {
-	const now = Date.now();
-	const entry = rateLimitStore.get(ip);
-	if (!entry || entry.resetTime < now) {
-		rateLimitStore.set(ip, { count: 1, resetTime: now + RATE_LIMIT_WINDOW_MS });
-		return true;
-	}
-	if (entry.count >= RATE_LIMIT_MAX) return false;
-	entry.count++;
-	return true;
-}
 
 function jsonResponse(body: CoaLookupResponse, status: number) {
 	return NextResponse.json(body, {
@@ -37,8 +24,13 @@ function jsonResponse(body: CoaLookupResponse, status: number) {
 }
 
 export async function GET(request: NextRequest, context: { params: Promise<{ token: string }> }) {
-	const ip = request.headers.get("x-forwarded-for")?.split(",")[0]?.trim() ?? "unknown";
-	if (!checkRateLimit(ip)) {
+	const limit = await rateLimit({
+		bucket: "coa",
+		identifier: getClientIp(request),
+		max: RATE_LIMIT_MAX,
+		windowMs: RATE_LIMIT_WINDOW_MS,
+	});
+	if (!limit.ok) {
 		return jsonResponse(
 			{ ok: false, error: "rate_limited", message: "Too many lookups. Please try again later." },
 			429,

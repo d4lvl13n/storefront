@@ -6,6 +6,10 @@ import { suggestProducts } from "@/lib/search";
 // The header dropdown fires one request per debounced keystroke, so the ceiling
 // is generous — it only exists to stop a scripted client from hammering the
 // Saleor egress. Most repeat queries are served from Next's data cache.
+//
+// Intentionally in-memory (per-instance), NOT the durable Neon limiter the
+// email/lookup routes use: this is a high-frequency, non-sensitive autocomplete,
+// so a DB write per keystroke would cost more than the abuse it prevents.
 const RATE_LIMIT_WINDOW_MS = 60 * 1000; // 1 minute
 const RATE_LIMIT_MAX = 80; // 80 suggest calls per IP per minute
 

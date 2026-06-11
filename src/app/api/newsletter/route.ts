@@ -102,7 +102,8 @@ export async function POST(request: NextRequest) {
 		return NextResponse.json({ success: true });
 	}
 
-	// No ESP configured — log and soft-fail success so the UI stays usable in dev
-	console.warn("Newsletter signup dropped — no RESEND_API_KEY configured:", normalized);
+	// No ESP configured — soft-fail success so the UI stays usable in dev. Don't
+	// log the subscriber email (avoid PII in logs).
+	console.warn("Newsletter signup dropped — no ESP configured (Klaviyo or Resend)");
 	return NextResponse.json({ success: true });
 }
