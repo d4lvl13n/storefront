@@ -1,16 +1,6 @@
 import { NextResponse, type NextRequest } from "next/server";
 
 /**
- * Known good-bot user-agents. Used to skip the checkout auth redirect for bots
- * (which would otherwise create redirect loops on the login page for bots that
- * follow). The RUO attestation is enforced client-side via the ResearchGate
- * modal overlay and server-side at commerce mutations, so we no longer gate
- * browse routes server-side here — full HTML is served to all visitors so
- * Googlebot can index PDPs, categories, and search pages.
- */
-const CRAWLER_UA = /(googlebot|bingbot|duckduckbot|yandex|baiduspider|facebot|twitterbot|slackbot)/i;
-
-/**
  * Channel canonicalization.
  *
  * The storefront routes are organized as `/<channel>/<route>` via the
@@ -37,16 +27,21 @@ const VALID_CHANNELS = new Set(
 const NON_CHANNEL_ROOTS = new Set(["checkout", "access-restricted", "maintenance"]);
 
 /**
- * Authenticated-only checkout guard.
+ * Checkout sign-in redirect (UX nudge — NOT an auth boundary).
  *
- * Frier Levitt memo (April 2026), Section III.B.b — Know-Your-Customer Screening (p. 18):
- *   "Individuals should be prohibited from opening an account"
+ * Frier Levitt memo (April 2026), §III.B.b — Know-Your-Customer screening:
+ * account purchases must be tied to a registered, screened customer. This
+ * redirect sends a logged-out visitor on /checkout to the login page (with
+ * `?next=<path>` so they return afterwards) so they don't fill in a checkout
+ * they can't complete.
  *
- * Saleor does not expose a channel-level toggle for guest checkout. The enforcement
- * happens in the storefront, here. Any request for /checkout without a Saleor
- * refresh token cookie is redirected to the login page. We deliberately check
- * cookie PRESENCE only (not validity) — stale cookies are a small edge case and
- * the frontend will surface the real auth error on the login/checkout pages.
+ * It is explicitly NOT the enforcement point. Saleor's GraphQL API is public, so
+ * a direct client can create and complete a checkout without ever loading the
+ * storefront. The authoritative no-guest-checkout rule must therefore live in
+ * Saleor itself — channel configuration and/or a payment app that rejects orders
+ * with no attached, authenticated customer. This edge check only sees cookie
+ * PRESENCE (a stale or forged cookie passes it), which is fine for a UX redirect
+ * but is exactly why it cannot be relied on as a security control.
  *
  * Refresh-token cookie name is produced by @saleor/auth-sdk using the pattern:
  *   `{saleorApiUrl}+saleor_auth_module_refresh_token`  →  non-alphanumeric → `_`
@@ -93,10 +88,6 @@ export function middleware(request: NextRequest) {
 		return NextResponse.rewrite(rewritten);
 	}
 
-	// ── Detect crawler UA (used by checkout auth gate to avoid redirect loops) ──
-	const ua = request.headers.get("user-agent") ?? "";
-	const isCrawler = CRAWLER_UA.test(ua);
-
 	// ── 1. Channel canonicalization: collapse duplicate-content URLs to /<channel>/* ──
 	//
 	// Without this, `/waiver/peptide-calculator` resolves as channel="waiver" and
@@ -122,14 +113,12 @@ export function middleware(request: NextRequest) {
 		}
 	}
 
-	// ── 2. Authenticated-only checkout: block guest purchase ──
+	// ── 2. Checkout sign-in redirect (UX nudge — see the guard's docblock) ──
 	//
-	// Redirects unauthenticated visitors hitting /checkout to the login page
-	// with a ?next=<original-path> so they return to the same checkout after
-	// signing in. Crawlers skip this check (the checkout route is noindex
-	// anyway, and redirecting crawlers to login creates a redirect loop on
-	// the login page for bots that follow).
-	if (REFRESH_TOKEN_COOKIE && !isCrawler && requiresAuth(url.pathname)) {
+	// Send a logged-out visitor hitting /checkout to the login page with a
+	// ?next=<original-path> so they return after signing in. This is not an auth
+	// boundary: the binding no-guest-checkout rule is enforced Saleor-side.
+	if (REFRESH_TOKEN_COOKIE && requiresAuth(url.pathname)) {
 		const hasRefreshToken = request.cookies.has(REFRESH_TOKEN_COOKIE);
 		if (!hasRefreshToken) {
 			const next = url.pathname + url.search;
