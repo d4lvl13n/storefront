@@ -61,9 +61,23 @@ const SCHEMA_STATEMENTS = [
 		paid_at TIMESTAMPTZ
 	)`,
 	// Widen the status check on databases created before 'reversed' existed
-	// (refund/cancellation reversal). Drop+add is idempotent across restarts.
-	`ALTER TABLE commissions DROP CONSTRAINT IF EXISTS commissions_status_check`,
-	`ALTER TABLE commissions ADD CONSTRAINT commissions_status_check CHECK (status IN ('pending', 'approved', 'paid', 'reversed'))`,
+	// (refund/cancellation reversal). Idempotent and concurrency-safe: only
+	// migrates when the current constraint doesn't already allow 'reversed', and
+	// swallows a duplicate-constraint race between concurrent cold starts.
+	`DO $$
+	BEGIN
+		IF NOT EXISTS (
+			SELECT 1 FROM pg_constraint
+			WHERE conrelid = 'commissions'::regclass
+				AND conname = 'commissions_status_check'
+				AND pg_get_constraintdef(oid) LIKE '%reversed%'
+		) THEN
+			ALTER TABLE commissions DROP CONSTRAINT IF EXISTS commissions_status_check;
+			ALTER TABLE commissions ADD CONSTRAINT commissions_status_check
+				CHECK (status IN ('pending', 'approved', 'paid', 'reversed'));
+		END IF;
+	EXCEPTION WHEN duplicate_object THEN NULL;
+	END $$`,
 	`CREATE INDEX IF NOT EXISTS idx_commissions_affiliate ON commissions (affiliate_id)`,
 	`CREATE INDEX IF NOT EXISTS idx_commissions_status ON commissions (status)`,
 	`CREATE TABLE IF NOT EXISTS affiliate_applications (
