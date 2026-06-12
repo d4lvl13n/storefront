@@ -168,7 +168,7 @@ export const InformationStep: FC<InformationStepProps> = ({ checkout, onNext }) 
 				phone: shippingAddress.phone || "",
 			});
 		}
-	}, [shippingAddress, showNewAddressForm]);
+	}, [defaultCountry, shippingAddress, showNewAddressForm]);
 
 	// Update selected address when user data loads
 	useEffect(() => {

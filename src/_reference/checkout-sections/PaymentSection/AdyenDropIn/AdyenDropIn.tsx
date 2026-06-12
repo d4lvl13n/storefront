@@ -20,6 +20,7 @@ export const AdyenDropIn: FC<AdyenDropinProps> = ({ config }) => {
 	const { onSubmit, onAdditionalDetails } = useAdyenDropin({ config });
 	const dropinContainerElRef = useRef<HTMLDivElement>(null);
 	const dropinComponentRef = useRef<DropinElement | null>(null);
+	const isInitializingRef = useRef(false);
 
 	const createAdyenCheckoutInstance = useCallback(
 		async (container: HTMLDivElement, data: AdyenGatewayInitializePayload) => {
@@ -37,10 +38,15 @@ export const AdyenDropIn: FC<AdyenDropinProps> = ({ config }) => {
 	);
 
 	useEffect(() => {
-		if (dropinContainerElRef.current && !dropinComponentRef.current) {
-			void createAdyenCheckoutInstance(dropinContainerElRef.current, config.data);
+		if (!dropinContainerElRef.current || dropinComponentRef.current || isInitializingRef.current) {
+			return;
 		}
-	}, []);
+
+		isInitializingRef.current = true;
+		void createAdyenCheckoutInstance(dropinContainerElRef.current, config.data).finally(() => {
+			isInitializingRef.current = false;
+		});
+	}, [config.data, createAdyenCheckoutInstance]);
 
 	return <div ref={dropinContainerElRef} />;
 };

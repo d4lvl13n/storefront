@@ -7,6 +7,7 @@ import {
 	reverseCommissionByOrderId,
 } from "@/lib/affiliate/db";
 import { mirrorPaidOrderToKlaviyo } from "@/lib/analytics/klaviyo-server";
+import { executeRawGraphQL } from "@/lib/graphql";
 
 const WEBHOOK_SECRET = process.env.SALEOR_WEBHOOK_SECRET;
 
@@ -106,11 +107,14 @@ export async function POST(request: NextRequest) {
 		return Response.json({ ok: true, skipped: true, reason: "unhandled-event" });
 	}
 
+	const buyerEmail = await resolveOrderUserEmail(order);
+	const orderWithBuyerEmail = buyerEmail ? { ...order, userEmail: buyerEmail } : order;
+
 	// Mirror EVERY paid order into Klaviyo (Placed Order + per-line Ordered
 	// Product) — independent of affiliate status, so it runs before the
 	// voucher/affiliate early-returns below. Never throws and dedups via unique_id
 	// against Saleor retries; awaited so it finishes before this function returns.
-	await mirrorPaidOrderToKlaviyo(order);
+	await mirrorPaidOrderToKlaviyo(orderWithBuyerEmail);
 
 	const voucherCode = order.voucher?.code;
 	if (!voucherCode) {
@@ -138,10 +142,19 @@ export async function POST(request: NextRequest) {
 	}
 
 	// Self-referral guard: an affiliate must not earn commission on their own
-	// purchase (a fresh account + their own code). Compare the buyer email to the
-	// affiliate's, case-insensitively.
-	const buyerEmail = order.userEmail?.trim().toLowerCase();
-	if (buyerEmail && buyerEmail === affiliate.email.trim().toLowerCase()) {
+	// purchase (a fresh account + their own code). `userEmail` is mandatory for
+	// this money control: if the webhook omitted it and the app-token fallback
+	// cannot fetch it, fail closed and do not record a commission.
+	const buyerEmailLower = buyerEmail?.toLowerCase();
+	if (!buyerEmailLower) {
+		console.error(
+			`[Affiliate Webhook] Order #${order.number ?? order.id} has affiliate voucher "${
+				affiliate.code
+			}" but no buyer email; skipping commission`,
+		);
+		return Response.json({ ok: true, skipped: true, reason: "missing-user-email" });
+	}
+	if (buyerEmailLower === affiliate.email.trim().toLowerCase()) {
 		console.log(
 			`[Affiliate Webhook] Order #${order.number} is a self-referral by "${affiliate.code}", skipping commission`,
 		);
@@ -207,6 +220,40 @@ interface OrderPayload {
 	total?: { gross?: { amount?: number; currency?: string } };
 	discounts?: Array<{ amount?: { amount?: number } }>;
 	voucher?: { code?: string };
+}
+
+const ORDER_BUYER_EMAIL_QUERY = `query AffiliateWebhookOrderBuyerEmail($id: ID!) {
+  order(id: $id) {
+    userEmail
+  }
+}`;
+
+interface OrderBuyerEmailResponse {
+	order?: { userEmail?: string | null } | null;
+}
+
+async function resolveOrderUserEmail(order: OrderPayload): Promise<string | null> {
+	const fromPayload = order.userEmail?.trim();
+	if (fromPayload) return fromPayload;
+
+	const appToken = process.env.SALEOR_APP_TOKEN?.trim();
+	if (!appToken) return null;
+
+	const result = await executeRawGraphQL<OrderBuyerEmailResponse>({
+		query: ORDER_BUYER_EMAIL_QUERY,
+		variables: { id: order.id },
+		headers: { Authorization: `Bearer ${appToken}` },
+	});
+
+	if (!result.ok) {
+		console.error(
+			`[Affiliate Webhook] Could not fetch buyer email for order ${order.id}:`,
+			result.error.message,
+		);
+		return null;
+	}
+
+	return result.data.order?.userEmail?.trim() || null;
 }
 
 /**

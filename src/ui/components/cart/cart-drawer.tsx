@@ -9,7 +9,7 @@ import { Button } from "@/ui/components/ui/button";
 import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetCloseButton } from "@/ui/components/ui/sheet";
 import { useCart } from "./cart-context";
 import { addLineToCart, deleteCartLine, updateCartLineQuantity } from "./actions";
-import { AddToCartSync } from "@/ui/components/pdp/add-to-cart-sync";
+import { AddToCartForm } from "@/ui/components/pdp/add-to-cart-form";
 import { cn } from "@/lib/utils";
 import { formatMoney } from "@/lib/utils";
 import { localeConfig } from "@/config/locale";
@@ -363,13 +363,12 @@ export function CartDrawer({ checkoutId, lines, totalPrice, channel, recommendat
 											<p className="text-sm text-muted-foreground">{formatMoney(rec.price, rec.currency)}</p>
 										</div>
 										{rec.variantId ? (
-											<form action={addLineToCart}>
+											<AddToCartForm action={addLineToCart}>
 												<input type="hidden" name="channel" value={channel} />
 												<input type="hidden" name="variantId" value={rec.variantId} />
 												<input type="hidden" name="quantity" value="1" />
 												<UpsellAddButton productName={rec.name} />
-												<AddToCartSync />
-											</form>
+											</AddToCartForm>
 										) : (
 											<Link
 												href={`/${channel}/products/${rec.slug}`}

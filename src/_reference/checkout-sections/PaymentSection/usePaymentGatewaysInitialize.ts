@@ -18,6 +18,7 @@ export const usePaymentGatewaysInitialize = () => {
 
 	const [gatewayConfigs, setGatewayConfigs] = useState<ParsedPaymentGateways>([]);
 	const previousBillingCountry = useRef(billingCountry);
+	const hasInitialized = useRef(false);
 
 	const [{ fetching }, paymentGatewaysInitialize] = usePaymentGatewaysInitializeMutation();
 
@@ -53,8 +54,13 @@ export const usePaymentGatewaysInitialize = () => {
 	);
 
 	useEffect(() => {
+		if (hasInitialized.current) {
+			return;
+		}
+
+		hasInitialized.current = true;
 		void onSubmit();
-	}, []);
+	}, [onSubmit]);
 
 	useEffect(() => {
 		if (billingCountry !== previousBillingCountry.current) {

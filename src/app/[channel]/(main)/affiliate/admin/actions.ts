@@ -129,7 +129,9 @@ export async function setCommissionStatusAction(formData: FormData): Promise<voi
 	const updated = await updateCommissionStatus([id], status as "pending" | "approved" | "paid");
 	backTo(
 		channel,
-		updated > 0 ? { ok: `Commission #${id} marked ${status}.` } : { err: `Commission #${id} not found.` },
+		updated > 0
+			? { ok: `Commission #${id} marked ${status}.` }
+			: { err: `Commission #${id} was not updated. It may be missing or already reversed.` },
 	);
 }
 

@@ -123,13 +123,17 @@ export async function rateLimit(opts: RateLimitOptions): Promise<RateLimitResult
 		await ensureSchema(sql);
 		const windowSeconds = windowMs / 1000;
 		const rows = (await sql.query(
-			`WITH purged AS (
+			`WITH locked AS (
+				SELECT pg_advisory_xact_lock(hashtext($1), hashtext($2))
+			),
+			purged AS (
 				DELETE FROM rate_limit_hits
+				USING locked
 				WHERE bucket = $1 AND identifier = $2
 					AND created_at <= now() - make_interval(secs => $3::double precision)
 			),
 			fresh AS (
-				SELECT COUNT(*)::int AS count FROM rate_limit_hits
+				SELECT COUNT(*)::int AS count FROM rate_limit_hits, locked
 				WHERE bucket = $1 AND identifier = $2
 					AND created_at > now() - make_interval(secs => $3::double precision)
 			),

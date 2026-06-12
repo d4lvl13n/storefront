@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation";
 import { useFormStatus } from "react-dom";
 import { useCart } from "@/ui/components/cart/cart-context";
 import { trackAddToCart } from "@/lib/analytics/track";
+import type { AddToCartActionState } from "./add-to-cart-form";
 
 /** The item currently wired to the add-to-cart form (the selected variant/pack). */
 export interface AddToCartTrackingItem {
@@ -31,7 +32,13 @@ export interface AddToCartTrackingItem {
  *      quantity actually submitted (read from the in-flight FormData). Bulk packs
  *      flow through here too: the pack variant is `item`, with quantity 1.
  */
-export function AddToCartSync({ item }: { item?: AddToCartTrackingItem }) {
+export function AddToCartSync({
+	item,
+	result,
+}: {
+	item?: AddToCartTrackingItem;
+	result: AddToCartActionState;
+}) {
 	const { pending, data } = useFormStatus();
 	const { openCart } = useCart();
 	const router = useRouter();
@@ -45,9 +52,11 @@ export function AddToCartSync({ item }: { item?: AddToCartTrackingItem }) {
 
 	useEffect(() => {
 		if (wasPending.current && !pending) {
-			router.refresh();
-			openCart();
-			if (item) {
+			if (result.status === "success") {
+				router.refresh();
+				openCart();
+			}
+			if (result.status === "success" && item) {
 				const rawQty = Number(submitted.current?.get("quantity") ?? 1);
 				const quantity = Number.isFinite(rawQty) && rawQty > 0 ? rawQty : 1;
 				trackAddToCart({
@@ -66,7 +75,7 @@ export function AddToCartSync({ item }: { item?: AddToCartTrackingItem }) {
 			}
 		}
 		wasPending.current = pending;
-	}, [pending, router, openCart, item]);
+	}, [pending, router, openCart, item, result.status]);
 
 	return null;
 }

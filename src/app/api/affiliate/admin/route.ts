@@ -187,7 +187,11 @@ export async function POST(request: NextRequest) {
 			}
 
 			const updated = await updateCommissionStatus(ids, status as "pending" | "approved" | "paid");
-			return Response.json({ updated });
+			return Response.json({
+				updated,
+				skipped: ids.length - updated,
+				note: "Reversed commissions are terminal and are not updated by this endpoint.",
+			});
 		}
 
 		case "approve_application": {

@@ -319,7 +319,7 @@ export async function updateCommissionStatus(
 		`UPDATE commissions
 		 SET status = $1,
 		     paid_at = CASE WHEN $1 = 'paid' THEN now() ELSE NULL END
-		 WHERE id = ANY($2::int[])
+		 WHERE id = ANY($2::int[]) AND status <> 'reversed'
 		 RETURNING id`,
 		[status, ids],
 	)) as Array<{ id: number }>;

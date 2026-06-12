@@ -49,6 +49,20 @@ next-env.d.ts
 # QA / audit artifacts (screenshots, audit JSON, specs, DB dumps)
 /output/
 
+# Local AI assistant / agent scratch files
+/.claude/
+/.agents/
+/CLAUDE.md
+/claude.md
+/AGENTS.md
+/agents.md
+/CODEX.md
+/codex.md
+/skills/
+/findings.md
+/task_plan.md
+/progress.md
+
 # Playwright
 /playwright-report/
 /test-results/

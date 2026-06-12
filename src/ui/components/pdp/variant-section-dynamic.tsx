@@ -9,7 +9,8 @@ import { executeAuthenticatedGraphQL } from "@/lib/graphql";
 import * as Checkout from "@/lib/checkout";
 
 import { AddToCart } from "./add-to-cart";
-import { AddToCartSync, type AddToCartTrackingItem } from "./add-to-cart-sync";
+import type { AddToCartTrackingItem } from "./add-to-cart-sync";
+import { AddToCartForm, type AddToCartActionState } from "./add-to-cart-form";
 import { ProductViewTracker } from "./product-view-tracker";
 import { BulkOrderSelector, type BulkPackVariant } from "./bulk-order-selector";
 import { extractReviews, RatingSummary } from "./product-reviews";
@@ -194,12 +195,11 @@ export async function VariantSectionDynamic({ product, channel, searchParams }: 
 	const viewCurrency = viewGross?.currency ?? bulkCurrency;
 
 	// Server action for adding to cart
-	async function addToCart(formData: FormData) {
+	async function addToCart(_state: AddToCartActionState, formData: FormData): Promise<AddToCartActionState> {
 		"use server";
 
 		if (!selectedVariantID) {
-			// Silently return - button should be disabled if no variant selected
-			return;
+			return { status: "error", message: "Please select an available option before adding to cart." };
 		}
 
 		// Parse quantity from the form (default 1, clamp 1-10)
@@ -213,9 +213,8 @@ export async function VariantSectionDynamic({ product, channel, searchParams }: 
 			});
 
 			if (!checkout) {
-				// Log error server-side, UI will show via ErrorBoundary if needed
 				console.error("Add to cart: Failed to create checkout");
-				return;
+				return { status: "error", message: "Could not start a cart. Please try again." };
 			}
 
 			await Checkout.saveIdToCookie(channel, checkout.id);
@@ -231,14 +230,14 @@ export async function VariantSectionDynamic({ product, channel, searchParams }: 
 
 			if (!addResult.ok) {
 				console.error("Add to cart failed:", addResult.error.message);
-				return;
+				return { status: "error", message: "Could not add this item. Please try again." };
 			}
 
 			revalidatePath(`/${channel}/cart`);
+			return { status: "success" };
 		} catch (error) {
-			// Log error server-side - the UI feedback comes from cart drawer/badge update
-			// For explicit error UI, would need useActionState (separate enhancement)
 			console.error("Add to cart failed:", error);
+			return { status: "error", message: "Could not add this item. Please try again." };
 		}
 	}
 
@@ -292,7 +291,7 @@ export async function VariantSectionDynamic({ product, channel, searchParams }: 
 			</div>
 
 			{/* Buy form - order:4 */}
-			<form action={addToCart} className="order-4 mt-2 space-y-5">
+			<AddToCartForm action={addToCart} className="order-4 mt-2 space-y-5" item={trackingItem}>
 				{/* Variant Selectors — in bulk mode the packs are handled by the
 				    bulk selector below, so the standard selector only sees singles. */}
 				<VariantSelectionSection
@@ -348,15 +347,12 @@ export async function VariantSectionDynamic({ product, channel, searchParams }: 
 					</p>
 				</div>
 
-				{/* Open the cart drawer + refresh badge + fire add_to_cart after a successful add */}
-				<AddToCartSync item={trackingItem} />
-
-				{/* Klaviyo Viewed Product (browse-abandonment signal) */}
-				<ProductViewTracker item={viewItem} currency={viewCurrency} />
-
 				{/* Sticky Add to Cart Bar (Mobile) */}
 				<StickyBar productName={product.name} price={price} show={!isAddToCartDisabled} />
-			</form>
+			</AddToCartForm>
+
+			{/* Klaviyo Viewed Product (browse-abandonment signal) */}
+			<ProductViewTracker item={viewItem} currency={viewCurrency} />
 		</>
 	);
 }

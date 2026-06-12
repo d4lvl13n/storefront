@@ -1,7 +1,7 @@
 import Image from "next/image";
 import { addLineToCart } from "@/ui/components/cart/actions";
 import { LinkWithChannel } from "@/ui/atoms/link-with-channel";
-import { AddToCartSync } from "./add-to-cart-sync";
+import { AddToCartForm } from "./add-to-cart-form";
 import { QuickAddButton } from "./quick-add-button";
 
 export interface ProtocolItem {
@@ -61,13 +61,12 @@ export function CompleteYourProtocol({ items, channel }: { items: ProtocolItem[]
 						<div className="flex items-center justify-between gap-3">
 							<span className="text-base font-semibold text-foreground">{item.price}</span>
 							{item.variantId ? (
-								<form action={addLineToCart}>
+								<AddToCartForm action={addLineToCart}>
 									<input type="hidden" name="channel" value={channel} />
 									<input type="hidden" name="variantId" value={item.variantId} />
 									<input type="hidden" name="quantity" value="1" />
 									<QuickAddButton />
-									<AddToCartSync />
-								</form>
+								</AddToCartForm>
 							) : (
 								<LinkWithChannel
 									href={`/products/${item.slug}`}
