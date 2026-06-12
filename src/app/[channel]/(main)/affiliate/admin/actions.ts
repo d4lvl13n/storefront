@@ -68,7 +68,9 @@ export async function approveApplicationAction(formData: FormData): Promise<void
 	if (!Number.isFinite(ratePct) || ratePct <= 0 || ratePct > 100) {
 		backTo(channel, { err: "Commission must be a percentage between 0 and 100 (e.g. 10)." });
 	}
-	if (!Number.isFinite(discountPct) || discountPct <= 0 || discountPct > 100) {
+	// 0 is allowed: a referral code that attributes commission but gives the
+	// customer no discount is a valid setup. Negatives and >100 are not.
+	if (!Number.isFinite(discountPct) || discountPct < 0 || discountPct > 100) {
 		backTo(channel, { err: "Customer discount must be a percentage between 0 and 100 (e.g. 10)." });
 	}
 
