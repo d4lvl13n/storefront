@@ -16,6 +16,25 @@ function opsEmail(): string {
 	return process.env.AFFILIATE_NOTIFY_EMAIL ?? process.env.CONTACT_EMAIL ?? "support@infinitybiolabs.com";
 }
 
+// Retry policy for transient Resend failures. We attempt up to MAX_ATTEMPTS
+// times with exponential backoff + jitter. Only network errors, 429 (rate
+// limit) and 5xx are retried — permanent 4xx (bad key, unverified domain,
+// validation like the comma reply_to bug) fail the same way every time, so we
+// fail fast on those instead of stalling the operator's approval action.
+const MAX_ATTEMPTS = 3;
+const BASE_DELAY_MS = 400;
+const MAX_DELAY_MS = 4000;
+
+const sleep = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms));
+
+/** Exponential backoff with jitter; honors a 429 `Retry-After` (seconds) when larger. */
+function backoffMs(attempt: number, retryAfter: string | null): number {
+	const exp = Math.min(BASE_DELAY_MS * 2 ** (attempt - 1), MAX_DELAY_MS);
+	const jittered = exp / 2 + Math.random() * (exp / 2);
+	const retryAfterMs = retryAfter ? Number(retryAfter) * 1000 : 0;
+	return Math.min(Math.max(jittered, Number.isFinite(retryAfterMs) ? retryAfterMs : 0), MAX_DELAY_MS);
+}
+
 async function send(opts: { to: string; subject: string; text: string; replyTo?: string }): Promise<boolean> {
 	const apiKey = process.env.RESEND_API_KEY;
 	if (!apiKey) {
@@ -39,30 +58,66 @@ async function send(opts: { to: string; subject: string; text: string; replyTo?:
 	}
 	const replyTo = opts.replyTo ? splitAddrs(opts.replyTo) : [];
 
-	try {
-		const res = await fetch(RESEND_ENDPOINT, {
-			method: "POST",
-			headers: {
-				Authorization: `Bearer ${apiKey}`,
-				"Content-Type": "application/json",
-			},
-			body: JSON.stringify({
-				from: FROM,
-				to: recipients,
-				...(replyTo.length ? { reply_to: replyTo } : {}),
-				subject: opts.subject,
-				text: opts.text,
-			}),
-		});
-		if (!res.ok) {
-			console.error("[affiliate] Resend error:", res.status, await res.text());
-			return false;
+	const body = JSON.stringify({
+		from: FROM,
+		to: recipients,
+		...(replyTo.length ? { reply_to: replyTo } : {}),
+		subject: opts.subject,
+		text: opts.text,
+	});
+
+	for (let attempt = 1; attempt <= MAX_ATTEMPTS; attempt++) {
+		try {
+			const res = await fetch(RESEND_ENDPOINT, {
+				method: "POST",
+				headers: {
+					Authorization: `Bearer ${apiKey}`,
+					"Content-Type": "application/json",
+				},
+				body,
+			});
+			if (res.ok) return true;
+
+			const status = res.status;
+			const detail = await res.text();
+			const retryable = status === 429 || status >= 500;
+			if (!retryable || attempt === MAX_ATTEMPTS) {
+				console.error(
+					`[affiliate] Resend error ${status} (attempt ${attempt}/${MAX_ATTEMPTS}, ${
+						retryable ? "gave up" : "not retryable"
+					}) — ${opts.subject}:`,
+					detail,
+				);
+				return false;
+			}
+			const wait = backoffMs(attempt, res.headers.get("retry-after"));
+			console.warn(
+				`[affiliate] Resend ${status} — retrying in ${Math.round(
+					wait,
+				)}ms (attempt ${attempt}/${MAX_ATTEMPTS}):`,
+				detail,
+			);
+			await sleep(wait);
+		} catch (err) {
+			// Network/abort error — transient, so retry until attempts run out.
+			if (attempt === MAX_ATTEMPTS) {
+				console.error(
+					`[affiliate] Resend network error (attempt ${attempt}/${MAX_ATTEMPTS}, gave up) — ${opts.subject}:`,
+					err,
+				);
+				return false;
+			}
+			const wait = backoffMs(attempt, null);
+			console.warn(
+				`[affiliate] Resend network error — retrying in ${Math.round(
+					wait,
+				)}ms (attempt ${attempt}/${MAX_ATTEMPTS}):`,
+				err,
+			);
+			await sleep(wait);
 		}
-		return true;
-	} catch (err) {
-		console.error("[affiliate] Resend network error:", err);
-		return false;
 	}
+	return false;
 }
 
 /** New application: alert ops + send the applicant a confirmation. */
