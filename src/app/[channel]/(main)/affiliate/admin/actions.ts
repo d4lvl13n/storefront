@@ -76,19 +76,12 @@ export async function approveApplicationAction(formData: FormData): Promise<void
 		backTo(channel, { err: `Code "${code}" is already in use — pick another.` });
 	}
 
-	// Provision the Saleor voucher FIRST. If it fails, the approval aborts:
-	// the application stays pending, no affiliate is activated, and no email
-	// goes out advertising a code that wouldn't work at checkout. Retrying
-	// after a fix is safe — an already-existing voucher counts as provisioned.
+	// Best-effort voucher minting. When SALEOR_APP_TOKEN is configured and the
+	// mint succeeds, the code works at checkout immediately. When it isn't set
+	// (or the mint fails), approval STILL completes — the operator creates the
+	// voucher manually in the Saleor Dashboard, and the amber banner below tells
+	// them exactly what to make. Approval is never blocked on Saleor.
 	const voucher = await createAffiliateVoucher({ code, discountPct, channelSlug: channel });
-	if (!voucher.ok) {
-		backTo(channel, {
-			err:
-				`Approval NOT completed — the Saleor voucher couldn't be created (${voucher.reason}). ` +
-				`Fix the app permission (MANAGE_DISCOUNTS on SALEOR_APP_TOKEN) or create voucher "${code}" ` +
-				`manually in the Dashboard (${discountPct}% entire order), then approve again with the same code.`,
-		});
-	}
 
 	const application = await updateApplicationStatus(applicationId, "approved");
 	if (!application) backTo(channel, { err: "Application not found." });
@@ -98,20 +91,34 @@ export async function approveApplicationAction(formData: FormData): Promise<void
 		name: application.name,
 		email: application.email,
 		commission_rate: Math.round(ratePct * 100) / 10000,
-		voucher_id: voucher.voucherId,
+		voucher_id: voucher.ok ? voucher.voucherId : null,
 	});
 
 	const emailed = await notifyApplicationApproved(affiliate);
+	const emailNote = emailed
+		? " They've been emailed their referral link."
+		: " ⚠ Email failed — send them their code manually.";
+	const summary = `Approved ${application.name} as "${affiliate.code}" — ${ratePct}% commission, ${discountPct}% customer discount.`;
 
+	if (voucher.ok) {
+		backTo(channel, {
+			ok:
+				summary +
+				(voucher.alreadyExisted
+					? ` Voucher "${affiliate.code}" already existed in Saleor — reused.`
+					: ` Voucher "${affiliate.code}" created in Saleor.`) +
+				emailNote,
+		});
+	}
+
+	// Mint didn't happen — approval is done, but the discount won't apply until
+	// the operator creates the voucher by hand. Surface that prominently (amber).
 	backTo(channel, {
-		ok:
-			`Approved ${application.name} as "${affiliate.code}" — ${ratePct}% commission, ${discountPct}% customer discount.` +
-			(voucher.alreadyExisted
-				? ` Voucher "${affiliate.code}" already existed in Saleor — reused.`
-				: ` Voucher "${affiliate.code}" created in Saleor.`) +
-			(emailed
-				? " They've been emailed their referral link — the program is live for them."
-				: " ⚠ Email failed — send them their code manually."),
+		warn:
+			summary +
+			` ⚠ Now create voucher "${affiliate.code}" in the Saleor Dashboard: ${discountPct}% off the entire order, ` +
+			`listed on this channel, apply once per customer. Until you do, the referral link won't apply a discount at checkout.` +
+			emailNote,
 	});
 }
 

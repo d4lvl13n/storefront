@@ -27,7 +27,7 @@ export const dynamic = "force-dynamic"; // operator data must always be fresh
  */
 
 type Params = { channel: string };
-type SearchParams = { ok?: string | string[]; err?: string | string[] };
+type SearchParams = { ok?: string | string[]; err?: string | string[]; warn?: string | string[] };
 
 export async function generateMetadata(props: { params: Promise<Params> }): Promise<Metadata> {
 	const { channel } = await props.params;
@@ -44,7 +44,7 @@ export default async function AffiliateAdminPage(props: {
 	searchParams: Promise<SearchParams>;
 }) {
 	const { channel } = await props.params;
-	const { ok, err } = await props.searchParams;
+	const { ok, err, warn } = await props.searchParams;
 
 	const gate = await getOperatorGate();
 	if (gate.status === "anonymous") {
@@ -68,6 +68,7 @@ export default async function AffiliateAdminPage(props: {
 	const reviewed = applications.filter((a) => a.status !== "pending").slice(0, 10);
 	const okMsg = typeof ok === "string" ? ok : undefined;
 	const errMsg = typeof err === "string" ? err : undefined;
+	const warnMsg = typeof warn === "string" ? warn : undefined;
 
 	return (
 		<section className="bg-background text-foreground">
@@ -90,6 +91,11 @@ export default async function AffiliateAdminPage(props: {
 				{errMsg && (
 					<div className="mb-6 rounded-xl border border-red-500/30 bg-red-500/10 px-4 py-3 text-sm text-red-200">
 						{errMsg}
+					</div>
+				)}
+				{warnMsg && (
+					<div className="mb-6 rounded-xl border border-amber-500/40 bg-amber-500/10 px-4 py-3 text-sm text-amber-200">
+						{warnMsg}
 					</div>
 				)}
 

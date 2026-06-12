@@ -113,7 +113,7 @@ Uses `"use cache"` directive with `cacheLife()` and `cacheTag()` — NOT the old
 
 1. Visitor applies at `/affiliate` → row in Neon + **ops alert email** + applicant confirmation (Resend)
 2. Operator opens **`/[channel]/affiliate/admin`** (operator console) → approves with code + commission % + customer discount %
-3. Approval does everything: creates affiliate in Neon, **auto-mints the Saleor voucher** (ENTIRE_ORDER percentage, channel-listed, `applyOncePerCustomer`), emails the affiliate their code + `?ref=` link
+3. Approval creates the affiliate in Neon and emails them their code + `?ref=` link. Voucher minting is **best-effort**: if `SALEOR_APP_TOKEN` is configured and the mint succeeds, the Saleor voucher (ENTIRE_ORDER percentage, channel-listed, `applyOncePerCustomer`) is created automatically; if the token is absent or the mint fails, **approval still completes** and an amber banner tells the operator to create the voucher manually in the Saleor Dashboard (`{discount}%` off entire order, this channel, apply once per customer). Approval is never blocked on Saleor.
 4. Commissions appear on paid orders → operator marks approved → paid (actual payment is off-platform). Refunded/cancelled orders auto-reverse to status `reversed` (excluded from payout; approve/pay actions hidden in the console)
 
 ### Console auth
@@ -154,7 +154,7 @@ Operators log in with their **normal storefront (Saleor) account**; access requi
 - **Codes are canonical UPPERCASE everywhere** — Saleor's checkout promo match is case-sensitive. Approval uppercases the code; the middleware uppercases the `?ref=` capture. Don't introduce lowercase codes anywhere.
 - **Commission ≠ discount.** `commission_rate` (Neon, what the affiliate earns, used by the webhook) and the voucher's `discountValue` (what the customer saves) are independent numbers set separately at approval.
 - **`?ref=` is reserved** by the middleware for affiliate capture (it strips the param with a redirect and sets a cookie). Never use a `ref` query param for anything else — use `via=` etc.
-- **Voucher minting is atomic**: if channel listing fails after `voucherCreate`, the orphan voucher is deleted and the approval aborts (application stays pending, no email). Re-approval is idempotent — an existing code counts as provisioned.
+- **Voucher minting is best-effort, but the mint itself is atomic**: when minting is attempted and channel listing fails after `voucherCreate`, the orphan voucher is deleted — but the approval no longer aborts. With no token / a failed mint, the affiliate is still created (with a null `voucher_id`) and the operator is told to make the voucher by hand. Because the affiliate now exists after the first approve, re-approving the same code is blocked ("code already in use") — provision the voucher manually instead of re-approving.
 - **Webhook is race-proof**: commissions insert with `ON CONFLICT (order_id) DO NOTHING`; duplicate/concurrent Saleor retries return 2xx skips, never double-credit.
 - The webhook accepts `Saleor-Signature` and the deprecated `X-Saleor-Signature` (HMAC-SHA256 hex of the raw body).
 - **One endpoint, many events**: the webhook dispatches on the `Saleor-Event` header. Register ORDER_PAID **and** ORDER_REFUNDED / ORDER_FULLY_REFUNDED / ORDER_CANCELLED at `/api/affiliate/webhook`, and make the subscription select `order { userEmail }` (needed for the self-referral guard and the Klaviyo mirror). A missing event header is treated as ORDER_PAID for back-compat.
