@@ -69,6 +69,10 @@ export default async function AffiliateAdminPage(props: {
 	const okMsg = typeof ok === "string" ? ok : undefined;
 	const errMsg = typeof err === "string" ? err : undefined;
 	const warnMsg = typeof warn === "string" ? warn : undefined;
+	// Email is the only channel that proactively alerts ops to new applications.
+	// If Resend isn't configured, those alerts (and approval/rejection emails)
+	// silently drop — surface that loudly here, since it can't be emailed.
+	const emailDisabled = !process.env.RESEND_API_KEY;
 
 	return (
 		<section className="bg-background text-foreground">
@@ -83,6 +87,13 @@ export default async function AffiliateAdminPage(props: {
 				</div>
 
 				{/* Action outcome banners */}
+				{emailDisabled && (
+					<div className="mb-6 rounded-xl border border-red-500/40 bg-red-500/10 px-4 py-3 text-sm text-red-200">
+						<span className="font-semibold">Email notifications are OFF.</span> RESEND_API_KEY is not
+						configured, so new applications won’t email you and approval/rejection emails won’t send. Watch
+						the applications list below and send affiliates their code manually until it’s set.
+					</div>
+				)}
 				{okMsg && (
 					<div className="mb-6 rounded-xl border border-emerald-500/30 bg-emerald-500/10 px-4 py-3 text-sm text-emerald-200">
 						{okMsg}

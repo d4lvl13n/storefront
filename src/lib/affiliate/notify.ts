@@ -23,6 +23,18 @@ async function send(opts: { to: string; subject: string; text: string; replyTo?:
 		return false;
 	}
 
+	// `to` may be comma-separated (e.g. AFFILIATE_NOTIFY_EMAIL with multiple ops
+	// recipients). Split into the array Resend expects; a single address just
+	// yields a one-element array.
+	const recipients = opts.to
+		.split(",")
+		.map((addr) => addr.trim())
+		.filter(Boolean);
+	if (recipients.length === 0) {
+		console.error("[affiliate] no valid recipient — notification dropped:", opts.subject);
+		return false;
+	}
+
 	try {
 		const res = await fetch(RESEND_ENDPOINT, {
 			method: "POST",
@@ -32,7 +44,7 @@ async function send(opts: { to: string; subject: string; text: string; replyTo?:
 			},
 			body: JSON.stringify({
 				from: FROM,
-				to: [opts.to],
+				to: recipients,
 				...(opts.replyTo ? { reply_to: opts.replyTo } : {}),
 				subject: opts.subject,
 				text: opts.text,
