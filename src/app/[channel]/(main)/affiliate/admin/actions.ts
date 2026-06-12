@@ -2,6 +2,7 @@
 
 import { redirect } from "next/navigation";
 import { requireOperator } from "@/lib/affiliate/admin-auth";
+import { getServerAuthClient } from "@/lib/auth/server";
 import {
 	createAffiliate,
 	getAffiliateByCode,
@@ -25,6 +26,24 @@ const CODE_RE = /^[a-zA-Z0-9_-]{2,50}$/;
 function backTo(channel: string, params: Record<string, string>): never {
 	const qs = new URLSearchParams(params).toString();
 	redirect(`/${encodeURIComponent(channel)}/affiliate/admin${qs ? `?${qs}` : ""}`);
+}
+
+/**
+ * Sign the current (non-operator) user out and bounce them to the login page,
+ * pre-pointed back at the operator console.
+ *
+ * This is the escape hatch for the "not authorized" notice: an operator who
+ * landed here on the wrong account can't otherwise recover, because the login
+ * page redirects already-authenticated users straight back. No operator check —
+ * by definition this is only reached by someone who is NOT an operator, and all
+ * it does is sign the current session out.
+ */
+export async function signOutToOperatorLoginAction(formData: FormData): Promise<void> {
+	const raw = String(formData.get("channel") ?? "").trim();
+	const channel = /^[a-z0-9-]+$/i.test(raw) ? raw : "";
+	await (await getServerAuthClient()).signOut();
+	const base = channel ? `/${channel}` : "";
+	redirect(`${base}/login?next=${encodeURIComponent(`${base}/affiliate/admin`)}`);
 }
 
 export async function approveApplicationAction(formData: FormData): Promise<void> {

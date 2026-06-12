@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { notFound, redirect } from "next/navigation";
+import { redirect } from "next/navigation";
 
 import { buildPageMetadata, noIndexRobots } from "@/lib/seo";
 import { getOperatorGate } from "@/lib/affiliate/admin-auth";
@@ -10,6 +10,7 @@ import {
 	approveApplicationAction,
 	rejectApplicationAction,
 	setCommissionStatusAction,
+	signOutToOperatorLoginAction,
 	toggleAffiliateActiveAction,
 } from "./actions";
 
@@ -50,8 +51,11 @@ export default async function AffiliateAdminPage(props: {
 		redirect(`/${channel}/login?next=${encodeURIComponent(`/${channel}/affiliate/admin`)}`);
 	}
 	if (gate.status === "forbidden") {
-		// Logged in but not whitelisted — don't advertise that this page exists.
-		notFound();
+		// Logged in but not on the operator whitelist. Rather than a dead-end 404,
+		// show a recoverable notice with a sign-out escape hatch — an operator who
+		// landed on the wrong account can otherwise get stuck (the login page bounces
+		// already-authenticated users straight back here).
+		return <NotAuthorized channel={channel} email={gate.email} />;
 	}
 
 	const [{ applications }, affiliates, { commissions }] = await Promise.all([
@@ -174,6 +178,43 @@ export default async function AffiliateAdminPage(props: {
 					Dashboard. Commissions appear here on paid orders and move pending → approved → paid; the payment
 					itself (wire / PayPal) happens outside this page.
 				</p>
+			</div>
+		</section>
+	);
+}
+
+// ─── Not-authorized notice ─────────────────────────────────────
+
+function NotAuthorized({ channel, email }: { channel: string; email: string }) {
+	return (
+		<section className="bg-background text-foreground">
+			<div className="mx-auto flex max-w-lg flex-col items-center px-6 py-24 text-center sm:py-32">
+				<p className="text-sm font-medium uppercase tracking-[0.25em] text-emerald-400">
+					Affiliate operator console
+				</p>
+				<h1 className="mt-3 text-2xl font-bold tracking-tight sm:text-3xl">This area is for operators</h1>
+				<p className="mt-4 text-sm leading-relaxed text-muted-foreground">
+					You&rsquo;re signed in as <span className="font-medium text-foreground">{email}</span>, which
+					isn&rsquo;t authorized for the affiliate operations console. If you have an operator account, sign
+					out and sign back in with it.
+				</p>
+				<div className="mt-8 flex flex-wrap items-center justify-center gap-3">
+					<form action={signOutToOperatorLoginAction}>
+						<input type="hidden" name="channel" value={channel} />
+						<button
+							type="submit"
+							className="h-10 rounded-lg bg-emerald-500 px-5 text-sm font-semibold text-neutral-950 transition-colors hover:bg-emerald-400"
+						>
+							Sign out &amp; switch account
+						</button>
+					</form>
+					<a
+						href={`/${channel}`}
+						className="h-10 rounded-lg border border-border px-5 text-sm font-medium leading-10 text-muted-foreground transition-colors hover:text-foreground"
+					>
+						Back to storefront
+					</a>
+				</div>
 			</div>
 		</section>
 	);

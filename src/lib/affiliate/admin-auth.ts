@@ -13,7 +13,7 @@ import { getCurrentUser } from "@/app/[channel]/(main)/account/get-current-user"
 
 export type OperatorGate =
 	| { status: "anonymous" }
-	| { status: "forbidden" }
+	| { status: "forbidden"; email: string }
 	| { status: "ok"; email: string };
 
 function allowList(): string[] {
@@ -29,7 +29,7 @@ export async function getOperatorGate(): Promise<OperatorGate> {
 
 	const allowed = allowList();
 	if (allowed.length === 0 || !allowed.includes(user.email.toLowerCase())) {
-		return { status: "forbidden" };
+		return { status: "forbidden", email: user.email };
 	}
 
 	return { status: "ok", email: user.email };
