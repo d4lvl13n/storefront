@@ -23,17 +23,21 @@ async function send(opts: { to: string; subject: string; text: string; replyTo?:
 		return false;
 	}
 
-	// `to` may be comma-separated (e.g. AFFILIATE_NOTIFY_EMAIL with multiple ops
-	// recipients). Split into the array Resend expects; a single address just
-	// yields a one-element array.
-	const recipients = opts.to
-		.split(",")
-		.map((addr) => addr.trim())
-		.filter(Boolean);
+	// `to` and `reply_to` may be comma-separated (e.g. AFFILIATE_NOTIFY_EMAIL
+	// with multiple ops recipients, used as the approval email's reply-to).
+	// Resend rejects a comma-joined string — both fields must be arrays.
+	const splitAddrs = (value: string) =>
+		value
+			.split(",")
+			.map((addr) => addr.trim())
+			.filter(Boolean);
+
+	const recipients = splitAddrs(opts.to);
 	if (recipients.length === 0) {
 		console.error("[affiliate] no valid recipient — notification dropped:", opts.subject);
 		return false;
 	}
+	const replyTo = opts.replyTo ? splitAddrs(opts.replyTo) : [];
 
 	try {
 		const res = await fetch(RESEND_ENDPOINT, {
@@ -45,7 +49,7 @@ async function send(opts: { to: string; subject: string; text: string; replyTo?:
 			body: JSON.stringify({
 				from: FROM,
 				to: recipients,
-				...(opts.replyTo ? { reply_to: opts.replyTo } : {}),
+				...(replyTo.length ? { reply_to: replyTo } : {}),
 				subject: opts.subject,
 				text: opts.text,
 			}),
