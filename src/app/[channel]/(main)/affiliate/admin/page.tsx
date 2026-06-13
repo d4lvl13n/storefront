@@ -10,6 +10,7 @@ import {
 	approveApplicationAction,
 	rejectApplicationAction,
 	setCommissionStatusAction,
+	resendAffiliateEmailAction,
 	signOutToOperatorLoginAction,
 	toggleAffiliateActiveAction,
 } from "./actions";
@@ -490,6 +491,17 @@ function AffiliateRow({ a, channel }: { a: AffiliateWithStats; channel: string }
 			<Stat label="Paid" value={formatMoney(a.paid_amount, "USD")} />
 			<div className="ml-auto flex items-center gap-3">
 				{!a.active && <StatusChip tone="red" label="paused" />}
+				<form action={resendAffiliateEmailAction}>
+					<input type="hidden" name="channel" value={channel} />
+					<input type="hidden" name="affiliate_id" value={a.id} />
+					<button
+						type="submit"
+						title="Re-send this affiliate their code, referral link and commission rate"
+						className="rounded-md border border-neutral-700 px-2.5 py-1 text-xs font-medium text-neutral-300 transition-colors hover:border-emerald-500/50 hover:text-emerald-300"
+					>
+						Resend email
+					</button>
+				</form>
 				<form action={toggleAffiliateActiveAction}>
 					<input type="hidden" name="channel" value={channel} />
 					<input type="hidden" name="affiliate_id" value={a.id} />

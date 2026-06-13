@@ -6,6 +6,7 @@ import { getServerAuthClient } from "@/lib/auth/server";
 import {
 	createAffiliate,
 	getAffiliateByCode,
+	getAffiliateById,
 	updateAffiliate,
 	updateApplicationStatus,
 	updateCommissionStatus,
@@ -182,5 +183,32 @@ export async function toggleAffiliateActiveAction(formData: FormData): Promise<v
 					}`,
 				}
 			: { err: "Affiliate not found." },
+	);
+}
+
+/**
+ * Re-send an existing affiliate their approval email (code, referral link,
+ * commission rate). Recovery for sends that failed at approval time — the
+ * affiliate already exists in Neon, so nothing is re-created; we just re-fire
+ * the same email. Safe to click repeatedly.
+ */
+export async function resendAffiliateEmailAction(formData: FormData): Promise<void> {
+	await requireOperator();
+
+	const channel = String(formData.get("channel") ?? "");
+	const id = Number(formData.get("affiliate_id"));
+	if (!id) backTo(channel, { err: "Missing affiliate id." });
+
+	const affiliate = await getAffiliateById(id);
+	if (!affiliate) backTo(channel, { err: "Affiliate not found." });
+
+	const emailed = await notifyApplicationApproved(affiliate);
+	backTo(
+		channel,
+		emailed
+			? { ok: `Re-sent the code email to ${affiliate.email} (${affiliate.code}).` }
+			: {
+					err: `Couldn't send to ${affiliate.email} — check the email logs (Resend may be misconfigured). Their code is "${affiliate.code}".`,
+				},
 	);
 }
