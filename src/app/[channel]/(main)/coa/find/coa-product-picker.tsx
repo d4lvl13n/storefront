@@ -113,8 +113,7 @@ export function CoaProductPicker({ entries }: { entries: CoaIndexEntry[] }) {
 		event.preventDefault();
 		if (!selected || !channel) return;
 		setNavigating(true);
-		// `via`, not `ref` — middleware reserves ?ref= for affiliate capture.
-		router.push(`/${channel}/coa/${selected.token}?via=label-misprint`);
+		router.push(`/${channel}/coa/${selected.token}`);
 	};
 
 	return (

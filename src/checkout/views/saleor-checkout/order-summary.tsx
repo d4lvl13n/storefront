@@ -2,7 +2,7 @@
 
 import { useState, type FC } from "react";
 import Image from "next/image";
-import { Tag, ShieldCheck, RotateCcw, Truck, ChevronDown, ShoppingBag } from "lucide-react";
+import { Tag, ShieldCheck, FlaskConical, Truck, ChevronDown, ShoppingBag } from "lucide-react";
 import { Button } from "@/ui/components/ui/button";
 import { Input } from "@/ui/components/ui/input";
 import { cn } from "@/lib/utils";
@@ -429,11 +429,11 @@ export const OrderSummary: FC<OrderSummaryProps> = ({ checkout, order, editable 
 							</span>
 						</div>
 						<div className="flex flex-col items-center rounded-lg bg-secondary p-2.5 text-center">
-							<RotateCcw className="mb-1 h-4 w-4 text-muted-foreground" />
+							<FlaskConical className="mb-1 h-4 w-4 text-muted-foreground" />
 							<span className="text-[10px] leading-tight text-muted-foreground">
-								30-day
+								Lab-
 								<br />
-								returns
+								tested
 							</span>
 						</div>
 						<div className="flex flex-col items-center rounded-lg bg-secondary p-2.5 text-center">

@@ -164,7 +164,7 @@ async function ProductContent({
 	const coaUrl = metaMap.get("coa_url") ?? null;
 	const lotNumber = metaMap.get("lot_number") ?? metaMap.get("batch_number") ?? null;
 
-	// FAQ section = product FAQs + storage/handling + shipping/returns
+	// FAQ section = product FAQs + storage/handling + shipping
 	const faqEntries: FaqEntry[] = [
 		...(faqItems ?? []),
 		...(careInstructions
@@ -174,11 +174,6 @@ async function ProductContent({
 			question: "How is it shipped?",
 			answer:
 				"Free shipping on orders over $150. Standard delivery 3–7 business days, shipped in temperature-controlled packaging to maintain stability.",
-		},
-		{
-			question: "What is your return policy?",
-			answer:
-				"Returns are accepted within 14 days of delivery for unopened, sealed items only. Contact support for return authorization.",
 		},
 	];
 

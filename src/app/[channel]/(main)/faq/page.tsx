@@ -4,7 +4,7 @@ import { HomepageFAQ } from "../homepage-faq";
 export const metadata: Metadata = {
 	title: "FAQ | InfinityBio Labs",
 	description:
-		"Frequently asked questions about InfinityBio Labs research peptides — purity standards, shipping, storage, Certificates of Analysis, returns, and bulk pricing.",
+		"Frequently asked questions about InfinityBio Labs research peptides — purity standards, shipping, storage, Certificates of Analysis, and bulk pricing.",
 	alternates: { canonical: "/us-us/faq" },
 };
 

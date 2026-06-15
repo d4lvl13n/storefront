@@ -21,10 +21,6 @@ const faqItems = [
 		a: "Yes. Every order includes batch-specific COAs documenting HPLC purity data, mass spectrometry identity confirmation, endotoxin results, and physical characteristics. Historical COAs for any product lot are available upon request.",
 	},
 	{
-		q: "What is your return policy?",
-		a: "Returns are accepted within 14 days of delivery for unopened, sealed items only. If a product doesn't meet the specifications listed on the COA, we replace it at no cost. Contact our support team for return authorization.",
-	},
-	{
 		q: "Do you offer bulk or institutional pricing?",
 		a: "Yes. We offer volume discounts for bulk orders and institutional accounts with NET-30 payment terms for verified research organizations. Contact our sales team for custom pricing.",
 	},

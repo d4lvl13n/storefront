@@ -454,7 +454,7 @@ function GuaranteeStrip() {
 		{
 			icon: IconCertificate,
 			title: "99% purity guaranteed",
-			subtitle: "Or your money back",
+			subtitle: "Verified by HPLC + MS",
 		},
 	];
 

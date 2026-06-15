@@ -12,9 +12,6 @@ import { VerifyPdfFile } from "./verify-pdf-file";
 export const dynamic = "force-dynamic"; // never cache the rendered HTML — status flips matter
 
 type Params = { channel: string; token: string };
-// `via`, not `ref` — the middleware reserves ?ref= for affiliate capture and
-// strips it from the URL with a redirect before the page would ever see it.
-type SearchParams = { via?: string | string[] };
 type PendingCoa = Extract<PublicCoa, { status: "pending" }>;
 type SharedCoa = Extract<PublicCoa, { status: "shared" }>;
 type PublishedCoa = Exclude<PublicCoa, PendingCoa | SharedCoa>;
@@ -32,17 +29,8 @@ export async function generateMetadata(props: { params: Promise<Params> }): Prom
 	return { ...base, robots: noIndexRobots };
 }
 
-export default async function CoaVerificationPage(props: {
-	params: Promise<Params>;
-	searchParams: Promise<SearchParams>;
-}) {
+export default async function CoaVerificationPage(props: { params: Promise<Params> }) {
 	const { channel, token: rawToken } = await props.params;
-	const { via } = await props.searchParams;
-	// Customer arrived from the guided picker (/coa/find) that shared
-	// mis-printed QR codes redirect to — their label's batch number is known
-	// to be wrong, so swap the "must match your label" warning for an
-	// explanation. Cosmetic only; spoofing the param changes nothing material.
-	const viaLabelMisprint = via === "label-misprint";
 
 	// 1) Reject malformed tokens early — generic 404 (no existence leak).
 	const canonical = normalizeToken(rawToken);
@@ -108,7 +96,7 @@ export default async function CoaVerificationPage(props: {
 
 			<div className="relative mx-auto max-w-5xl px-6 py-16 sm:py-20">
 				{/* Header */}
-				<CoaHeader coa={coa} viaLabelMisprint={viaLabelMisprint} />
+				<CoaHeader coa={coa} />
 
 				{/* Status-driven body */}
 				{coa.status === "recalled" ? (
@@ -197,7 +185,7 @@ function PendingCoaPage({ coa }: { coa: PendingCoa }) {
 
 // ─── Header ────────────────────────────────────────────────────
 
-function CoaHeader({ coa, viaLabelMisprint }: { coa: PublishedCoa; viaLabelMisprint: boolean }) {
+function CoaHeader({ coa }: { coa: PublishedCoa }) {
 	const issuedAtLabel = formatIssuedAt(coa.issuedAt);
 
 	return (
@@ -258,22 +246,10 @@ function CoaHeader({ coa, viaLabelMisprint }: { coa: PublishedCoa; viaLabelMispr
 				</div>
 			</div>
 
-			{viaLabelMisprint ? (
-				// Arrived via /coa/find: their label's printed batch number is known
-				// to be wrong, so "must match your label" would contradict reality.
-				<p className="mt-4 text-sm leading-relaxed text-muted-foreground">
-					<span className="font-semibold text-amber-300">About your label:</span> a printing error on a recent
-					production run means the batch number printed on your vial may not match the batch shown above. The{" "}
-					<span className="text-foreground">product name</span> on your label is the correct reference. If
-					that doesn&rsquo;t match the peptide above, <span className="text-emerald-400">contact us</span>{" "}
-					before using this product for research.
-				</p>
-			) : (
-				<p className="mt-4 text-sm leading-relaxed text-muted-foreground">
-					If the peptide or batch above doesn&rsquo;t match the label on your vial,{" "}
-					<span className="text-emerald-400">contact us</span> before using this product for research.
-				</p>
-			)}
+			<p className="mt-4 text-sm leading-relaxed text-muted-foreground">
+				If the peptide or batch above doesn&rsquo;t match the label on your vial,{" "}
+				<span className="text-emerald-400">contact us</span> before using this product for research.
+			</p>
 		</div>
 	);
 }
