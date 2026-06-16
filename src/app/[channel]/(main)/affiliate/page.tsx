@@ -73,7 +73,7 @@ export default function AffiliatePage() {
 							Affiliate Program
 						</p>
 						<h1 className="mt-4 text-3xl font-bold tracking-tight sm:text-4xl lg:text-5xl">
-							Earn With InfinityBio Labs
+							Earn With Infinity BioLabs
 						</h1>
 						<p className="mt-6 text-lg leading-relaxed text-muted-foreground">
 							Partner with us and earn commissions promoting pharmaceutical-grade research peptides. Whether
