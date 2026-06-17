@@ -1,3 +1,4 @@
+ 
 import type { DocumentTypeDecoration } from "@graphql-typed-document-node/core";
 export type Maybe<T> = T | null;
 export type InputMaybe<T> = T | null | undefined;
@@ -314,6 +315,7 @@ export enum AccountErrorCode {
 	DeleteStaffAccount = "DELETE_STAFF_ACCOUNT",
 	DeleteSuperuserAccount = "DELETE_SUPERUSER_ACCOUNT",
 	DuplicatedInputItem = "DUPLICATED_INPUT_ITEM",
+	FileSizeLimitExceeded = "FILE_SIZE_LIMIT_EXCEEDED",
 	GraphqlError = "GRAPHQL_ERROR",
 	Inactive = "INACTIVE",
 	Invalid = "INVALID",
@@ -5928,6 +5930,7 @@ export type CollectionError = {
 export enum CollectionErrorCode {
 	CannotManageProductWithoutVariant = "CANNOT_MANAGE_PRODUCT_WITHOUT_VARIANT",
 	DuplicatedInputItem = "DUPLICATED_INPUT_ITEM",
+	FileSizeLimitExceeded = "FILE_SIZE_LIMIT_EXCEEDED",
 	GraphqlError = "GRAPHQL_ERROR",
 	Invalid = "INVALID",
 	NotFound = "NOT_FOUND",
@@ -19619,7 +19622,10 @@ export type Payment = Node &
 		modified: Scalars["DateTime"]["output"];
 		/** Order associated with a payment. */
 		order?: Maybe<Order>;
-		/** Informs whether this is a partial payment. */
+		/**
+		 * Informs whether this is a partial payment.
+		 * @deprecated This field is reserved for the Adyen Gateway plugin. For other gateways, its value is always `false`. This field will be removed in 3.23 along with the plugin.
+		 */
 		partial: Scalars["Boolean"]["output"];
 		/** Type of method used for payment. */
 		paymentMethodType: Scalars["String"]["output"];
@@ -21089,6 +21095,7 @@ export enum ProductBulkCreateErrorCode {
 	AttributeVariantsDisabled = "ATTRIBUTE_VARIANTS_DISABLED",
 	Blank = "BLANK",
 	DuplicatedInputItem = "DUPLICATED_INPUT_ITEM",
+	FileSizeLimitExceeded = "FILE_SIZE_LIMIT_EXCEEDED",
 	GraphqlError = "GRAPHQL_ERROR",
 	Invalid = "INVALID",
 	InvalidPrice = "INVALID_PRICE",
@@ -21523,6 +21530,7 @@ export enum ProductErrorCode {
 	AttributeVariantsDisabled = "ATTRIBUTE_VARIANTS_DISABLED",
 	CannotManageProductWithoutVariant = "CANNOT_MANAGE_PRODUCT_WITHOUT_VARIANT",
 	DuplicatedInputItem = "DUPLICATED_INPUT_ITEM",
+	FileSizeLimitExceeded = "FILE_SIZE_LIMIT_EXCEEDED",
 	GraphqlError = "GRAPHQL_ERROR",
 	Invalid = "INVALID",
 	InvalidFileType = "INVALID_FILE_TYPE",
@@ -23055,6 +23063,31 @@ export type ProductVariantDeleted = Event & {
 /** Event sent when product variant is deleted. */
 export type ProductVariantDeletedProductVariantArgs = {
 	channel?: InputMaybe<Scalars["String"]["input"]>;
+};
+
+/**
+ * Event sent when product variant discounted price is recalculated.
+ *
+ * Added in Saleor 3.22.
+ */
+export type ProductVariantDiscountedPriceUpdated = Event & {
+	__typename?: "ProductVariantDiscountedPriceUpdated";
+	/** The channel where the price changed. */
+	channel: Channel;
+	/** Time of the event. */
+	issuedAt?: Maybe<Scalars["DateTime"]["output"]>;
+	/** The user or application that triggered the event. */
+	issuingPrincipal?: Maybe<IssuingPrincipal>;
+	/** The new discounted price. */
+	newPrice: Money;
+	/** The previous discounted price. */
+	previousPrice: Money;
+	/** The product variant the event relates to. */
+	productVariant: ProductVariant;
+	/** The application receiving the webhook. */
+	recipient?: Maybe<App>;
+	/** Saleor version that triggered the event. */
+	version?: Maybe<Scalars["String"]["output"]>;
 };
 
 export type ProductVariantFilterInput = {
@@ -28265,6 +28298,14 @@ export type Subscription = {
 	 * Note: this API is currently in Feature Preview and can be subject to changes at later point.
 	 */
 	orderUpdated?: Maybe<OrderUpdated>;
+	/**
+	 * Event sent when product variant discounted price is recalculated.
+	 *
+	 * Added in Saleor 3.22.
+	 *
+	 * Note: this API is currently in Feature Preview and can be subject to changes at later point.
+	 */
+	productVariantDiscountedPriceUpdated?: Maybe<ProductVariantDiscountedPriceUpdated>;
 };
 
 export type SubscriptionCheckoutCreatedArgs = {
@@ -28344,6 +28385,10 @@ export type SubscriptionOrderRefundedArgs = {
 };
 
 export type SubscriptionOrderUpdatedArgs = {
+	channels?: InputMaybe<Array<Scalars["String"]["input"]>>;
+};
+
+export type SubscriptionProductVariantDiscountedPriceUpdatedArgs = {
 	channels?: InputMaybe<Array<Scalars["String"]["input"]>>;
 };
 
@@ -31826,6 +31871,7 @@ export enum WebhookEventTypeAsyncEnum {
 	ProductVariantCreated = "PRODUCT_VARIANT_CREATED",
 	/** A product variant is deleted. Warning: this event will not be executed when parent product has been deleted. Check PRODUCT_DELETED. */
 	ProductVariantDeleted = "PRODUCT_VARIANT_DELETED",
+	ProductVariantDiscountedPriceUpdated = "PRODUCT_VARIANT_DISCOUNTED_PRICE_UPDATED",
 	/** A product variant metadata is updated. */
 	ProductVariantMetadataUpdated = "PRODUCT_VARIANT_METADATA_UPDATED",
 	/** A product variant is out of stock. */
@@ -32158,6 +32204,7 @@ export enum WebhookEventTypeEnum {
 	ProductVariantCreated = "PRODUCT_VARIANT_CREATED",
 	/** A product variant is deleted. Warning: this event will not be executed when parent product has been deleted. Check PRODUCT_DELETED. */
 	ProductVariantDeleted = "PRODUCT_VARIANT_DELETED",
+	ProductVariantDiscountedPriceUpdated = "PRODUCT_VARIANT_DISCOUNTED_PRICE_UPDATED",
 	/** A product variant metadata is updated. */
 	ProductVariantMetadataUpdated = "PRODUCT_VARIANT_METADATA_UPDATED",
 	/** A product variant is out of stock. */
@@ -32401,6 +32448,7 @@ export enum WebhookSampleEventTypeEnum {
 	ProductVariantBackInStock = "PRODUCT_VARIANT_BACK_IN_STOCK",
 	ProductVariantCreated = "PRODUCT_VARIANT_CREATED",
 	ProductVariantDeleted = "PRODUCT_VARIANT_DELETED",
+	ProductVariantDiscountedPriceUpdated = "PRODUCT_VARIANT_DISCOUNTED_PRICE_UPDATED",
 	ProductVariantMetadataUpdated = "PRODUCT_VARIANT_METADATA_UPDATED",
 	ProductVariantOutOfStock = "PRODUCT_VARIANT_OUT_OF_STOCK",
 	ProductVariantStockUpdated = "PRODUCT_VARIANT_STOCK_UPDATED",
@@ -32933,6 +32981,10 @@ export type CheckoutFindQuery = {
 				}>;
 			};
 		}>;
+		subtotalPrice: {
+			__typename?: "TaxedMoney";
+			gross: { __typename?: "Money"; amount: number; currency: string };
+		};
 		totalPrice: {
 			__typename?: "TaxedMoney";
 			gross: { __typename?: "Money"; amount: number; currency: string };
@@ -34502,7 +34554,10 @@ export const ChannelsListDocument = new TypedDocumentString(`
     `) as unknown as TypedDocumentString<ChannelsListQuery, ChannelsListQueryVariables>;
 export const CheckoutAddLineDocument = new TypedDocumentString(`
     mutation CheckoutAddLine($id: ID!, $productVariantId: ID!, $quantity: Int = 1) {
-  checkoutLinesAdd(id: $id, lines: [{quantity: $quantity, variantId: $productVariantId}]) {
+  checkoutLinesAdd(
+    id: $id
+    lines: [{quantity: $quantity, variantId: $productVariantId}]
+  ) {
     checkout {
       id
       lines {
@@ -34658,6 +34713,12 @@ export const CheckoutFindDocument = new TypedDocumentString(`
             value
           }
         }
+      }
+    }
+    subtotalPrice {
+      gross {
+        amount
+        currency
       }
     }
     totalPrice {

@@ -116,7 +116,10 @@ export interface RecommendedProduct {
 interface CartDrawerProps {
 	checkoutId: string | null;
 	lines: CartLine[];
-	totalPrice: {
+	// Product subtotal (pre-shipping). The free-shipping threshold must be measured
+	// against this, NOT the checkout total — once a paid shipping method is attached,
+	// totalPrice includes it and would falsely trip the threshold.
+	subtotalPrice: {
 		gross: {
 			amount: number;
 			currency: string;
@@ -126,13 +129,13 @@ interface CartDrawerProps {
 	recommendations: RecommendedProduct[];
 }
 
-export function CartDrawer({ checkoutId, lines, totalPrice, channel, recommendations }: CartDrawerProps) {
+export function CartDrawer({ checkoutId, lines, subtotalPrice, channel, recommendations }: CartDrawerProps) {
 	const { isOpen, closeCart } = useCart();
 	const [isPending, startTransition] = useTransition();
 
 	const itemCount = lines.reduce((sum, line) => sum + line.quantity, 0);
-	const subtotal = totalPrice?.gross.amount ?? 0;
-	const currency = totalPrice?.gross.currency ?? localeConfig.fallbackCurrency;
+	const subtotal = subtotalPrice?.gross.amount ?? 0;
+	const currency = subtotalPrice?.gross.currency ?? localeConfig.fallbackCurrency;
 
 	const handleRemove = (lineId: string) => {
 		if (!checkoutId) return;

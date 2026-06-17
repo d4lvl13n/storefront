@@ -20,7 +20,7 @@ export async function CartDrawerWrapper({ channel }: CartDrawerWrapperProps) {
 		<CartDrawer
 			checkoutId={checkoutId || null}
 			lines={checkout?.lines ?? []}
-			totalPrice={checkout?.totalPrice ?? null}
+			subtotalPrice={checkout?.subtotalPrice ?? null}
 			channel={channel}
 			recommendations={recommendations}
 		/>
