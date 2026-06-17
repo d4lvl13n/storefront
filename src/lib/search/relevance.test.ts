@@ -1,6 +1,6 @@
 import { describe, it, expect } from "vitest";
 
-import { scoreProduct, rankByRelevance } from "./relevance";
+import { scoreProduct, rankByRelevance, matchesQuery } from "./relevance";
 
 describe("scoreProduct", () => {
 	it("scores an exact name match highest", () => {
@@ -24,6 +24,29 @@ describe("scoreProduct", () => {
 
 	it("returns 0 with no terms", () => {
 		expect(scoreProduct({ name: "BPC-157" }, [])).toBe(0);
+	});
+});
+
+describe("matchesQuery", () => {
+	// The reported bug: typing a prefix returned "No matches" because Saleor's
+	// whole-word search found nothing and nothing reached the ranker.
+	it("matches a word prefix (ipamor → Ipamorelin)", () => {
+		expect(matchesQuery({ name: "IPAMORELIN" }, ["ipamor"])).toBe(true);
+		expect(matchesQuery({ name: "CJC-1295 + IPAMORELIN" }, ["ipamor"])).toBe(true);
+	});
+
+	it("matches whole query as a substring and per-term substrings", () => {
+		expect(matchesQuery({ name: "BPC-157 + TB-500" }, ["tb-500"])).toBe(true);
+		expect(matchesQuery({ name: "Semaglutide" }, ["sema"])).toBe(true);
+	});
+
+	it("matches on category", () => {
+		expect(matchesQuery({ name: "GHK-CU", categoryName: "Healing & Repair" }, ["healing"])).toBe(true);
+	});
+
+	it("does not match unrelated terms or empty input", () => {
+		expect(matchesQuery({ name: "IPAMORELIN" }, ["semaglutide"])).toBe(false);
+		expect(matchesQuery({ name: "IPAMORELIN" }, [])).toBe(false);
 	});
 });
 

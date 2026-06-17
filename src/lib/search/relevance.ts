@@ -77,6 +77,28 @@ export function scoreProduct(product: Scorable, terms: string[]): number {
 }
 
 /**
+ * Does the product genuinely match the query? This is the match test WITHOUT the
+ * brevity bonus that `scoreProduct` always adds (which makes its score non-zero
+ * even for non-matches). Use this to filter a full-catalog scan down to real hits
+ * when Saleor's whole-word full-text search returns nothing — e.g. a word prefix
+ * like "ipamor" → "Ipamorelin".
+ */
+export function matchesQuery(product: Scorable, terms: string[]): boolean {
+	const cleanedTerms = terms.map((t) => t.toLowerCase()).filter(Boolean);
+	if (cleanedTerms.length === 0) return false;
+
+	const name = product.name.toLowerCase();
+	const category = (product.categoryName ?? "").toLowerCase();
+	const fullQuery = cleanedTerms.join(" ");
+	const nameWords = name.split(WORD_SPLIT).filter(Boolean);
+
+	if (name.includes(fullQuery)) return true;
+	return cleanedTerms.some(
+		(term) => nameWords.some((w) => w.startsWith(term)) || name.includes(term) || category.includes(term),
+	);
+}
+
+/**
  * Stable-sort products by descending relevance score. Ties preserve the input
  * order (which the caller fixes deterministically, e.g. Saleor `NAME asc`).
  */

@@ -19,7 +19,7 @@ import { SearchProductsDocument, OrderDirection, ProductOrderField } from "@/gql
 import type { SearchProduct, SearchResult, SearchPagination, SearchCorrection } from "./types";
 import { localeConfig } from "@/config/locale";
 import { expandQuery, fuzzyCorrectQuery, tokenize } from "./query-expansion";
-import { rankByRelevance } from "./relevance";
+import { rankByRelevance, matchesQuery } from "./relevance";
 
 interface SearchOptions {
 	query: string;
@@ -104,6 +104,25 @@ function toSearchProduct(node: {
 		currency: node.pricing?.priceRange?.start?.gross.currency ?? localeConfig.fallbackCurrency,
 		categoryName: node.category?.name,
 	};
+}
+
+/**
+ * Full-catalog fallback for queries Saleor's whole-word full-text search can't
+ * match — most commonly a word PREFIX ("ipamor" → "Ipamorelin"), which Saleor's
+ * Postgres search returns nothing for. The catalog is small, so we pull it in one
+ * (cached) name-ordered request and keep only genuine matches, using the same
+ * matcher the relevance ranker trusts. Caller still ranks/slices the result.
+ */
+async function catalogFallback(channel: string, terms: string[]): Promise<SearchProduct[]> {
+	if (terms.length === 0) return [];
+	const catalog = await fetchPage({
+		search: "", // empty search = whole catalog
+		channel,
+		field: ProductOrderField.Name,
+		order: OrderDirection.Asc,
+		first: RELEVANCE_WINDOW,
+	});
+	return catalog.products.filter((product) => matchesQuery(product, terms));
 }
 
 /**
@@ -205,6 +224,15 @@ async function relevanceSearch(args: {
 		}
 	}
 
+	// Prefix/substring fallback: Saleor matches whole words only, so "ipamor"
+	// returns nothing. Scan the small catalog for real matches before ranking.
+	if (window.totalCount === 0) {
+		const fallback = await catalogFallback(channel, scoringTerms);
+		if (fallback.length > 0) {
+			window = { products: fallback, totalCount: fallback.length, pageInfo: null };
+		}
+	}
+
 	const ranked = rankByRelevance(window.products, scoringTerms);
 	const pageItems = ranked.slice(offset, offset + limit);
 	const rankedCount = ranked.length;
@@ -258,6 +286,15 @@ export async function suggestProducts(options: {
 				correction = { original: query, searchedFor: corrected, didYouMean: corrected };
 				scoringTerms = tokenize(corrected);
 			}
+		}
+	}
+
+	// Prefix/substring fallback (e.g. "ipamor" → "Ipamorelin"): Saleor's
+	// full-text search matches whole words only, so scan the small catalog.
+	if (window.totalCount === 0) {
+		const fallback = await catalogFallback(channel, scoringTerms);
+		if (fallback.length > 0) {
+			window = { products: fallback, totalCount: fallback.length, pageInfo: null };
 		}
 	}
 
