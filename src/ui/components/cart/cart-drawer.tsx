@@ -13,6 +13,7 @@ import { AddToCartForm } from "@/ui/components/pdp/add-to-cart-form";
 import { cn } from "@/lib/utils";
 import { formatMoney } from "@/lib/utils";
 import { localeConfig } from "@/config/locale";
+import { shippingConfig } from "@/config/brand";
 import { hasDiscount } from "@/lib/pricing";
 
 interface CartLine {
@@ -147,7 +148,7 @@ export function CartDrawer({ checkoutId, lines, totalPrice, channel, recommendat
 		});
 	};
 
-	const freeShippingThreshold = 150;
+	const freeShippingThreshold = shippingConfig.freeShippingThreshold;
 	const progressToFreeShipping = Math.min((subtotal / freeShippingThreshold) * 100, 100);
 	const amountToFreeShipping = Math.max(freeShippingThreshold - subtotal, 0);
 

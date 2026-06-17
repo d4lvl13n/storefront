@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { cn } from "@/lib/utils";
+import { freeShippingThresholdLabel } from "@/config/brand";
 
 const faqItems = [
 	{
@@ -10,7 +11,7 @@ const faqItems = [
 	},
 	{
 		q: "How are your products shipped and stored?",
-		a: "Lyophilized peptides are shipped in temperature-controlled packaging with cold packs to maintain stability. We recommend storing at -4°F protected from light and moisture. After reconstitution, store at 36-46°F and use within the timeframe specified on each product's COA.",
+		a: `Shipping is free on all orders over ${freeShippingThresholdLabel}. Lyophilized peptides are shipped in temperature-controlled packaging with cold packs to maintain stability. We recommend storing at -4°F protected from light and moisture. After reconstitution, store at 36-46°F and use within the timeframe specified on each product's COA.`,
 	},
 	{
 		q: "Are your products intended for human use?",

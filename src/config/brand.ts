@@ -51,6 +51,17 @@ export const brandConfig = {
 } as const;
 
 /**
+ * Shipping configuration.
+ */
+export const shippingConfig = {
+	/** Order subtotal (USD) at or above which shipping is free */
+	freeShippingThreshold: 150,
+} as const;
+
+/** "$150" — the free-shipping threshold formatted for display copy. */
+export const freeShippingThresholdLabel = `$${shippingConfig.freeShippingThreshold}`;
+
+/**
  * Helper to format page title using brand template.
  */
 export function formatPageTitle(title: string): string {

@@ -14,6 +14,7 @@ import {
 	type ProductDetailsQuery,
 } from "@/gql/graphql";
 import { buildPageMetadata, buildProductJsonLd, buildFaqJsonLd, buildBreadcrumbJsonLd } from "@/lib/seo";
+import { freeShippingThresholdLabel } from "@/config/brand";
 import { formatMoney } from "@/lib/utils";
 import { Breadcrumbs } from "@/ui/components/breadcrumbs";
 import { Reveal } from "@/ui/components/reveal";
@@ -172,8 +173,7 @@ async function ProductContent({
 			: []),
 		{
 			question: "How is it shipped?",
-			answer:
-				"Free shipping on orders over $150. Standard delivery 3–7 business days, shipped in temperature-controlled packaging to maintain stability.",
+			answer: `Free shipping on orders over ${freeShippingThresholdLabel}. Standard delivery 3–7 business days, shipped in temperature-controlled packaging to maintain stability.`,
 		},
 	];
 
@@ -543,7 +543,7 @@ function buildDescriptionFallback(
 		parts.push(`from ${formatted}`);
 	}
 
-	parts.push("– COA included, free shipping over $150");
+	parts.push(`– COA included, free shipping over ${freeShippingThresholdLabel}`);
 
 	return parts.join(" · ").slice(0, 160);
 }

@@ -5,6 +5,7 @@ import { useFormStatus } from "react-dom";
 import { Minus, Plus, ShoppingBag } from "lucide-react";
 import { Button } from "@/ui/components/ui/button";
 import { cn } from "@/lib/utils";
+import { freeShippingThresholdLabel } from "@/config/brand";
 
 interface AddToCartProps {
 	disabled?: boolean;
@@ -113,7 +114,7 @@ export function AddToCart({ disabled = false, disabledReason, lockQuantity = fal
 						<path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2V9z" />
 						<path d="M9 22V12h6v10" />
 					</svg>
-					Free delivery over $150
+					Free delivery over {freeShippingThresholdLabel}
 				</span>
 			</div>
 		</div>

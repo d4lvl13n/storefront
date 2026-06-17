@@ -6,6 +6,7 @@ import * as Checkout from "@/lib/checkout";
 import { formatMoney, getHrefForVariant } from "@/lib/utils";
 import { LinkWithChannel } from "@/ui/atoms/link-with-channel";
 import { noIndexRobots } from "@/lib/seo";
+import { freeShippingThresholdLabel } from "@/config/brand";
 
 export const metadata = {
 	title: "Shopping Cart | InfinityBio Labs",
@@ -105,7 +106,7 @@ async function CartContent({ params: paramsPromise }: { params: Promise<{ channe
 						<div>
 							<p className="font-semibold text-foreground">Your Total</p>
 							<p className="mt-1 text-sm text-muted-foreground">
-								Shipping will be calculated in the next step
+								Free shipping on orders over {freeShippingThresholdLabel} — calculated at checkout
 							</p>
 						</div>
 						<div className="text-lg font-semibold tabular-nums text-foreground">

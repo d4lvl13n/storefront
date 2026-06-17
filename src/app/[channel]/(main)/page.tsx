@@ -11,6 +11,7 @@ import { HowOrderingWorks } from "@/ui/components/how-ordering-works";
 import { VerifiedStoryCard } from "@/ui/components/verified-story-card";
 import { ShopGoalCard } from "@/ui/components/shop-goal-card";
 import { NewsletterForm } from "@/ui/components/newsletter-form";
+import { freeShippingThresholdLabel } from "@/config/brand";
 
 export const metadata = {
 	title: { absolute: "InfinityBio Labs — Research Peptides, 99%+ Purity" },
@@ -206,7 +207,7 @@ function getCategoryDescription(slug: string) {
 const trustItems = [
 	{ label: "HPLC Purity Verified", icon: IconShield },
 	{ label: "Third-Party Lab Tested", icon: IconFlask },
-	{ label: "Free Shipping Over $150", icon: IconTruck },
+	{ label: `Free Shipping Over ${freeShippingThresholdLabel}`, icon: IconTruck },
 	{ label: "Certificate of Analysis", icon: IconCertificate },
 	{ label: "Secure Encrypted Checkout", icon: IconLock },
 	{ label: "Same-Day Processing", icon: IconMolecule },
@@ -448,7 +449,7 @@ function GuaranteeStrip() {
 		},
 		{
 			icon: IconShield,
-			title: "Free shipping $150+",
+			title: `Free shipping ${freeShippingThresholdLabel}+`,
 			subtitle: "Insured, tracked U.S. delivery",
 		},
 		{
