@@ -3,9 +3,10 @@
 import type React from "react";
 import Link from "next/link";
 import Image from "next/image";
-import { Plus } from "lucide-react";
+import { Plus, ShieldCheck } from "lucide-react";
 import { Button } from "@/ui/components/ui/button";
 import { Badge } from "@/ui/components/ui/badge";
+import { LinkWithChannel } from "@/ui/atoms/link-with-channel";
 import { cn } from "@/lib/utils";
 
 export interface ProductCardData {
@@ -43,9 +44,11 @@ export interface ProductCardData {
 interface ProductCardProps {
 	product: ProductCardData;
 	priority?: boolean;
+	/** Render a "View COA" link under the card (batch documentation picker) */
+	showCoaLink?: boolean;
 }
 
-export function ProductCard({ product, priority = false }: ProductCardProps) {
+export function ProductCard({ product, priority = false, showCoaLink = false }: ProductCardProps) {
 	const canQuickAdd = !product.hasVariants && product.onQuickAdd;
 
 	const handleQuickAdd = (e: React.MouseEvent) => {
@@ -193,6 +196,16 @@ export function ProductCard({ product, priority = false }: ProductCardProps) {
 					</div>
 				</div>
 			</Link>
+
+			{showCoaLink && (
+				<LinkWithChannel
+					href="/coa/find"
+					className="bg-card/40 mt-2 inline-flex w-full items-center justify-center gap-1.5 rounded-lg border border-border px-3 py-2 text-xs font-medium text-muted-foreground transition-colors hover:border-emerald-500/40 hover:text-emerald-400"
+				>
+					<ShieldCheck className="h-3.5 w-3.5" />
+					View COA
+				</LinkWithChannel>
+			)}
 		</article>
 	);
 }

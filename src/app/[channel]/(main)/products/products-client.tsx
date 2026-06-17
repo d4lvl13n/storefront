@@ -85,7 +85,7 @@ export function ProductsPageClient({
 			/>
 			<div className="mx-auto max-w-7xl px-4 py-10 sm:px-6 sm:py-12 lg:px-8">
 				{filteredProducts.length > 0 ? (
-					<ProductGrid products={filteredProducts} />
+					<ProductGrid products={filteredProducts} showCoaLink />
 				) : (
 					<div className="py-20 text-center">
 						<p className="text-lg text-muted-foreground">No products match your filters.</p>
