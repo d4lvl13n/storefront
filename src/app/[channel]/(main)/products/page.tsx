@@ -5,8 +5,14 @@ import { ProductListDocument, ProductListPaginatedDocument } from "@/gql/graphql
 import { executePublicGraphQL } from "@/lib/graphql";
 import { getPaginatedListVariables } from "@/lib/utils";
 import { CategoryHero, transformToProductCard } from "@/ui/components/plp";
-import { buildSortVariables, buildFilterVariables } from "@/ui/components/plp/filter-utils";
+import {
+	buildSortVariables,
+	buildFilterVariables,
+	applyPinnedLead,
+	paginateInMemory,
+} from "@/ui/components/plp/filter-utils";
 import { resolveCategorySlugsToIds } from "@/ui/components/plp/filter-utils.server";
+import { ProductsPerPage } from "@/app/config";
 import { ProductsPageClient } from "./products-client";
 
 export const metadata = {
@@ -88,6 +94,43 @@ async function ProductsContent({
 		priceRange: searchParams.price,
 		categoryIds,
 	});
+
+	// Default ("featured") view = no explicit sort, price, or category filter.
+	// Curate the order (GLP-1/2/3 lead) over the full catalog and paginate in
+	// memory so the pins lead regardless of their bestselling rank. Filtered or
+	// explicitly-sorted views keep Saleor's native cursor pagination.
+	const isDefaultView = !searchParams.sort && !searchParams.price && categorySlugs.length === 0;
+
+	if (isDefaultView) {
+		const all = await executePublicGraphQL(ProductListPaginatedDocument, {
+			variables: { first: 100, channel: params.channel, sortBy },
+			revalidate: 300,
+		});
+		if (!all.ok) {
+			throw new Error(`Products query failed: ${all.error.message}`);
+		}
+		if (!all.data.products) {
+			notFound();
+		}
+		const ordered = applyPinnedLead(
+			all.data.products.edges.map((e) => transformToProductCard(e.node, params.channel)),
+		);
+		const cursor = Array.isArray(searchParams.cursor) ? searchParams.cursor[0] : searchParams.cursor;
+		const { items, pageInfo, totalCount } = paginateInMemory(ordered, cursor, ProductsPerPage);
+		const productOptions = all.data.products.edges
+			.map((e) => ({ name: e.node.name, href: `/${params.channel}/products/${e.node.slug}` }))
+			.sort((a, b) => a.name.localeCompare(b.name));
+
+		return (
+			<ProductsPageClient
+				products={items}
+				productOptions={productOptions}
+				pageInfo={pageInfo}
+				totalCount={totalCount}
+				resolvedCategories={[]}
+			/>
+		);
+	}
 
 	const [result, allProductsResult] = await Promise.all([
 		executePublicGraphQL(ProductListPaginatedDocument, {
