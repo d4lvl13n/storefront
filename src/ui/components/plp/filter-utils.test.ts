@@ -17,6 +17,7 @@ import {
 	STATIC_PRICE_RANGES,
 	STATIC_PRICE_RANGES_WITH_COUNT,
 	applyPinnedLead,
+	applyPinnedTrail,
 	paginateInMemory,
 } from "./filter-utils";
 import {
@@ -409,6 +410,32 @@ describe("applyPinnedLead", () => {
 	it("is a no-op when no pinned products are present", () => {
 		const input = [p("a"), p("b")];
 		expect(applyPinnedLead(input)).toEqual(input);
+	});
+});
+
+describe("applyPinnedTrail", () => {
+	const p = (slug: string) => ({ slug });
+
+	it("sinks trailed products to the end in PINNED_TRAIL_SLUGS order", () => {
+		const input = [p("oxytocin"), p("bpc-157"), p("kpv"), p("glp-1"), p("aod-9604")];
+		expect(applyPinnedTrail(input).map((x) => x.slug)).toEqual([
+			"bpc-157",
+			"glp-1",
+			"aod-9604",
+			"kpv",
+			"oxytocin",
+		]);
+	});
+
+	it("composes with applyPinnedLead: leads first, trails last, middle preserved", () => {
+		const input = [p("kpv"), p("glp-2"), p("bpc-157"), p("glp-1"), p("oxytocin"), p("tb-500")];
+		const ordered = applyPinnedTrail(applyPinnedLead(input));
+		expect(ordered.map((x) => x.slug)).toEqual(["glp-1", "glp-2", "bpc-157", "tb-500", "kpv", "oxytocin"]);
+	});
+
+	it("is a no-op when no trailed products are present", () => {
+		const input = [p("a"), p("b")];
+		expect(applyPinnedTrail(input)).toEqual(input);
 	});
 });
 

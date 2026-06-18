@@ -9,6 +9,7 @@ import {
 	buildSortVariables,
 	buildFilterVariables,
 	applyPinnedLead,
+	applyPinnedTrail,
 	paginateInMemory,
 } from "@/ui/components/plp/filter-utils";
 import { resolveCategorySlugsToIds } from "@/ui/components/plp/filter-utils.server";
@@ -112,8 +113,8 @@ async function ProductsContent({
 		if (!all.data.products) {
 			notFound();
 		}
-		const ordered = applyPinnedLead(
-			all.data.products.edges.map((e) => transformToProductCard(e.node, params.channel)),
+		const ordered = applyPinnedTrail(
+			applyPinnedLead(all.data.products.edges.map((e) => transformToProductCard(e.node, params.channel))),
 		);
 		const cursor = Array.isArray(searchParams.cursor) ? searchParams.cursor[0] : searchParams.cursor;
 		const { items, pageInfo, totalCount } = paginateInMemory(ordered, cursor, ProductsPerPage);

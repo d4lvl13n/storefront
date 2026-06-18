@@ -10,6 +10,7 @@ import {
 	buildSortVariables,
 	buildFilterVariables,
 	applyPinnedLead,
+	applyPinnedTrail,
 	paginateInMemory,
 } from "@/ui/components/plp/filter-utils";
 import { ProductsPerPage } from "@/app/config";
@@ -131,8 +132,8 @@ async function CategoryProducts({
 			notFound();
 		}
 
-		const ordered = applyPinnedLead(
-			allProducts.edges.map((e) => transformToProductCard(e.node, params.channel)),
+		const ordered = applyPinnedTrail(
+			applyPinnedLead(allProducts.edges.map((e) => transformToProductCard(e.node, params.channel))),
 		);
 		const { items, pageInfo, totalCount } = paginateInMemory(ordered, searchParams.cursor, ProductsPerPage);
 
